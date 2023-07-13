@@ -2,6 +2,6 @@
 
 public interface IAppApi
 {
-    public SymptomHistory<Symptom> LoadSymptomsHistory();
-    public void SaveSymptomsHistory();
+    public Task<IEnumerable<Symptom>> LoadSymptomsHistory(User user);
+    public Task SaveSymptomsHistory();
 }

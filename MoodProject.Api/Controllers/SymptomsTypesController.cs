@@ -1,22 +1,34 @@
 ﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using MoodProject.Core;
 
 namespace MoodProject.Api.Controllers;
 
 [ApiController]
-[Route("[controller]")]
-[EnableCors("dev")]
+[Route("api/[controller]/[action]/")]
+[EnableCors()]
 public class SymptomsTypesController
 {
-    [HttpGet(Name = "GetSymptomsTypes")]
-    public IEnumerable<SymptomType> GetAll()
+    [HttpGet]
+    public IEnumerable<SymptomType> GetSymptomsTypes()
     {
-        return new List<SymptomType>()
+        using (var context = new MoodProjectContext())
         {
-            new SymptomType(0, "Symptome 1"),
-            new SymptomType(1, "Symptome 2"),
-            new SymptomType(2, "Symptome 3")
-        };
+            var types = context.SymptomTypes.ToList();
+            return types;
+        }
+    }
+
+    [HttpGet]
+    public IResult AddSymptomType(string name)
+    {
+        using (var context = new MoodProjectContext())
+        {
+            var symptomType = new SymptomType(0, name);
+            context.SymptomTypes.Add(symptomType);
+            context.SaveChanges();
+        }
+        return Results.Ok();
     }
 }

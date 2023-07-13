@@ -2,11 +2,21 @@
 
 public class FactorValue
 {
-    public DateTime Timestamp { get; init; }
-    public float Value { get; init; }
+    public int Id { get; set; }
+    public int SymptomId { get; set; }
+    public FactorType Type { get; set; }
+    public Symptom Symptom { get; set; }
+    public DateTime Timestamp { get; set; }
+    public float Value { get; set; }
 
-    public FactorValue(DateTime timestamp, float value)
+    public FactorValue()
     {
+        
+    }
+
+    public FactorValue(Symptom symptom, DateTime timestamp, float value)
+    {
+        Symptom = symptom;
         Timestamp = timestamp;
         Value = value;
     }

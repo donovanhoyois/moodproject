@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using MoodProject.Api;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -16,6 +19,11 @@ builder.Services.AddCors(c => c.AddPolicy("dev", builder =>
         .AllowAnyHeader();
 }));
     
+// MySQL
+var connectionString = "datasource=127.0.0.1;port=3306;username=root;password=;database=moodproject;";
+var version = new MySqlServerVersion(new Version(10, 4, 11));
+builder.Services.AddDbContext<MoodProjectContext>();
+
 
 var app = builder.Build();
 

@@ -2,8 +2,7 @@
 
 public interface ISymptomsFormService
 {
-    public SymptomHistory<Symptom> RetrieveHistory();
+    public Task<IEnumerable<Symptom>> RetrieveHistory(User user);
     public void SaveHistory();
     public bool NeedsToBeGenerated();
-    public SymptomsForm Generate();
 }

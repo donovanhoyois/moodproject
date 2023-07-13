@@ -14,6 +14,6 @@ public class SymptomsTypesService : ISymptomsTypesService
     }
     public async Task<IEnumerable<SymptomType>> GetAll()
     {
-        return await ApiClient.GetFromJsonAsync<IEnumerable<SymptomType>>("SymptomsTypes");
+        return await ApiClient.GetFromJsonAsync<IEnumerable<SymptomType>>("SymptomsTypes/GetSymptomsTypes");
     }
 }

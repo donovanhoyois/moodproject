@@ -2,14 +2,20 @@
 
 public class Symptom
 {
-    public string Name { get; set; }
-    public Factor PresenceFactor { get; set; }
-    public Factor HarmfulnessFactor { get; set; }
+    public int Id { get; set; }
+    public int UserId { get; set; }
+    public SymptomType Type { get; set; }
+    public int TypeId { get; set; }
+    public IEnumerable<FactorValue> ValuesHistory { get; set; }
 
-    public Symptom(string name, Factor presenceFactor, Factor harmfulnessFactor)
+    public Symptom()
     {
-        Name = name;
-        PresenceFactor = presenceFactor;
-        HarmfulnessFactor = harmfulnessFactor;
+        
+    }
+
+    public Symptom(SymptomType type, IEnumerable<FactorValue> valuesHistory)
+    {
+        Type = type;
+        ValuesHistory = valuesHistory;
     }
 }

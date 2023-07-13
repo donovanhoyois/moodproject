@@ -1,0 +1,30 @@
+﻿@page "/Profile"
+@using MoodProject.Core
+@using MoodProject.Core.Ports.In
+@inject ISymptomsTypesService typesService
+
+<AuthorizeView>
+    <Authorized>
+        <h3>Profil</h3>
+        <p>@context.User</p>
+        <div>
+            <h4>Vos symptomes</h4>
+            <p>Vous pouvez modifier les symptomes qui seront suivis à tout moment.</p>
+            <form>
+                @foreach (var type in symptomsTypes)
+                {
+                    <input type="checkbox" name="@type.Name">
+                }
+            </form>
+        </div>
+    </Authorized>
+</AuthorizeView>
+
+@code {
+    private IEnumerable<SymptomType> symptomsTypes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        symptomsTypes = await typesService.GetAll() ?? new List<SymptomType>();
+    }
+}
