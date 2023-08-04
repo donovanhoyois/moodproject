@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MoodProject.Core;
 
 namespace MoodProject.Api.Controllers;
@@ -9,12 +10,67 @@ namespace MoodProject.Api.Controllers;
 [EnableCors]
 public class SymptomsController
 {
-    [HttpGet]
+    private MoodProjectContext DbContext;
+    public SymptomsController(MoodProjectContext dbContext)
+    {
+        DbContext = dbContext;
+    }
+    [HttpGet(Name = "GetSymptoms")]
     public IEnumerable<Symptom> GetSymptoms(string userId)
     {
-        using (var context = new MoodProjectContext())
+        return DbContext.Symptoms.Where(symptom => symptom.UserId.Equals(userId) && !symptom.isDisabled).ToList();
+    }
+
+    [HttpPost]
+    public void UpdateSymptoms(IEnumerable<Symptom> newSymptoms)
+    {
+        var userId = newSymptoms.FirstOrDefault()?.UserId ?? string.Empty;
+        var cleanedSymptoms = new List<SymptomEntity>();
+
+        var existingSymptoms = DbContext.Symptoms.Where(s => s.UserId.Equals(userId));
+        
+        foreach (var symptomToInsert in newSymptoms)
         {
-            return context.Symptoms.Where(symptom => symptom.UserId.Equals(userId)).ToList();
+            var foundType = DbContext.SymptomTypes.First(type => type.Id.Equals(symptomToInsert.TypeId));
+            if (foundType != null)
+            {
+                symptomToInsert.Type = foundType;
+            }
+
+            var existingSymptom = existingSymptoms.FirstOrDefault(s =>
+                s.UserId.Equals(symptomToInsert.UserId) && s.TypeId.Equals(symptomToInsert.TypeId));
+            if (existingSymptom == null)
+            {
+                cleanedSymptoms.Add(symptomToInsert as SymptomEntity);
+            }
         }
+
+        // Disable old symptoms
+        foreach (var existingSymptom in existingSymptoms)
+        {
+            existingSymptom.isDisabled =
+                newSymptoms.FirstOrDefault(s => s.TypeId.Equals(existingSymptom.TypeId)) == null;
+        }
+        
+        DbContext.Symptoms.AddRange(cleanedSymptoms);
+        DbContext.SaveChanges();
+    }
+    
+    [HttpGet(Name = "GetSymptomsHistory")]
+    public IEnumerable<Symptom> GetSymptomsHistory(string userId)
+    {
+        return DbContext.Symptoms
+            .Include(symptom => symptom.Type)
+            .Include(symptom => symptom.ValuesHistory.OrderByDescending(value => value.Timestamp))
+            .Where(s => s.UserId.Equals(userId) && !s.isDisabled)
+            .ToList();
+    }
+
+    [HttpPost(Name = "UpdateSymptomsHistory")]
+    public bool UpdateSymptomsHistory(IEnumerable<FactorValue> values)
+    {
+        DbContext.FactorValues.AddRange(values);
+        var nbChanges = DbContext.SaveChanges();
+        return nbChanges > 0;
     }
 }

@@ -1,0 +1,27 @@
+﻿@using MoodProject.Core
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
+@code {
+    public string UserId { get; set; } = string.Empty;
+    
+    public async Task<string> GetUserId()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (UserId.Equals(string.Empty))
+        {
+            if (authState.User != null)
+            {
+                var sidString = authState.User.Claims.First(c => c.Type.Equals("sub")).Value;
+                UserId = sidString.Replace("auth0|", string.Empty);
+                Console.WriteLine($"sub found: {UserId}");
+                return UserId;
+            }
+        }
+        else
+        {
+            return UserId;
+        }
+        
+        return null;
+    }
+}

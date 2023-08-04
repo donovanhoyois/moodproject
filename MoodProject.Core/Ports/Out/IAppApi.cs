@@ -2,6 +2,9 @@
 
 public interface IAppApi
 {
-    public Task<IEnumerable<Symptom>> LoadSymptomsHistory(User user);
-    public Task SaveSymptomsHistory();
+    public Task<IEnumerable<SymptomType>> GetSymptomsTypes();
+    public Task<IEnumerable<Symptom>> GetSymptoms(string userId);
+    public Task<bool> SaveSymptoms(IEnumerable<Symptom> symptoms);
+    public Task<IEnumerable<Symptom>> GetSymptomsWithHistory(string userId);
+    public Task<bool> SaveSymptomsHistory(IEnumerable<FactorValue> values);
 }

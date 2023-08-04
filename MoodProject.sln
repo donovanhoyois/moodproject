@@ -8,6 +8,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoodProject.Api", "MoodProj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoodProject.App", "MoodProject.App\MoodProject.App.csproj", "{9A5DDB29-DE61-4924-B2D0-CE2BD4A43D9A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoodProject.Tests", "MoodProject.Tests\MoodProject.Tests.csproj", "{04A3CC42-4E2F-4B03-BF46-46ACE8BF0F46}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MoodProject.Console", "MoodProject.Console\MoodProject.Console.csproj", "{15DBD565-38AB-4470-A5E0-586572F04F19}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +34,13 @@ Global
 		{9A5DDB29-DE61-4924-B2D0-CE2BD4A43D9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9A5DDB29-DE61-4924-B2D0-CE2BD4A43D9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9A5DDB29-DE61-4924-B2D0-CE2BD4A43D9A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04A3CC42-4E2F-4B03-BF46-46ACE8BF0F46}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04A3CC42-4E2F-4B03-BF46-46ACE8BF0F46}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04A3CC42-4E2F-4B03-BF46-46ACE8BF0F46}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04A3CC42-4E2F-4B03-BF46-46ACE8BF0F46}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15DBD565-38AB-4470-A5E0-586572F04F19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15DBD565-38AB-4470-A5E0-586572F04F19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15DBD565-38AB-4470-A5E0-586572F04F19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15DBD565-38AB-4470-A5E0-586572F04F19}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

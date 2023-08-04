@@ -1,9 +1,95 @@
 ﻿@page "/quizz"
+@using MoodProject.Core.Ports.In
+@using MoodProject.Core
+@using MoodProject.App.Models
+
+@inject IQuizzService QuizzService
+
+@inherits MoodProject.App.Shared.Helpers.IdentityHelper
 
 <PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
+<AuthorizeView>
+    <Authorized>
+        <h3>Questionnaire</h3>
+        <div>
+            @if (!quizz.Questions.Any())
+            {
+                <p>@WaitMessage</p>
+            }
+            else
+            {
+                if (currentQuestion < quizz.Questions.Count())
+                {
+                    <div class="quizz-question">
+                        <div class="quizz-question-header">
+                            <p>@quizz.Questions[currentQuestion].Question</p>
+                            <p>@quizz.Questions[currentQuestion].Symptom.Type.Name</p>
+                        </div>
+                        <div class="quizz-question-main">
+                            <InputRadioGroup @bind-Value="quizz.Questions[currentQuestion].Result">
+                                @foreach (var answer in quizz.Questions[currentQuestion].AnswerPossibilities)
+                                {
+                                    <label>
+                                        <InputRadio Value="answer.Weight" />
+                                        <text>@answer.Text</text>
+                                    </label>
+                                }
+                            </InputRadioGroup>
+                            <div class="quizz-question-bottom">
+                                <button class="quizz-question-submit" onclick="@Confirm">Confirmer</button>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <p>Merci d'avoir répondu !</p>
+                }
+            }
+        </div>
+    </Authorized>
+</AuthorizeView>
 
-Welcome to your new app.
+@code{
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    private QuizzForm quizz = new QuizzForm(new List<QuizzQuestion>());
+    private int currentQuestion = 0;
+
+    private string WaitMessage { get; set; } = "Génération du questionnaire, veuillez patienter...";
+    
+    protected override async Task OnInitializedAsync()
+    {
+        var quizzQuestions = await QuizzService.Generate(await GetUserId());
+        if (quizzQuestions != null)
+        {
+            quizz = new QuizzForm(quizzQuestions);
+        }
+        else
+        {
+            WaitMessage = "Aucun questionnaire n'est diponible pour vous actuellement.";
+        }
+    }
+
+    private async Task Confirm()
+    {
+        Console.WriteLine(quizz.Questions[currentQuestion].Result);
+        currentQuestion++;
+        if (currentQuestion >= quizz.Questions.Count)
+        {
+            var valuesToSubmit = new List<FactorValue>();
+            foreach (var question in quizz.Questions)
+            {
+                valuesToSubmit.Add(new()
+                {
+                    SymptomId = question.Symptom.Id,
+                    Timestamp = DateTime.Now,
+                    Type = question.FactorType,
+                    Value = question.Result
+                });
+            }
+            var symptoms = quizz.Questions.Select(q => q.Symptom).ToList();
+            await QuizzService.Submit(symptoms, valuesToSubmit);
+        }
+    }
+}

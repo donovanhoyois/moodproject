@@ -2,6 +2,7 @@
 
 public enum FactorType
 {
+    None,
     Presence,
     Harmfulness
 }

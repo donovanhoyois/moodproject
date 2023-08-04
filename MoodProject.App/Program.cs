@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MoodProject.App;
+using MoodProject.Core;
 using MoodProject.Core.Ports.In;
+using MoodProject.Core.Ports.Out;
 using MoodProject.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -18,8 +20,9 @@ builder.Services.AddOidcAuthentication(options =>
     options.ProviderOptions.ResponseType = "code";
     //options.ProviderOptions.AdditionalProviderParameters.Add("audience", builder.Configuration["Auth0:Audience"]);
 });
-//builder.Services.AddSingleton<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+builder.Services.AddSingleton<IAppApi, AppApi>();
 builder.Services.AddSingleton<ISymptomsTypesService, SymptomsTypesService>();
-builder.Services.AddSingleton<ISymptomsFormService, SymptomsFormService>();
+builder.Services.AddSingleton<ISymptomsService, SymptomsService>();
+builder.Services.AddSingleton<IQuizzService, QuizzService>();
 
 await builder.Build().RunAsync();

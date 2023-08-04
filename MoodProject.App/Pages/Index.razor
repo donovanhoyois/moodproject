@@ -1,4 +1,7 @@
 ﻿@page "/"
+@using System.Text.Json
+@using System.Text.Json.Serialization
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Index</PageTitle>
 
@@ -6,4 +9,19 @@
 
 Welcome to your new app.
 
+<AuthorizeView>
+    <Authorized>
+        @test
+    </Authorized>
+</AuthorizeView>
+
 <SurveyPrompt Title="How is Blazor working for you?" />
+
+@code{
+    private string test;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+    }
+}

@@ -1,30 +1,70 @@
 ﻿@page "/Profile"
 @using MoodProject.Core
 @using MoodProject.Core.Ports.In
-@inject ISymptomsTypesService typesService
+@using MoodProject.App.Models
+@using Microsoft.AspNetCore.Components
+@inject ISymptomsTypesService TypesService
+@inject ISymptomsService SymptomsService
+
+@inherits MoodProject.App.Shared.Helpers.IdentityHelper
 
 <AuthorizeView>
     <Authorized>
         <h3>Profil</h3>
-        <p>@context.User</p>
         <div>
             <h4>Vos symptomes</h4>
             <p>Vous pouvez modifier les symptomes qui seront suivis à tout moment.</p>
-            <form>
-                @foreach (var type in symptomsTypes)
+            <EditForm Model="_symptomTypesForm" OnSubmit="SymptomsSubmit" Context="formContext">
+                @foreach (var type in _symptomTypesForm.symptomsTypesCheckboxes)
                 {
-                    <input type="checkbox" name="@type.Name">
+                    <InputCheckbox @bind-Value="@type.IsChecked" DisplayName="@type.Name"/> @type.Name<br />
                 }
-            </form>
+                <input type="submit" value="Enregistrer"/>
+            </EditForm>
         </div>
     </Authorized>
 </AuthorizeView>
 
 @code {
-    private IEnumerable<SymptomType> symptomsTypes;
 
+    private List<SymptomType> symptomsTypes = new List<SymptomType>();
+    private List<Symptom> symptoms = new List<Symptom>();
+    private SymptomsTypesForm _symptomTypesForm = new SymptomsTypesForm(new List<SymptomType>());
+    
     protected override async Task OnInitializedAsync()
     {
-        symptomsTypes = await typesService.GetAll() ?? new List<SymptomType>();
+        _symptomTypesForm = new SymptomsTypesForm((await TypesService.GetAll()).ToList());
+        symptoms = (await SymptomsService.GetSymptoms(await GetUserId())).ToList();
+        
+        CheckRetrievedSymptoms();
+    }
+
+    private void CheckRetrievedSymptoms()
+    {
+        foreach (var symptom in symptoms)
+        {
+            var typeCheckbox = _symptomTypesForm.symptomsTypesCheckboxes.FirstOrDefault(s => s.Id.Equals(symptom.TypeId));
+            typeCheckbox.IsChecked = true;
+        }
+    }
+
+    public async Task SymptomsSubmit()
+    {
+        var updatedSymptomsList = new List<Symptom>();
+        foreach (var symptomType in _symptomTypesForm.symptomsTypesCheckboxes)
+        {
+            if (symptomType.IsChecked)
+            {
+                updatedSymptomsList.Add(new()
+                {
+                    Type = symptomType,
+                    TypeId = symptomType.Id,
+                    UserId = await GetUserId(),
+                    ValuesHistory = new List<FactorValue>()
+                });
+            }
+        }
+        var response = await SymptomsService.SaveSymptoms(updatedSymptomsList);
+        Console.WriteLine(response);
     }
 }

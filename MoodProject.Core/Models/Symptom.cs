@@ -3,7 +3,7 @@
 public class Symptom
 {
     public int Id { get; set; }
-    public int UserId { get; set; }
+    public string UserId { get; set; }
     public SymptomType Type { get; set; }
     public int TypeId { get; set; }
     public IEnumerable<FactorValue> ValuesHistory { get; set; }

@@ -5,8 +5,9 @@ namespace MoodProject.Api;
 
 public class MoodProjectContext : DbContext
 {
+    public DbSet<User> Users { get; set; }
     public DbSet<SymptomType> SymptomTypes { get; set; }
-    public DbSet<Symptom> Symptoms { get; set; }
+    public DbSet<SymptomEntity> Symptoms { get; set; }
     public DbSet<FactorValue> FactorValues { get; set; }
     public MoodProjectContext()
     {
@@ -21,17 +22,18 @@ public class MoodProjectContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+
         // Symptom <-> SymptomType
-        modelBuilder.Entity<Symptom>()
+        modelBuilder.Entity<SymptomEntity>()
             .HasOne(symptom => symptom.Type)
             .WithMany()
             .HasForeignKey(symptom => symptom.TypeId)
             .IsRequired();
 
         // Symptom <-> FactorValue
-        modelBuilder.Entity<Symptom>()
+        modelBuilder.Entity<SymptomEntity>()
             .HasMany(symptom => symptom.ValuesHistory)
-            .WithOne(value => value.Symptom)
+            .WithOne()
             .HasForeignKey(value => value.SymptomId)
             .IsRequired();
 

@@ -3,6 +3,15 @@
 public class User
 {
     public int Id { get; set; }
-    public string Mail { get; set; }
-    public List<Symptom> Symptoms { get; set; }
+    public string AuthProviderUserId { get; set; }
+
+    public User()
+    {
+        
+    }
+    public User(int id, string authProviderUserId)
+    {
+        Id = id;
+        AuthProviderUserId = authProviderUserId;
+    }
 }

@@ -24,6 +24,9 @@ var connectionString = "datasource=127.0.0.1;port=3306;username=root;password=;d
 var version = new MySqlServerVersion(new Version(10, 4, 11));
 builder.Services.AddDbContext<MoodProjectContext>();
 
+// Custom injections
+builder.Services.AddSingleton(sp => new HttpClient());
+
 
 var app = builder.Build();
 
@@ -34,7 +37,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors();
+app.UseCors("dev");
 
 app.UseHttpsRedirection();
 
