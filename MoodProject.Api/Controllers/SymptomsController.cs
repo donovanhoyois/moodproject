@@ -11,17 +11,19 @@ namespace MoodProject.Api.Controllers;
 public class SymptomsController
 {
     private MoodProjectContext DbContext;
+    
     public SymptomsController(MoodProjectContext dbContext)
     {
         DbContext = dbContext;
     }
-    [HttpGet(Name = "GetSymptoms")]
+    
+    [HttpGet, ActionName("Get")]
     public IEnumerable<Symptom> GetSymptoms(string userId)
     {
         return DbContext.Symptoms.Where(symptom => symptom.UserId.Equals(userId) && !symptom.isDisabled).ToList();
     }
 
-    [HttpPost]
+    [HttpPost, ActionName("Update")]
     public void UpdateSymptoms(IEnumerable<Symptom> newSymptoms)
     {
         var userId = newSymptoms.FirstOrDefault()?.UserId ?? string.Empty;
@@ -56,7 +58,7 @@ public class SymptomsController
         DbContext.SaveChanges();
     }
     
-    [HttpGet(Name = "GetSymptomsHistory")]
+    [HttpGet, ActionName("GetHistory")]
     public IEnumerable<Symptom> GetSymptomsHistory(string userId)
     {
         return DbContext.Symptoms
@@ -66,7 +68,7 @@ public class SymptomsController
             .ToList();
     }
 
-    [HttpPost(Name = "UpdateSymptomsHistory")]
+    [HttpPost, ActionName("UpdateHistory")]
     public bool UpdateSymptomsHistory(IEnumerable<FactorValue> values)
     {
         DbContext.FactorValues.AddRange(values);

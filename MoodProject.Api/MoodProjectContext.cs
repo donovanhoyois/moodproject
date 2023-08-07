@@ -9,6 +9,9 @@ public class MoodProjectContext : DbContext
     public DbSet<SymptomType> SymptomTypes { get; set; }
     public DbSet<SymptomEntity> Symptoms { get; set; }
     public DbSet<FactorValue> FactorValues { get; set; }
+    public DbSet<QuizzQuestionEntity> QuizzQuestions { get; set; }
+    public DbSet<QuizzAnswer> QuizzAnswers { get; set; }
+
     public MoodProjectContext()
     {
         

@@ -1,0 +1,16 @@
+﻿namespace MoodProject.Core;
+
+public class CustomQuizzQuestion
+{
+    public int Id { get; set; }
+    public string Question { get; set; }
+    public QuestionType Type { get; set; }
+    public SymptomType SymptomType { get; set; }
+    public FactorType FactorType { get; set; }
+    public IEnumerable<QuizzAnswer> AnswerPossibilities { get; set; }
+
+    public CustomQuizzQuestion()
+    {
+        
+    }
+}

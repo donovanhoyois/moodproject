@@ -10,7 +10,14 @@ namespace MoodProject.Api.Controllers;
 [EnableCors()]
 public class SymptomsTypesController
 {
-    [HttpGet]
+    private MoodProjectContext DbContext;
+
+    public SymptomsTypesController(MoodProjectContext dbContext)
+    {
+        DbContext = dbContext;
+    }
+    
+    [HttpGet, ActionName("GetAll")]
     public IEnumerable<SymptomType> GetSymptomsTypes()
     {
         using (var context = new MoodProjectContext())
@@ -20,7 +27,7 @@ public class SymptomsTypesController
         }
     }
 
-    [HttpGet]
+    [HttpGet, ActionName("Add")]
     public IResult AddSymptomType(string name)
     {
         using (var context = new MoodProjectContext())

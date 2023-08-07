@@ -23,12 +23,15 @@
                 {
                     <div class="quizz-question">
                         <div class="quizz-question-header">
-                            <p>@quizz.Questions[currentQuestion].Question</p>
-                            <p>@quizz.Questions[currentQuestion].Symptom.Type.Name</p>
+                            <p>@quizz.Questions[currentQuestion].Question.Question</p>
+                            @if (quizz.Questions[currentQuestion].Question.Id == 0)
+                            {
+                                <p>@quizz.Questions[currentQuestion].Symptom.Type.Name</p>
+                            }
                         </div>
                         <div class="quizz-question-main">
                             <InputRadioGroup @bind-Value="quizz.Questions[currentQuestion].Result">
-                                @foreach (var answer in quizz.Questions[currentQuestion].AnswerPossibilities)
+                                @foreach (var answer in quizz.Questions[currentQuestion].Question.AnswerPossibilities)
                                 {
                                     <label>
                                         <InputRadio Value="answer.Weight" />
@@ -61,6 +64,7 @@
     protected override async Task OnInitializedAsync()
     {
         var quizzQuestions = await QuizzService.Generate(await GetUserId());
+        Console.WriteLine("Generation ended.");
         if (quizzQuestions != null)
         {
             quizz = new QuizzForm(quizzQuestions);
@@ -84,7 +88,7 @@
                 {
                     SymptomId = question.Symptom.Id,
                     Timestamp = DateTime.Now,
-                    Type = question.FactorType,
+                    Type = question.Question.FactorType,
                     Value = question.Result
                 });
             }

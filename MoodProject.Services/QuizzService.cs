@@ -30,6 +30,8 @@ public class QuizzService : IQuizzService
         var symptoms = await AppApi.GetSymptomsWithHistory(userId);
         var questions = new List<QuizzQuestion>();
 
+        var customQuestions = await AppApi.GetCustomQuestions();
+
         foreach (var symptom in symptoms)
         {
             
@@ -45,8 +47,8 @@ public class QuizzService : IQuizzService
             var daysRequiredBeforeNextQuizz = GetRequiredDaysBeforeNextQuizz(symptom);
             if (daysSinceLastValue.TotalDays >= daysRequiredBeforeNextQuizz)
             {
-                questions.Add(GenerateQuestion(symptom, FactorType.Presence));
-                questions.Add(GenerateQuestion(symptom, FactorType.Harmfulness));
+                questions.Add(GenerateQuestion(symptom, FactorType.Presence, customQuestions));
+                questions.Add(GenerateQuestion(symptom, FactorType.Harmfulness, customQuestions));
             }
         }
 
@@ -93,26 +95,33 @@ public class QuizzService : IQuizzService
         return daysRequired;
     }
 
-    private QuizzQuestion GenerateQuestion(Symptom symptom, FactorType factorType)
+    private QuizzQuestion GenerateQuestion(Symptom symptom, FactorType factorType, IEnumerable<CustomQuizzQuestion> customQuizzQuestions)
     {
-        // TODO: Get questions from db
         var word = factorType == FactorType.Presence ? "présent" : "nuisible";
-        return new QuizzQuestion()
+        var newQuestion = new QuizzQuestion()
         {
-            Question = $"Le symptôme suivant est-il {word} aujourd'hui ?",
-            Type = QuestionType.QCM,
-            Symptom = symptom,
-            FactorType = factorType,
-            AnswerPossibilities = new List<QuizzAnswer>()
-            {
-                { new QuizzAnswer(){ Text = $"Très peu {word}", Weight = 0.1f } },
-                { new QuizzAnswer(){ Text = $"Peu {word}", Weight = 0.05f } },
-                { new QuizzAnswer(){ Text = $"Légèrement {word}", Weight = -0.05f } },
-                { new QuizzAnswer(){ Text = $"Assez {word}", Weight = -0.1f } },
-                { new QuizzAnswer(){ Text = $"Très {word}", Weight = -0.15f } },
-            }
+            Question = 
+                customQuizzQuestions.FirstOrDefault(
+                    q => q.SymptomType.Id.Equals(symptom.Id) && q.FactorType.Equals(factorType))
+                ?? new CustomQuizzQuestion()
+                {
+                    Question = $"Le symptôme suivant a-t-il été {word} aujourd'hui ?",
+                    Type = QuestionType.QCM,
+                    FactorType = factorType
+                },
+            Symptom = symptom
         };
+        newQuestion.Question.AnswerPossibilities = new List<QuizzAnswer>()
+        {
+            {new QuizzAnswer() {Text = $"Pas du tout", Weight = 0.10f}},
+            {new QuizzAnswer() {Text = $"Très peu", Weight = 0.05f}},
+            {new QuizzAnswer() {Text = $"Peu", Weight = 0.00f}},
+            {new QuizzAnswer() {Text = $"Légèrement", Weight = -0.05f}},
+            {new QuizzAnswer() {Text = $"Fortement", Weight = -0.10f}},
+        };
+        return newQuestion;
     }
+
 
     private IEnumerable<FactorValue> DerivateNewValues(IEnumerable<Symptom> symptoms, IEnumerable<FactorValue> newValues)
     {

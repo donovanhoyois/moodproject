@@ -7,4 +7,5 @@ public interface IAppApi
     public Task<bool> SaveSymptoms(IEnumerable<Symptom> symptoms);
     public Task<IEnumerable<Symptom>> GetSymptomsWithHistory(string userId);
     public Task<bool> SaveSymptomsHistory(IEnumerable<FactorValue> values);
+    public Task<IEnumerable<CustomQuizzQuestion>> GetCustomQuestions();
 }

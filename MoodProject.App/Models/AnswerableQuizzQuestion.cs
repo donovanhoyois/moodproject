@@ -9,9 +9,6 @@ public class AnswerableQuizzQuestion : QuizzQuestion
     public AnswerableQuizzQuestion(QuizzQuestion parentQuestion)
     {
         Question = parentQuestion.Question;
-        Type = parentQuestion.Type;
         Symptom = parentQuestion.Symptom;
-        FactorType = parentQuestion.FactorType;
-        AnswerPossibilities = parentQuestion.AnswerPossibilities;
     }
 }
