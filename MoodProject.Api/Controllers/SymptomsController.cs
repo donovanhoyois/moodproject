@@ -43,7 +43,8 @@ public class SymptomsController
                 s.UserId.Equals(symptomToInsert.UserId) && s.TypeId.Equals(symptomToInsert.TypeId));
             if (existingSymptom == null)
             {
-                cleanedSymptoms.Add(symptomToInsert as SymptomEntity);
+                var newEntity = new SymptomEntity(symptomToInsert);
+                cleanedSymptoms.Add(newEntity);
             }
         }
 
