@@ -1,4 +1,6 @@
 ﻿using MoodProject.Core;
+using MoodProject.Core.Enums;
+using MoodProject.Core.Models;
 using MoodProject.Core.Ports.Out;
 using MoodProject.Services;
 using Moq;

@@ -1,4 +1,4 @@
-﻿namespace MoodProject.Core;
+﻿namespace MoodProject.Core.Models;
 
 public class User
 {

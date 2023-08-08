@@ -2,6 +2,8 @@
 @using MoodProject.Core.Ports.In
 @using MoodProject.Core
 @using MoodProject.App.Models
+@using MoodProject.Core.Enums
+@using MoodProject.Core.Models
 
 @inject IQuizzService QuizzService
 
@@ -13,11 +15,11 @@
     <Authorized>
         <h3>Questionnaire</h3>
         <div>
-            @if (!quizz.Questions.Any())
+            @if (quizzQuestionsOperation.Status == OperationResultType.Pending)
             {
-                <p>@WaitMessage</p>
+                <p>Génération du questionnaire, veuillez patienter...</p>
             }
-            else
+            else if(quizzQuestionsOperation.Status == OperationResultType.Ok)
             {
                 if (currentQuestion < quizz.Questions.Count())
                 {
@@ -50,6 +52,10 @@
                     <p>Merci d'avoir répondu !</p>
                 }
             }
+            else
+            {
+                @quizzQuestionsOperation.Message
+            }
         </div>
     </Authorized>
 </AuthorizeView>
@@ -59,19 +65,15 @@
     private QuizzForm quizz = new QuizzForm(new List<QuizzQuestion>());
     private int currentQuestion = 0;
 
-    private string WaitMessage { get; set; } = "Génération du questionnaire, veuillez patienter...";
+    private OperationResult<IEnumerable<QuizzQuestion>> quizzQuestionsOperation { get; set; } = new(OperationResultType.Pending);
     
     protected override async Task OnInitializedAsync()
     {
-        var quizzQuestions = await QuizzService.Generate(await GetUserId());
+        quizzQuestionsOperation = await QuizzService.Generate(await GetUserId());
         Console.WriteLine("Generation ended.");
-        if (quizzQuestions != null)
+        if (quizzQuestionsOperation.Status == OperationResultType.Ok)
         {
-            quizz = new QuizzForm(quizzQuestions);
-        }
-        else
-        {
-            WaitMessage = "Aucun questionnaire n'est diponible pour vous actuellement.";
+            quizz = new QuizzForm(quizzQuestionsOperation.Content);
         }
     }
 

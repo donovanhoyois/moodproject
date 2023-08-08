@@ -1,4 +1,6 @@
-﻿namespace MoodProject.Core.Ports.In;
+﻿using MoodProject.Core.Models;
+
+namespace MoodProject.Core.Ports.In;
 
 public interface ISymptomsTypesService
 {

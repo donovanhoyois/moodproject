@@ -1,4 +1,6 @@
-﻿namespace MoodProject.Core;
+﻿using MoodProject.Core.Enums;
+
+namespace MoodProject.Core.Models;
 
 public class FactorValue
 {

@@ -1,4 +1,5 @@
 ﻿using MoodProject.Core;
+using MoodProject.Core.Models;
 
 namespace MoodProject.App.Models;
 

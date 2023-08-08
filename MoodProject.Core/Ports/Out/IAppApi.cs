@@ -1,4 +1,6 @@
-﻿namespace MoodProject.Core.Ports.Out;
+﻿using MoodProject.Core.Models;
+
+namespace MoodProject.Core.Ports.Out;
 
 public interface IAppApi
 {

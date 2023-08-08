@@ -3,8 +3,11 @@
 @using MoodProject.Core.Ports.In
 @using MoodProject.App.Models
 @using Microsoft.AspNetCore.Components
+@using MoodProject.Core.Enums
+@using MoodProject.Core.Models
 @inject ISymptomsTypesService TypesService
 @inject ISymptomsService SymptomsService
+@inject IQuizzService QuizzService
 
 @inherits MoodProject.App.Shared.Helpers.IdentityHelper
 
@@ -22,6 +25,30 @@
                 <input type="submit" value="Enregistrer"/>
             </EditForm>
         </div>
+        <br /><br />
+        <div class="health-average">
+            <p>Votre moyenne santé</p>
+            @if (healthAveragePercentageOperation.Status == OperationResultType.Pending)
+            {
+                <div>Calcul de votre moyenne santé...</div>
+            }
+            else
+            {
+                <div class="health-stats-list">
+                    <div class="health-stat">
+                        @if (healthAveragePercentageOperation.Status.Equals(OperationResultType.Ok))
+                        {
+                            <p>@healthAveragePercentageOperation.Content%</p>
+                        }
+                        else
+                        {
+                            <p>@healthAveragePercentageOperation.Message</p>
+                        }
+                        
+                    </div>
+                </div> 
+            }
+        </div>
     </Authorized>
 </AuthorizeView>
 
@@ -30,15 +57,21 @@
     private List<SymptomType> symptomsTypes = new List<SymptomType>();
     private List<Symptom> symptoms = new List<Symptom>();
     private SymptomsTypesForm _symptomTypesForm = new SymptomsTypesForm(new List<SymptomType>());
+
+    private OperationResult<float> healthAveragePercentageOperation = new OperationResult<float>(OperationResultType.Pending);
     
     protected override async Task OnInitializedAsync()
     {
         _symptomTypesForm = new SymptomsTypesForm((await TypesService.GetAll()).ToList());
-        symptoms = (await SymptomsService.GetSymptoms(await GetUserId())).ToList();
+        symptoms = (await SymptomsService.GetSymptomsWithHistory(await GetUserId())).ToList();
         
         CheckRetrievedSymptoms();
+        CalculateHealthAverages();
     }
 
+    /// <summary>
+    /// Retrieve the current symptoms of the user and turn on the corresponding checkboxes
+    /// </summary>
     private void CheckRetrievedSymptoms()
     {
         foreach (var symptom in symptoms)
@@ -48,23 +81,31 @@
         }
     }
 
-    public async Task SymptomsSubmit()
+    /// <summary>
+    /// Submit the checkboxes form
+    /// </summary>
+    private async Task SymptomsSubmit()
     {
         var updatedSymptomsList = new List<Symptom>();
-        foreach (var symptomType in _symptomTypesForm.symptomsTypesCheckboxes)
+        foreach (var symptomType in _symptomTypesForm.symptomsTypesCheckboxes.Where(symptomType => symptomType.IsChecked))
         {
-            if (symptomType.IsChecked)
+            updatedSymptomsList.Add(new Symptom()
             {
-                updatedSymptomsList.Add(new()
-                {
-                    Type = symptomType,
-                    TypeId = symptomType.Id,
-                    UserId = await GetUserId(),
-                    ValuesHistory = new List<FactorValue>()
-                });
-            }
+                Type = symptomType,
+                TypeId = symptomType.Id,
+                UserId = await GetUserId(),
+                ValuesHistory = new List<FactorValue>()
+            });
         }
         var response = await SymptomsService.SaveSymptoms(updatedSymptomsList);
-        Console.WriteLine(response);
+    }
+
+    private void CalculateHealthAverages()
+    {
+        healthAveragePercentageOperation = QuizzService.GetHealthAverageAsPercentage(symptoms, 14);
+        if (healthAveragePercentageOperation.Status.Equals(OperationResultType.Ok))
+        {
+            healthAveragePercentageOperation.Content = (float) Math.Round(healthAveragePercentageOperation.Content, MidpointRounding.ToEven);
+        }
     }
 }

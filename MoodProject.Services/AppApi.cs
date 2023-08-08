@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Json;
 using MoodProject.Core;
+using MoodProject.Core.Models;
 using MoodProject.Core.Ports.Out;
 
 namespace MoodProject.Services;

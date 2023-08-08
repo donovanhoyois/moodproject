@@ -1,4 +1,5 @@
 ﻿using MoodProject.Core;
+using MoodProject.Core.Models;
 using MoodProject.Core.Ports.In;
 using MoodProject.Core.Ports.Out;
 
@@ -22,8 +23,8 @@ public class SymptomsService : ISymptomsService
         return await AppApi.SaveSymptoms(symptoms);
     }
 
-    public bool NeedsToBeGenerated()
+    public async Task<IEnumerable<Symptom>> GetSymptomsWithHistory(string userId)
     {
-        throw new NotImplementedException();
+        return await AppApi.GetSymptomsWithHistory(userId);
     }
 }

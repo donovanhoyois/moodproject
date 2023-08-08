@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MoodProject.Core;
+using MoodProject.Core.Models;
 
 namespace MoodProject.Api;
 
