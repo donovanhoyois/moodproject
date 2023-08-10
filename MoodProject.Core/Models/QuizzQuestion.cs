@@ -3,7 +3,7 @@
 
 public class QuizzQuestion
 {
-    public CustomQuizzQuestion Question { get; set; }
+    public CustomQuizzQuestion CustomQuestion { get; set; }
     public Symptom Symptom { get; set; }
 }
 

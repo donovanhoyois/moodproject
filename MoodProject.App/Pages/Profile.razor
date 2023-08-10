@@ -1,56 +1,72 @@
 ﻿@page "/Profile"
-@using MoodProject.Core
 @using MoodProject.Core.Ports.In
 @using MoodProject.App.Models
 @using Microsoft.AspNetCore.Components
 @using MoodProject.Core.Enums
 @using MoodProject.Core.Models
+@inject IJSRuntime JsRuntime
 @inject ISymptomsTypesService TypesService
 @inject ISymptomsService SymptomsService
 @inject IQuizzService QuizzService
 
+@attribute [Authorize]
+
 @inherits MoodProject.App.Shared.Helpers.IdentityHelper
 
-<AuthorizeView>
-    <Authorized>
-        <h3>Profil</h3>
-        <div>
-            <h4>Vos symptomes</h4>
-            <p>Vous pouvez modifier les symptomes qui seront suivis à tout moment.</p>
-            <EditForm Model="_symptomTypesForm" OnSubmit="SymptomsSubmit" Context="formContext">
-                @foreach (var type in _symptomTypesForm.symptomsTypesCheckboxes)
-                {
-                    <InputCheckbox @bind-Value="@type.IsChecked" DisplayName="@type.Name"/> @type.Name<br />
-                }
-                <input type="submit" value="Enregistrer"/>
-            </EditForm>
+<h1 class="display-1">Votre profil</h1>
+<div class="symptoms my-3">
+    <div class="card">
+      <div class="card-header">
+        Vos symptomes
+      </div>
+      <div class="card-body">
+          <p class="card-text">Vous pouvez modifier les symptomes qui seront suivis à tout moment.</p>
+          <EditForm Model="_symptomTypesForm" OnSubmit="SymptomsSubmit" Context="formContext">
+              @foreach (var type in _symptomTypesForm.symptomsTypesCheckboxes)
+              {
+                  <div class="form-check">
+                      <InputCheckbox @bind-Value="@type.IsChecked" DisplayName="@type.Name" class="form-check-input"/>
+                      <label class="form-check-label" for="flexCheckDefault">
+                          @type.Name
+                      </label>
+                  </div>
+              }
+              <br />
+              <button type="button" class="btn btn-success p-2" onclick="@SymptomsSubmit">Valider</button>
+          </EditForm>
+      </div>
+    </div>
+</div>
+<div class="health-average my-3">
+    @if (healthAveragePercentageOperation.Status == OperationResultType.Pending)
+    {
+        <div class="spinner-border text-success" role="status">
+            <span class="visually-hidden">Loading...</span>
         </div>
-        <br /><br />
-        <div class="health-average">
-            <p>Votre moyenne santé</p>
-            @if (healthAveragePercentageOperation.Status == OperationResultType.Pending)
-            {
-                <div>Calcul de votre moyenne santé...</div>
-            }
-            else
-            {
-                <div class="health-stats-list">
-                    <div class="health-stat">
-                        @if (healthAveragePercentageOperation.Status.Equals(OperationResultType.Ok))
-                        {
-                            <p>@healthAveragePercentageOperation.Content%</p>
-                        }
-                        else
-                        {
-                            <p>@healthAveragePercentageOperation.Message</p>
-                        }
-                        
-                    </div>
-                </div> 
-            }
-        </div>
-    </Authorized>
-</AuthorizeView>
+    }
+    else
+    {
+        @if (healthAveragePercentageOperation.Status.Equals(OperationResultType.Ok))
+        {
+            <div class="card">
+                <div class="card-header">
+                    Votre moyenne santé
+                </div>
+                <div class="card-body">
+                    <blockquote class="blockquote mb-0">
+                        <CircleProgress Percentage=@healthAveragePercentageOperation.Content />
+                    </blockquote>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-danger" role="alert">
+                @healthAveragePercentageOperation.Message
+            </div>
+        }
+    }
+</div>
 
 @code {
 

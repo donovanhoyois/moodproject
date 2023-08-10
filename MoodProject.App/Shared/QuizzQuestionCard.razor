@@ -1,0 +1,36 @@
+﻿@using MoodProject.App.Models
+
+<div class="card">
+  <div class="card-header">
+    <p>@Question.CustomQuestion.Text</p>
+    @if (Question.CustomQuestion.Id == 0)
+    {
+      <p>@Question.Symptom.Type.Name</p>
+    }
+  </div>
+  <ul class="list-group list-group-flush">
+    <InputRadioGroup @bind-Value="Question.Result">
+      @foreach (var answer in Question.CustomQuestion.AnswerPossibilities)
+      {
+        <li class="list-group-item">
+          <InputRadio Value="answer.Weight"/>
+          <text>@answer.Text</text>
+        </li>
+      }
+    </InputRadioGroup>
+    <button type="button" class="btn btn-success" onclick="@OnClickValidate">Valider</button>
+  </ul>
+</div>
+
+@code {
+    [Parameter]
+    public AnswerableQuizzQuestion Question { get; set; }
+    [Parameter]
+    public Action OnClickValidateAction { get; set; }
+
+    private void OnClickValidate()
+    {
+      OnClickValidateAction.Invoke();
+    }
+    
+}

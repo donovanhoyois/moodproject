@@ -1,0 +1,32 @@
+﻿@inject IJSRuntime JsRuntime
+
+<div class="container py-5">
+  <div class="row">
+    <div class="col-xl-3 col-lg-6 mb-4">
+      <div class="bg-white rounded-lg p-5 shadow">
+        <!-- Progress bar 1 -->
+        <div class="progress mx-auto" data-value='@Percentage'>
+          <span class="progress-left">
+            <span class="progress-bar border-primary"></span>
+          </span>
+          <span class="progress-right">
+            <span class="progress-bar border-primary"></span>
+          </span>
+          <div class="progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">
+            <div class="h2 font-weight-bold">@Percentage %</div>
+          </div>
+        </div>
+        <!-- END -->
+      </div>
+    </div>
+  </div>
+</div>
+@code {
+    [Parameter] public float Percentage { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await JsRuntime.InvokeVoidAsync("renderCircleProgress");
+        // TODO: Fix error on first load
+    }
+}

@@ -9,7 +9,7 @@ public class AnswerableQuizzQuestion : QuizzQuestion
 
     public AnswerableQuizzQuestion(QuizzQuestion parentQuestion)
     {
-        Question = parentQuestion.Question;
+        CustomQuestion = parentQuestion.CustomQuestion;
         Symptom = parentQuestion.Symptom;
     }
 }

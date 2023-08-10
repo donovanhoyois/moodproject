@@ -26,4 +26,12 @@
     <ProjectReference Include="..\MoodProject.Services\MoodProject.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\sample-data\weather.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\js\CircleProgress.js" />
+  </ItemGroup>
+
 </Project>

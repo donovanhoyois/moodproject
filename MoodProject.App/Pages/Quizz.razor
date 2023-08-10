@@ -1,68 +1,45 @@
 ﻿@page "/quizz"
 @using MoodProject.Core.Ports.In
-@using MoodProject.Core
 @using MoodProject.App.Models
 @using MoodProject.Core.Enums
 @using MoodProject.Core.Models
+@attribute [Authorize]
 
 @inject IQuizzService QuizzService
 
 @inherits MoodProject.App.Shared.Helpers.IdentityHelper
 
-<PageTitle>Index</PageTitle>
-
-<AuthorizeView>
-    <Authorized>
-        <h3>Questionnaire</h3>
-        <div>
-            @if (quizzQuestionsOperation.Status == OperationResultType.Pending)
-            {
-                <p>Génération du questionnaire, veuillez patienter...</p>
-            }
-            else if(quizzQuestionsOperation.Status == OperationResultType.Ok)
-            {
-                if (currentQuestion < quizz.Questions.Count())
-                {
-                    <div class="quizz-question">
-                        <div class="quizz-question-header">
-                            <p>@quizz.Questions[currentQuestion].Question.Question</p>
-                            @if (quizz.Questions[currentQuestion].Question.Id == 0)
-                            {
-                                <p>@quizz.Questions[currentQuestion].Symptom.Type.Name</p>
-                            }
-                        </div>
-                        <div class="quizz-question-main">
-                            <InputRadioGroup @bind-Value="quizz.Questions[currentQuestion].Result">
-                                @foreach (var answer in quizz.Questions[currentQuestion].Question.AnswerPossibilities)
-                                {
-                                    <label>
-                                        <InputRadio Value="answer.Weight" />
-                                        <text>@answer.Text</text>
-                                    </label>
-                                }
-                            </InputRadioGroup>
-                            <div class="quizz-question-bottom">
-                                <button class="quizz-question-submit" onclick="@Confirm">Confirmer</button>
-                            </div>
-                        </div>
-                    </div>
-                }
-                else
-                {
-                    <p>Merci d'avoir répondu !</p>
-                }
-            }
-            else
-            {
-                @quizzQuestionsOperation.Message
-            }
+<PageTitle>Questionnaire</PageTitle>
+<h3>Questionnaire</h3>
+<div>
+    @if (quizzQuestionsOperation.Status == OperationResultType.Pending)
+    {
+        <p>Génération du questionnaire, veuillez patienter...</p>
+    }
+    else if(quizzQuestionsOperation.Status == OperationResultType.Ok)
+    {
+        if (currentQuestion < quizz.Questions.Count())
+        {
+            <QuizzQuestionCard Question=quizz.Questions[currentQuestion] OnClickValidateAction="() => Confirm()"/>
+        }
+        else
+        {
+            <div class="alert alert-success" role="alert">
+                Merci d'avoir répondu !
+            </div>
+        }
+    }
+    else
+    {
+        <div class="alert alert-danger" role="alert">
+            @quizzQuestionsOperation.Message
         </div>
-    </Authorized>
-</AuthorizeView>
+    }
+</div>
 
 @code{
 
-    private QuizzForm quizz = new QuizzForm(new List<QuizzQuestion>());
+    private QuizzForm quizz = new QuizzForm(new List<AnswerableQuizzQuestion>());
     private int currentQuestion = 0;
 
     private OperationResult<IEnumerable<QuizzQuestion>> quizzQuestionsOperation { get; set; } = new(OperationResultType.Pending);
@@ -79,7 +56,6 @@
 
     private async Task Confirm()
     {
-        Console.WriteLine(quizz.Questions[currentQuestion].Result);
         currentQuestion++;
         if (currentQuestion >= quizz.Questions.Count)
         {
@@ -90,12 +66,14 @@
                 {
                     SymptomId = question.Symptom.Id,
                     Timestamp = DateTime.Now,
-                    Type = question.Question.FactorType,
+                    Type = question.CustomQuestion.FactorType,
                     Value = question.Result
                 });
             }
+            
             var symptoms = quizz.Questions.Select(q => q.Symptom).ToList();
             await QuizzService.Submit(symptoms, valuesToSubmit);
         }
+        StateHasChanged();
     }
 }

@@ -154,18 +154,18 @@ public class QuizzService : IQuizzService
         var word = factorType == FactorType.Presence ? "présent" : "nuisible";
         var newQuestion = new QuizzQuestion()
         {
-            Question = 
+            CustomQuestion = 
                 customQuizzQuestions.FirstOrDefault(
                     q => q.SymptomType.Id.Equals(symptom.Id) && q.FactorType.Equals(factorType))
                 ?? new CustomQuizzQuestion()
                 {
-                    Question = $"Le symptôme suivant a-t-il été {word} aujourd'hui ?",
+                    Text = $"Le symptôme suivant a-t-il été {word} aujourd'hui ?",
                     Type = QuestionType.QCM,
                     FactorType = factorType
                 },
             Symptom = symptom
         };
-        newQuestion.Question.AnswerPossibilities = new List<QuizzAnswer>()
+        newQuestion.CustomQuestion.AnswerPossibilities = new List<QuizzAnswer>()
         {
             {new QuizzAnswer() {Text = $"Pas du tout", Weight = 0.10f}},
             {new QuizzAnswer() {Text = $"Très peu", Weight = 0.05f}},

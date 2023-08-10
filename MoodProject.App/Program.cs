@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MoodProject.App;
 using MoodProject.Core;
@@ -13,13 +14,16 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri("https://localhost:44337/api/") });
 
-// Custom
+// Auth0
 builder.Services.AddOidcAuthentication(options =>
 {
     builder.Configuration.Bind("Auth0", options.ProviderOptions);
     options.ProviderOptions.ResponseType = "code";
     //options.ProviderOptions.AdditionalProviderParameters.Add("audience", builder.Configuration["Auth0:Audience"]);
 });
+builder.Services.AddScoped(typeof(AccountClaimsPrincipalFactory<RemoteUserAccount>), typeof(CustomAccountFactory));
+
+// Services
 builder.Services.AddSingleton<IAppApi, AppApi>();
 builder.Services.AddSingleton<ISymptomsTypesService, SymptomsTypesService>();
 builder.Services.AddSingleton<ISymptomsService, SymptomsService>();
