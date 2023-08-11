@@ -97,7 +97,8 @@
         CheckRetrievedSymptoms();
         CalculateHealthAverages();
 
-        CalculateGraphValues();
+        var graphValues = CalculateGraphValues();
+        ConfigureHealthHistoryGraph(graphValues);
     }
 
     /// <summary>
@@ -140,7 +141,7 @@
         }
     }
 
-    private void CalculateGraphValues()
+    private void ConfigureHealthHistoryGraph(IEnumerable<double> values)
     {
         graphConfig = new LineConfig()
         {
@@ -150,7 +151,7 @@
                 Title = new OptionsTitle()
                 {
                     Display = true,
-                    Text = "Votre moyenne santé"
+                    Text = "Historique de votre moyenne santé"
                 },
                 Scales = new Scales()
                 {
@@ -160,7 +161,7 @@
                         {
                             ScaleLabel = new ScaleLabel
                             {
-                                LabelString = "Date"
+                                LabelString = "Age"
                             }
                         }
                     },
@@ -175,22 +176,32 @@
                         }
                     }
                 }
+            },
+            Data =
+            {
+                Datasets =
+                {
+                    new LineDataset<double>(values)
+                    {
+                        Label = "Moyenne santé",
+                        BackgroundColor = ColorUtil.ColorHexString(255, 255, 255),
+                        BorderColor = ColorUtil.ColorHexString(40, 40, 160),
+                        Fill = FillingMode.Disabled
+                    }
+                }
             }
         };
-
-
-        var history = QuizzService.GetHealthAverageHistory(symptoms, 100).Reverse().Select(v => Math.Round(v, MidpointRounding.ToEven));
-        var dataset = new LineDataset<double>(history)
-        {
-            Label = "Historique",
-            BackgroundColor = ColorUtil.ColorHexString(255, 255, 255),
-            BorderColor = ColorUtil.ColorHexString(40, 40, 160),
-            Fill = FillingMode.Disabled
-        };
-        for (var i = 0; i < dataset.Count(); i++)
+        
+        for (var i = 0; i < values.Count(); i++)
         {
             graphConfig.Data.Labels.Add(string.Empty);
         }
-        graphConfig.Data.Datasets.Add(dataset);
+    }
+    
+    private IEnumerable<double> CalculateGraphValues()
+    {
+        return QuizzService.GetHealthAverageHistory(symptoms, 100)
+                .Reverse()
+                .Select(v => Math.Round(v, MidpointRounding.ToEven));
     }
 }
