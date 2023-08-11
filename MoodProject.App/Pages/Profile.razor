@@ -4,6 +4,14 @@
 @using Microsoft.AspNetCore.Components
 @using MoodProject.Core.Enums
 @using MoodProject.Core.Models
+@using ChartJs.Blazor;
+@using ChartJs.Blazor.LineChart
+@using ChartJs.Blazor.Common
+@using ChartJs.Blazor.Common.Axes
+@using ChartJs.Blazor.Common.Enums
+@using ChartJs.Blazor.Util
+@using ChartJs.Blazor.Interop
+@using Microsoft.VisualBasic.CompilerServices
 @inject IJSRuntime JsRuntime
 @inject ISymptomsTypesService TypesService
 @inject ISymptomsService SymptomsService
@@ -67,12 +75,17 @@
         }
     }
 </div>
+<div class="graph my-3">
+    <Chart Config="graphConfig"></Chart>
+</div>
 
 @code {
 
     private List<SymptomType> symptomsTypes = new List<SymptomType>();
     private List<Symptom> symptoms = new List<Symptom>();
     private SymptomsTypesForm _symptomTypesForm = new SymptomsTypesForm(new List<SymptomType>());
+
+    private LineConfig graphConfig;
 
     private OperationResult<float> healthAveragePercentageOperation = new OperationResult<float>(OperationResultType.Pending);
     
@@ -83,6 +96,8 @@
         
         CheckRetrievedSymptoms();
         CalculateHealthAverages();
+
+        CalculateGraphValues();
     }
 
     /// <summary>
@@ -118,10 +133,64 @@
 
     private void CalculateHealthAverages()
     {
-        healthAveragePercentageOperation = QuizzService.GetHealthAverageAsPercentage(symptoms, 14);
+        healthAveragePercentageOperation = QuizzService.GetHealthAverageAsPercentage(symptoms);
         if (healthAveragePercentageOperation.Status.Equals(OperationResultType.Ok))
         {
             healthAveragePercentageOperation.Content = (float) Math.Round(healthAveragePercentageOperation.Content, MidpointRounding.ToEven);
         }
+    }
+
+    private void CalculateGraphValues()
+    {
+        graphConfig = new LineConfig()
+        {
+            Options = new LineOptions()
+            {
+                Responsive = true,
+                Title = new OptionsTitle()
+                {
+                    Display = true,
+                    Text = "Votre moyenne santé"
+                },
+                Scales = new Scales()
+                {
+                    XAxes = new List<CartesianAxis>
+                    {
+                        new CategoryAxis
+                        {
+                            ScaleLabel = new ScaleLabel
+                            {
+                                LabelString = "Date"
+                            }
+                        }
+                    },
+                    YAxes = new List<CartesianAxis>
+                    {
+                        new LinearCartesianAxis
+                        {
+                            ScaleLabel = new ScaleLabel
+                            {
+                                LabelString = "Value"
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+
+        var history = QuizzService.GetHealthAverageHistory(symptoms, 100).Reverse().Select(v => Math.Round(v, MidpointRounding.ToEven));
+        var dataset = new LineDataset<double>(history)
+        {
+            Label = "Historique",
+            BackgroundColor = ColorUtil.ColorHexString(255, 255, 255),
+            BorderColor = ColorUtil.ColorHexString(40, 40, 160),
+            Fill = FillingMode.Disabled
+        };
+        for (var i = 0; i < dataset.Count(); i++)
+        {
+            graphConfig.Data.Labels.Add(string.Empty);
+        }
+        graphConfig.Data.Datasets.Add(dataset);
     }
 }

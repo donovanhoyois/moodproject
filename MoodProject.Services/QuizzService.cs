@@ -1,4 +1,5 @@
-﻿using MoodProject.Core.Enums;
+﻿using System.Net.NetworkInformation;
+using MoodProject.Core.Enums;
 using MoodProject.Core.Models;
 using MoodProject.Core.Ports.In;
 using MoodProject.Core.Ports.Out;
@@ -13,6 +14,7 @@ public class QuizzService : IQuizzService
     private const float MAX_POSITIVE_VALUE = 1f;
     private const float MAX_NEGATIVE_VALUE = -1f;
     private const int VALUES_DERIVATION_LENGTH = 3;
+    private const int HEALTH_AVERAGE_VALUES_COUNT = 3;
     
 
     private Dictionary<FactorType, float> FactorWeights = new Dictionary<FactorType, float>()
@@ -40,7 +42,11 @@ public class QuizzService : IQuizzService
 
         foreach (var symptom in symptoms)
         {
+            /* DEBUG QUIZZ TO ASK QUESTIONS EVERY TIME */
+            questions.Add(GenerateQuestion(symptom, FactorType.Presence, customQuestions));
+            questions.Add(GenerateQuestion(symptom, FactorType.Harmfulness, customQuestions));
             
+            /*
             // Min & Max days since last quizz
             var lastValue = symptom.ValuesHistory.FirstOrDefault();
             var daysSinceLastValue = DateTime.Now - lastValue?.Timestamp ?? TimeSpan.MaxValue;
@@ -57,6 +63,7 @@ public class QuizzService : IQuizzService
                 questions.Add(GenerateQuestion(symptom, FactorType.Presence, customQuestions));
                 questions.Add(GenerateQuestion(symptom, FactorType.Harmfulness, customQuestions));
             }
+            */
         }
 
         return questions.Any()
@@ -71,7 +78,7 @@ public class QuizzService : IQuizzService
         return await AppApi.SaveSymptomsHistory(values);
     }
 
-    public float GetAverageValues(Symptom symptom, int max = 5, FactorType? type = null)
+    public float GetAverageValues(Symptom symptom, int max = 5, int offset = 0, FactorType? type = null)
     {
         if (type != null)
         {
@@ -81,11 +88,12 @@ public class QuizzService : IQuizzService
             }
             return symptom.ValuesHistory
                 .Where(v => v.Type.Equals(type))
+                .Skip(offset)
                 .Take(max)
                 .Average(v => v.Value);
         }
 
-        var values = symptom.ValuesHistory.Take(max);
+        var values = symptom.ValuesHistory.Skip(offset*2).Take(max).ToList();
         var sum = 0f;
         foreach (var weight in FactorWeights)
         {
@@ -99,37 +107,28 @@ public class QuizzService : IQuizzService
         var average = sum / values.Count();
         return average;
     }
+    
 
-    public float GetAverageValues(Symptom symptom, DateTime from, FactorType? type = null)
-    {
-        var filteredValues = symptom.ValuesHistory.Where(v => v.Timestamp > from).ToList();
-        symptom.ValuesHistory = filteredValues;
-        return GetAverageValues(symptom, int.MaxValue);
-    }
-
-    public float GetHealthAverage(IEnumerable<Symptom> symptoms, int days)
+    public float GetHealthAverage(IEnumerable<Symptom> symptoms, int offset = 0)
     {
         var averages = new List<float>();
         foreach (var symptom in symptoms)
         {
-            averages.Add(GetAverageValues(symptom, DateTime.Now - TimeSpan.FromDays(days)));
+            averages.Add(GetAverageValues(symptom, HEALTH_AVERAGE_VALUES_COUNT, offset: offset));
         }
 
         return averages.Average();
     }
 
-    public OperationResult<float> GetHealthAverageAsPercentage(IEnumerable<Symptom> symptoms, int days)
+    public OperationResult<float> GetHealthAverageAsPercentage(IEnumerable<Symptom> symptoms, int offset = 0)
     {
-        var average = GetHealthAverage(symptoms, days);
+        var average = GetHealthAverage(symptoms, offset);
         if (float.IsNaN(average))
         {
-            Console.WriteLine("is nan");
             var op = new OperationResult<float>(
                 float.NaN,
                 OperationResultType.Error,
                 "Pas assez de données disponibles pour établir une moyenne santé.");
-            Console.WriteLine($"op: {op.Status}");
-            Console.WriteLine(op.Message);
             return op;
         }
 
@@ -137,9 +136,24 @@ public class QuizzService : IQuizzService
         return new OperationResult<float>(50 + average*50, OperationResultType.Ok);
     }
 
-    public IEnumerable<float> GetHealthAverageHistory()
+    public IEnumerable<float> GetHealthAverageHistory(IEnumerable<Symptom> symptoms, int depth = 10)
     {
-        throw new NotImplementedException();
+        var valuesHistory = new List<float>();
+        var maxHistoryDepth = symptoms.Select(s => s.ValuesHistory.Count()).Max();
+        for (var i = 0; i < maxHistoryDepth && i < depth; i++)
+        {
+            var v = GetHealthAverageAsPercentage(symptoms, offset: i);
+            if (v.Status.Equals(OperationResultType.Ok))
+            {
+                valuesHistory.Add(v.Content);
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        return valuesHistory;
     }
 
     private double GetRequiredDaysBeforeNextQuizz(Symptom symptom)
@@ -180,7 +194,7 @@ public class QuizzService : IQuizzService
     {
         foreach (var value in newValues)
         {
-            var average = GetAverageValues(symptoms.FirstOrDefault(s => s.Id.Equals(value.SymptomId)), VALUES_DERIVATION_LENGTH, value.Type);
+            var average = GetAverageValues(symptoms.FirstOrDefault(s => s.Id.Equals(value.SymptomId)), VALUES_DERIVATION_LENGTH, type: value.Type);
             value.Value += average;
         }
         return newValues;
