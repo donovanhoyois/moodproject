@@ -10,8 +10,6 @@
 @using ChartJs.Blazor.Common.Axes
 @using ChartJs.Blazor.Common.Enums
 @using ChartJs.Blazor.Util
-@using ChartJs.Blazor.Interop
-@using Microsoft.VisualBasic.CompilerServices
 @inject IJSRuntime JsRuntime
 @inject ISymptomsTypesService TypesService
 @inject ISymptomsService SymptomsService
@@ -46,16 +44,15 @@
     </div>
 </div>
 <div class="health-average my-3">
-    @if (healthAveragePercentageOperation.Status == OperationResultType.Pending)
+    @switch (healthAveragePercentageOperation.Status)
     {
-        <div class="spinner-border text-success" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-    }
-    else
-    {
-        @if (healthAveragePercentageOperation.Status.Equals(OperationResultType.Ok))
-        {
+        case OperationResultType.Pending:
+            <div class="spinner-border text-success" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            break;
+            
+        case OperationResultType.Ok:
             <div class="card">
                 <div class="card-header">
                     Votre moyenne santé
@@ -66,13 +63,13 @@
                     </blockquote>
                 </div>
             </div>
-        }
-        else
-        {
+            break;
+            
+        default:
             <div class="alert alert-danger" role="alert">
                 @healthAveragePercentageOperation.Message
             </div>
-        }
+            break;
     }
 </div>
 <div class="graph my-3">

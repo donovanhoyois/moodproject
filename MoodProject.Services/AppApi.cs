@@ -44,4 +44,19 @@ public class AppApi : IAppApi
     {
         return await ApiClient.GetFromJsonAsync<IEnumerable<CustomQuizzQuestion>>("CustomQuizzQuestions/GetAll");
     }
+
+    public async Task<IEnumerable<ChatRoom>> GetChatRooms(string userId)
+    {
+        return await ApiClient.GetFromJsonAsync<IEnumerable<ChatRoom>>($"ChatRooms/GetRoomsAccessibleByUser?userId={userId}");
+    }
+
+    public async Task<ChatRoom> GetChatRoom(int id)
+    {
+        return await ApiClient.GetFromJsonAsync<ChatRoom>($"ChatRooms/GetRoom?id={id}");
+    }
+
+    public async Task<ChatRoomPost> GetChatPost(int id)
+    {
+        return await ApiClient.GetFromJsonAsync<ChatRoomPost>($"ChatRooms/GetPost?id={id}");
+    }
 }

@@ -12,7 +12,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri("https://localhost:44337/api/") });
+builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7073/api/") });
 
 // Auth0
 builder.Services.AddOidcAuthentication(options =>
@@ -28,5 +28,6 @@ builder.Services.AddSingleton<IAppApi, AppApi>();
 builder.Services.AddSingleton<ISymptomsTypesService, SymptomsTypesService>();
 builder.Services.AddSingleton<ISymptomsService, SymptomsService>();
 builder.Services.AddSingleton<IQuizzService, QuizzService>();
+builder.Services.AddSingleton<IChatRoomsService, ChatRoomsService>();
 
 await builder.Build().RunAsync();

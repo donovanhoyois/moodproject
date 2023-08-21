@@ -1,0 +1,57 @@
+﻿@page "/Room/{RoomId:int}/{PostId:int}"
+@using MoodProject.Core.Models
+@using MoodProject.Core.Enums
+@using MoodProject.Core.Ports.In
+
+@inject IChatRoomsService RoomsService
+
+@switch (postOperation.Status)
+{
+    case OperationResultType.Pending:
+        <LoadingText />
+        break;
+        
+    case OperationResultType.Ok:
+        <div class="card">
+            <div class="card-header">
+                @postOperation.Content.Title
+            </div>
+            <div class="card-body">
+                <p class="card-text">@postOperation.Content.Post</p>
+                
+            </div>
+            <div class="card-footer">
+                Publié le @postOperation.Content.PublishedDate par @postOperation.Content.AuthorId
+            </div>
+            
+        </div>
+        <div class="card">
+            <ul class="list-group list-group-flush">
+                @foreach (var comment in postOperation.Content.Comments)
+                {
+                    <li class="list-group-item">@comment.Content</li>
+                }
+            </ul>
+        </div>
+        break;
+        
+    default:
+        <div class="alert alert-danger" role="alert">
+            @postOperation.Message
+        </div>
+        break;
+}
+
+@code {
+    [Parameter]
+    public int RoomId { get; set; }
+    [Parameter]
+    public int PostId { get; set; }
+    
+    private OperationResult<ChatRoomPost> postOperation = new(OperationResultType.Pending);
+    
+    protected override async Task OnInitializedAsync()
+    {
+        postOperation = await RoomsService.GetPostById(PostId);
+    }
+}

@@ -1,0 +1,55 @@
+﻿@page "/Rooms"
+@using MoodProject.Core.Ports.In
+@using MoodProject.Core.Models
+@using MoodProject.Core.Enums
+@inject IChatRoomsService RoomsService
+
+@attribute [Authorize]
+
+@inherits MoodProject.App.Shared.Helpers.IdentityHelper
+
+@switch(roomListOperation.Status)
+{
+    case OperationResultType.Pending:
+        <div class="spinner-border text-success" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        break;
+        
+    case OperationResultType.Ok:
+        foreach (var room in roomListOperation.Content)
+        {
+            <div class="card" style="width: 18rem;">
+                <div class="card-header">
+                    @room.Name
+                  </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        <a class="btn btn-primary" href="/room/@room.Id">Voir</a>
+                    </p>
+                </div>
+            </div>
+        }
+        break;
+        
+    default:
+        <div class="alert alert-danger" role="alert">
+            @roomListOperation.Message
+        </div>
+        break;
+}
+
+@code {
+
+    private OperationResult<IEnumerable<ChatRoom>> roomListOperation { get; set; } = new(OperationResultType.Pending);
+
+    protected override async Task OnInitializedAsync()
+    {
+        roomListOperation = (await RoomsService.GetRooms(await GetUserId()));
+    }
+
+    private string GetPublishedDateFormatted(DateTime dateTime)
+    {
+        return $"Publié le {dateTime.Day}/{dateTime.Month}/{dateTime.Year} à {dateTime.Hour}:{dateTime.Minute}.";
+    }
+}

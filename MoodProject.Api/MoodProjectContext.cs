@@ -8,10 +8,13 @@ public class MoodProjectContext : DbContext
 {
     public DbSet<User> Users { get; set; }
     public DbSet<SymptomType> SymptomTypes { get; set; }
-    public DbSet<SymptomEntity> Symptoms { get; set; }
+    public DbSet<Symptom> Symptoms { get; set; }
     public DbSet<FactorValue> FactorValues { get; set; }
-    public DbSet<QuizzQuestionEntity> QuizzQuestions { get; set; }
+    public DbSet<CustomQuizzQuestion> QuizzQuestions { get; set; }
     public DbSet<QuizzAnswer> QuizzAnswers { get; set; }
+    public DbSet<ChatRoom> ChatRooms { get; set; }
+    public DbSet<ChatRoomPost> ChatRoomPosts { get; set; }
+    public DbSet<ChatRoomComment> ChatRoomComments { get; set; }
 
     public MoodProjectContext()
     {
@@ -28,14 +31,14 @@ public class MoodProjectContext : DbContext
     {
 
         // Symptom <-> SymptomType
-        modelBuilder.Entity<SymptomEntity>()
+        modelBuilder.Entity<Symptom>()
             .HasOne(symptom => symptom.Type)
             .WithMany()
             .HasForeignKey(symptom => symptom.TypeId)
             .IsRequired();
 
         // Symptom <-> FactorValue
-        modelBuilder.Entity<SymptomEntity>()
+        modelBuilder.Entity<Symptom>()
             .HasMany(symptom => symptom.ValuesHistory)
             .WithOne()
             .HasForeignKey(value => value.SymptomId)

@@ -21,6 +21,7 @@ public class SymptomsController
     [HttpGet, ActionName("Get")]
     public IEnumerable<Symptom> GetSymptoms(string userId)
     {
+        var t = DbContext.Symptoms.ToList();
         return DbContext.Symptoms.Where(symptom => symptom.UserId.Equals(userId) && !symptom.isDisabled).ToList();
     }
 
@@ -28,7 +29,7 @@ public class SymptomsController
     public void UpdateSymptoms(IEnumerable<Symptom> newSymptoms)
     {
         var userId = newSymptoms.FirstOrDefault()?.UserId ?? string.Empty;
-        var cleanedSymptoms = new List<SymptomEntity>();
+        var cleanedSymptoms = new List<Symptom>();
 
         var existingSymptoms = DbContext.Symptoms.Where(s => s.UserId.Equals(userId));
         
@@ -44,8 +45,7 @@ public class SymptomsController
                 s.UserId.Equals(symptomToInsert.UserId) && s.TypeId.Equals(symptomToInsert.TypeId));
             if (existingSymptom == null)
             {
-                var newEntity = new SymptomEntity(symptomToInsert);
-                cleanedSymptoms.Add(newEntity);
+                cleanedSymptoms.Add(symptomToInsert);
             }
         }
 

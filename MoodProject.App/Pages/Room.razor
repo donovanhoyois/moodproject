@@ -1,0 +1,54 @@
+﻿@page "/Room/{Id:int}"
+@using MoodProject.Core.Models
+@using MoodProject.Core.Ports.In
+@using MoodProject.Core.Enums
+@inject IChatRoomsService RoomsService
+
+@switch (roomOperation.Status)
+{
+    case OperationResultType.Pending:
+        <div class="spinner-border text-success" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        break;
+
+    case OperationResultType.Ok:
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">Titre</th>
+                <th scope="col">Auteur</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var post in roomOperation.Content.Posts)
+            {
+                <tr>
+                    <td>@post.Title</td>
+                    <td>@post.AuthorId</td>
+                    <td><a class="btn btn-primary" href="/room/@Id/@post.Id">Voir</a></td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        break;
+
+    default:
+        <div class="alert alert-danger" role="alert">
+            @roomOperation.Message
+        </div>
+        break;
+        
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private OperationResult<ChatRoom> roomOperation = new(OperationResultType.Pending);
+
+    protected override async Task OnInitializedAsync()
+    {
+        roomOperation = await RoomsService.GetRoomById(Id);
+    }
+}

@@ -7,6 +7,7 @@ public class Symptom
     public SymptomType Type { get; set; }
     public int TypeId { get; set; }
     public IEnumerable<FactorValue> ValuesHistory { get; set; }
+    public bool isDisabled { get; set; }
 
     public Symptom()
     {
