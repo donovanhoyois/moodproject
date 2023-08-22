@@ -53,5 +53,13 @@ public class ChatRoomsController
 			.Include(p => p.Comments)
 			.FirstOrDefault();
 	}
+
+	[HttpPost, ActionName("CreatePost")]
+	public bool CreatePost(ChatRoomPost post)
+	{
+		DbContext.ChatRoomPosts.Add(post);
+		var nbChanges = DbContext.SaveChanges();
+		return nbChanges > 0;
+	}
 	
 }

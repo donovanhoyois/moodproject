@@ -55,8 +55,14 @@ public class AppApi : IAppApi
         return await ApiClient.GetFromJsonAsync<ChatRoom>($"ChatRooms/GetRoom?id={id}");
     }
 
-    public async Task<ChatRoomPost> GetChatPost(int id)
+    public async Task<ChatRoomPost> GetChatRoomPost(int id)
     {
         return await ApiClient.GetFromJsonAsync<ChatRoomPost>($"ChatRooms/GetPost?id={id}");
+    }
+
+    public async Task<bool> CreateChatRoomPost(ChatRoomPost post)
+    {
+        var response = await ApiClient.PostAsJsonAsync($"ChatRooms/CreatePost", post);
+        return response.IsSuccessStatusCode;
     }
 }

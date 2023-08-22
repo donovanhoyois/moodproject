@@ -9,6 +9,9 @@ public class ChatRoomsService : IChatRoomsService
 {
 	private readonly IAppApi AppApi;
 	
+	private const int POST_TITLE_MAX_LENGTH = 64;
+	public const int POST_CONTENT_MAX_LENGTH = 2000;
+
 	public ChatRoomsService(IAppApi appApi)
 	{
 		AppApi = appApi;
@@ -57,7 +60,7 @@ public class ChatRoomsService : IChatRoomsService
 
 	public async Task<OperationResult<ChatRoomPost>> GetPostById(int id)
 	{
-		var apiResponse = await AppApi.GetChatPost(id);
+		var apiResponse = await AppApi.GetChatRoomPost(id);
 		if (apiResponse == null)
 		{
 			return new OperationResult<ChatRoomPost>(OperationResultType.Error)
@@ -71,5 +74,35 @@ public class ChatRoomsService : IChatRoomsService
 			Content = apiResponse
 		};
 
+	}
+
+	public async Task<OperationResult<ChatRoomPost>> CreatePost(ChatRoomPost post)
+	{
+		if (post.Title.Length > POST_TITLE_MAX_LENGTH)
+		{
+			return new OperationResult<ChatRoomPost>(OperationResultType.Error)
+			{
+				Message = "Le titre est trop long."
+			};
+		}
+
+		if (post.Content.Length > POST_CONTENT_MAX_LENGTH)
+		{
+			return new OperationResult<ChatRoomPost>(OperationResultType.Error)
+			{
+				Message = "Le contenu est trop long."
+			};
+		}
+
+		var apiResponse = await AppApi.CreateChatRoomPost(post);
+		return apiResponse
+			? new OperationResult<ChatRoomPost>(OperationResultType.Ok)
+			{
+				Message = "Votre nouvelle publication a été envoyée. Une fois acceptée par la modération, elle sera publique."
+			}
+			: new OperationResult<ChatRoomPost>(OperationResultType.Error)
+			{
+				Message = "Une erreur est survenue, veuillez nous en excuser."
+			};
 	}
 }

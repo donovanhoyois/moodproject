@@ -1,0 +1,77 @@
+﻿@page "/room/{RoomId:int}/create"
+@using MoodProject.Core.Models
+@using MoodProject.App.Models
+@using MoodProject.Core.Enums
+@using MoodProject.Core.Ports.In
+@inject IChatRoomsService RoomsService
+
+@attribute [Authorize]
+
+@inherits MoodProject.App.Shared.Helpers.IdentityHelper
+
+@if (CreateNewPostOperation.Status is OperationResultType.WaitingForUser or OperationResultType.Error)
+{
+    <EditForm Model="postForm" OnSubmit="Submit" Context="formContext">
+        <div class="form-group">
+            <label>Titre</label>
+            <InputText @bind-Value="@postForm.Title" DisplayName="@postForm.Title" class="form-control"/>
+        </div>
+        <div class="form-group">
+            <label>Contenu</label>
+            <InputTextArea @bind-Value="@postForm.Content" DisplayName="@postForm.Content" class="form-control" />
+        </div>
+        <div class="form-check">
+            <InputCheckbox @bind-Value="@postForm.MandatoryBoxIsChecked" class="form-check-input"/>
+            <label class="form-check-label" for="exampleCheck1">J'ai lu le réglement des espaces de discussions</label>
+        </div>
+        @if (CreateNewPostOperation.Status is OperationResultType.Error)
+        {
+            <ErrorMessage Text="@CreateNewPostOperation.Message"/>
+        }
+        <button type="submit" class="btn btn-primary">Envoyer</button>
+    </EditForm>
+}
+@if (CreateNewPostOperation.Status is OperationResultType.Ok)
+{
+    <SuccessMessage Text="@CreateNewPostOperation.Message" />
+    <a class="btn btn-primary">Retour à l'espace de discussion</a>
+}
+
+
+@code {
+
+    [Parameter]
+    public int RoomId { get; set; }
+
+    private NewChatRoomPostForm postForm { get; set; } = new();
+
+    private OperationResult<ChatRoomPost> CreateNewPostOperation { get; set; } = new(OperationResultType.WaitingForUser);
+
+    private async Task Submit()
+    {
+        if (!postForm.MandatoryBoxIsChecked)
+        {
+            CreateNewPostOperation = new OperationResult<ChatRoomPost>(OperationResultType.Error)
+            {
+                Message = "Vous devez accepter le réglement avant de publier dans cet espace de discussion."
+            };
+            return;
+        }
+        postForm.ChatRoomId = RoomId;
+        postForm.AuthorId = await GetUserId();
+        postForm.ModerationStatus = ModerationStatus.Pending;
+        postForm.PublishedDate = DateTime.Now;
+        postForm.Comments = new List<ChatRoomComment>();
+        /*
+        var newPost = new ChatRoomPost()
+        {
+            Title = postForm.Title,
+            Content = postForm.Content,
+            PublishedDate = DateTime.Now,
+            AuthorId = await GetUserId(),
+            ModerationStatus = ModerationStatus.Pending,
+        };
+        */
+        CreateNewPostOperation = await RoomsService.CreatePost(postForm);
+    }
+}

@@ -12,5 +12,6 @@ public interface IAppApi
     public Task<IEnumerable<CustomQuizzQuestion>> GetCustomQuestions();
     public Task<IEnumerable<ChatRoom>> GetChatRooms(string userId);
     public Task<ChatRoom> GetChatRoom(int id);
-    public Task<ChatRoomPost> GetChatPost(int id);
+    public Task<ChatRoomPost> GetChatRoomPost(int id);
+    public Task<bool> CreateChatRoomPost(ChatRoomPost post);
 }
