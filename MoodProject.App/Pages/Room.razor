@@ -3,6 +3,7 @@
 @using MoodProject.Core.Ports.In
 @using MoodProject.Core.Enums
 @inject IChatRoomsService RoomsService
+@inject NavigationManager NavigationManager
 
 @attribute [Authorize]
 
@@ -19,8 +20,8 @@
     case OperationResultType.Ok:
         if (roomOperation.Content.Posts.Any(p => p.ModerationStatus == ModerationStatus.Published))
         {
-            <table class="table">
-                <thead>
+            <table class="table table-hover">
+                <thead class="thead-dark">
                 <tr>
                     <th scope="col">Titre</th>
                     <th scope="col">Auteur</th>
@@ -29,12 +30,10 @@
                 <tbody>
                 @foreach (var post in roomOperation.Content.Posts.Where(p => p.ModerationStatus == ModerationStatus.Published))
                 {
-                    <tr>
+                    <tr @onclick="@(()=> NavigationManager.NavigateTo($"/room/{Id}/{post.Id}"))">
                         <td>@post.Title</td>
                         <td>@post.AuthorId</td>
-                        <td><a class="btn btn-primary" href="/room/@Id/@post.Id">Voir</a></td>
                     </tr>
-                    
                 }
                 </tbody>
             </table>
@@ -43,97 +42,6 @@
         {
             <InfoMessage Text="Il n'y a encore aucun post sur cet espace de discussion."/>
         }
-        <AuthorizeView Roles="Moderator">
-            <Authorized>
-                @if (roomOperation.Content.Posts.Any(p => p.ModerationStatus != ModerationStatus.Published))
-                {
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th scope="col">Titre</th>
-                            <th scope="col">Auteur</th>
-                            <th scope="col"></th>
-                            <th scope="col">Statut</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @foreach (var post in roomOperation.Content.Posts.Where(p => p.ModerationStatus != ModerationStatus.Published))
-                        {
-                            <tr>
-                                <td>@post.Title</td>
-                                <td>@post.AuthorId</td>
-                                <td>
-                                    <a class="btn btn-primary" href="/room/@Id/@post.Id">Voir</a>
-                                    <button class="btn btn-success">Accepter</button>
-                                    <button class="btn btn-danger">Refuser</button>
-                                </td>
-                                <td>
-                                    @switch (post.ModerationStatus)
-                                    {
-                                        case ModerationStatus.Pending:
-                                            <div class="alert alert-warning" role="alert">En attente de validation</div>
-                                            break;
-                
-                                        case ModerationStatus.Published:
-                                            <SuccessMessage Text="Publié"/>
-                                            break;
-                
-                                        case ModerationStatus.Refused:
-                                            <SuccessMessage Text="Refusé"/>
-                                            break;
-                                    }
-                                </td>
-                            </tr>
-                        }
-                        </tbody>
-                    </table>
-                }
-            </Authorized>
-            <NotAuthorized>
-                @if (roomOperation.Content.Posts.Any(p => p.AuthorId.Equals(userId)))
-                {
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th colspan="4">Vos publications</th>
-                        </tr>
-                        <tr>
-                            <th scope="col">Titre</th>
-                            <th scope="col"></th>
-                            <th scope="col">Statut</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        @foreach (var post in roomOperation.Content.Posts.Where(p => p.ModerationStatus != ModerationStatus.Published && p.AuthorId.Equals(userId)))
-                        {
-                            <tr>
-                                <td>@post.Title</td>
-                                <td>
-                                    <a class="btn btn-primary" href="/room/@Id/@post.Id">Voir</a>
-                                </td>
-                                <td>
-                                    @switch (post.ModerationStatus)
-                                    {
-                                        case ModerationStatus.Pending:
-                                            <div class="alert alert-warning" role="alert">En attente de validation</div>
-                                            break;
-                
-                                        case ModerationStatus.Published:
-                                            <SuccessMessage Text="Publié"/>
-                                            break;
-                
-                                        case ModerationStatus.Refused:
-                                            <ErrorMessage Text="Refusé"/>
-                                            break;
-                                    }
-                                </td>
-                            </tr>
-                        }
-                        </tbody>
-                    </table>
-                }
-            </NotAuthorized>
-        </AuthorizeView>
         break;
 
     default:
@@ -153,11 +61,24 @@
 
     private OperationResult<ChatRoom> roomOperation = new(OperationResultType.Pending);
     
-    // TODO: Boutons valider & refuser
 
     protected override async Task OnInitializedAsync()
     {
         roomOperation = await RoomsService.GetRoomById(Id);
         userId = await GetUserId();
+    }
+
+    private async Task UpdatePostStatus(int id, ModerationStatus newStatus)
+    {
+        var post = roomOperation.Content.Posts.FirstOrDefault(p => p.Id.Equals(id));
+        if (post != null)
+        {
+            post.ModerationStatus = newStatus;
+            var updateOperation = await RoomsService.UpdatePost(post);
+            if (updateOperation.Status.Equals(OperationResultType.Ok))
+            {
+                StateHasChanged();
+            }
+        }
     }
 }

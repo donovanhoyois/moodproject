@@ -1,0 +1,88 @@
+﻿@page "/Rooms/Moderation"
+@using MoodProject.Core.Ports.In
+@using MoodProject.Core.Models
+@using MoodProject.Core.Enums
+@inject IChatRoomsService RoomsService
+
+@attribute [Authorize(Roles = "Moderator")]
+
+@inherits MoodProject.App.Shared.Helpers.IdentityHelper
+
+@switch(postsOperation.Status)
+{
+    case OperationResultType.Pending:
+        <LoadingText/>
+        break;
+        
+    case OperationResultType.Ok:
+        if (postsOperation.Content.Any(p => p.ModerationStatus is ModerationStatus.Pending))
+        {
+            <div class="table-responsive-sm">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th colspan="4">Publications en attente de modération: @(postsOperation.Content.Where(p => p.ModerationStatus is ModerationStatus.Pending).Count())</th>
+                    </tr>
+                    <tr>
+                        <th scope="col">Titre</th>
+                        <th scope="col">Date de création</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var post in postsOperation.Content.Where(p => p.ModerationStatus is ModerationStatus.Pending))
+                    {
+                        <tr @key=post>
+                            <td>@post.Title</td>
+                            <td>@post.PublishedDate</td>
+                            <td>
+                                <a class="btn btn-primary" href="/room/@post.ChatRoomId/@post.Id">Voir</a>
+                                <button class="btn btn-success" @onclick="() => UpdatePostStatus(post.Id, ModerationStatus.Published)">Accepter</button>
+                                <button class="btn btn-danger" @onclick="() => UpdatePostStatus(post.Id, ModerationStatus.Refused)">Refuser</button>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <InfoMessage Text="Aucune publication en attente de modération." />
+        }
+        break;
+            
+    case OperationResultType.Error:
+        <ErrorMessage Text="@postsOperation.Message"/>
+        break;
+}
+
+@code{
+
+    private OperationResult<IEnumerable<ChatRoomPost>> postsOperation = new(OperationResultType.Pending);
+    private OperationResult<IEnumerable<ChatRoomComment>> commentsOperation = new(OperationResultType.Pending);
+    
+    protected override async Task OnInitializedAsync()
+    {
+        postsOperation = await RoomsService.GetPosts(ModerationStatus.Pending);
+        commentsOperation = await RoomsService.GetComments(ModerationStatus.Pending);
+    }
+
+    private async Task UpdatePostStatus(int id, ModerationStatus newStatus)
+    {
+        var post = postsOperation.Content.FirstOrDefault(p => p.Id.Equals(id));
+        if (post != null)
+        {
+            post.ModerationStatus = newStatus;
+            post.Comments ??= new List<ChatRoomComment>();
+            
+            var updateOperation = await RoomsService.UpdatePost(post);
+            Console.WriteLine(updateOperation.Message);
+            if (updateOperation.Status.Equals(OperationResultType.Ok))
+            {
+                StateHasChanged();
+            }
+        }
+    }
+}
+

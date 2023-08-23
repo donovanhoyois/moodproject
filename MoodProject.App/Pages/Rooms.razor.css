@@ -1,0 +1,24 @@
+﻿.rooms-cards{
+    display: flex;
+    flex-flow: row wrap;
+    margin-bottom: 40px;
+}
+.rooms-cards > div {
+    margin-right: 15px;
+}
+.rooms-cards .card-header{
+    height: 65px;
+    text-align: center;
+}
+.rooms-cards a{
+    width: 100%;
+}
+.buttons{
+    display: flex;
+    flex-flow: column wrap;
+    align-items: flex-start;
+}
+.buttons > * {
+    width: 18rem;
+    margin: 15px 0;
+}

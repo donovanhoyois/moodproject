@@ -16,7 +16,7 @@ builder.Services.AddCors(c => c.AddPolicy("dev", builder =>
     builder
         .AllowAnyOrigin()
         .AllowAnyHeader()
-        .AllowAnyHeader();
+        .AllowAnyMethod();
 }));
     
 // MySQL

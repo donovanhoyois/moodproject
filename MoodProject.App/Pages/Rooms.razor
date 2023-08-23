@@ -17,19 +17,21 @@
         break;
         
     case OperationResultType.Ok:
-        foreach (var room in roomListOperation.Content)
-        {
-            <div class="card" style="width: 18rem;">
-                <div class="card-header">
-                    @room.Name
-                  </div>
-                <div class="card-body">
-                    <p class="card-text">
-                        <a class="btn btn-primary" href="/room/@room.Id">Voir</a>
-                    </p>
+        <div class="rooms-cards">
+            @foreach (var room in roomListOperation.Content)
+            {
+                <div class="card" style="width: 18rem;">
+                    <div class="card-header">
+                        @room.Name
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            <a class="btn btn-primary" href="/room/@room.Id">Voir</a>
+                        </p>
+                    </div>
                 </div>
-            </div>
-        }
+            }
+        </div>
         break;
         
     default:
@@ -38,6 +40,15 @@
         </div>
         break;
 }
+<div class="buttons">
+    <a class="btn btn-primary" href="/rooms/history">Voir mon historique</a>
+    <AuthorizeView Roles="Moderator">
+        <Authorized>
+            <a class="btn btn-primary" href="/rooms/moderation">Panel modération</a>
+        </Authorized>
+    </AuthorizeView>
+</div>
+
 
 @code {
 

@@ -12,6 +12,13 @@ public interface IAppApi
     public Task<IEnumerable<CustomQuizzQuestion>> GetCustomQuestions();
     public Task<IEnumerable<ChatRoom>> GetChatRooms(string userId);
     public Task<ChatRoom> GetChatRoom(int id);
+    public Task<IEnumerable<ChatRoomPost>> GetUnpublishedPosts();
     public Task<ChatRoomPost> GetChatRoomPost(int id);
+    public Task<IEnumerable<ChatRoomPost>> GetChatRoomPostsOfUser(string userId);
     public Task<bool> CreateChatRoomPost(ChatRoomPost post);
+    public Task<bool> UpdateChatRoomPost(ChatRoomPost post);
+    public Task<IEnumerable<ChatRoomComment>> GetUnpublishedComments();
+    public Task<IEnumerable<ChatRoomComment>> GetChatRoomCommentsOfUser(string userId);
+    public Task<bool> CreateChatRoomComment(ChatRoomComment comment);
+    public Task<bool> UpdateChatRoomComment(ChatRoomComment comment);
 }

@@ -10,7 +10,8 @@ public class ChatRoomsService : IChatRoomsService
 	private readonly IAppApi AppApi;
 	
 	private const int POST_TITLE_MAX_LENGTH = 64;
-	public const int POST_CONTENT_MAX_LENGTH = 2000;
+	private const int POST_CONTENT_MAX_LENGTH = 2000;
+	private const int COMMENT_MAX_LENGTH = 2000;
 
 	public ChatRoomsService(IAppApi appApi)
 	{
@@ -76,6 +77,42 @@ public class ChatRoomsService : IChatRoomsService
 
 	}
 
+	public async Task<OperationResult<IEnumerable<ChatRoomPost>>> GetPosts(ModerationStatus moderationStatus)
+	{
+		if (moderationStatus == ModerationStatus.Pending)
+		{
+			var apiResponse = await AppApi.GetUnpublishedPosts();
+			return apiResponse != null
+				? new OperationResult<IEnumerable<ChatRoomPost>>(OperationResultType.Ok)
+				{
+					Content = apiResponse
+				}
+				: new OperationResult<IEnumerable<ChatRoomPost>>(OperationResultType.Error)
+				{
+					Message = "Une erreur est survenue lors de la récupération des posts en attente de modération."
+				};
+		}
+
+		return new OperationResult<IEnumerable<ChatRoomPost>>(OperationResultType.Error)
+		{
+			Message = "Impossible de récupérer les posts avec le statut de modération demandé."
+		};
+	}
+
+	public async Task<OperationResult<IEnumerable<ChatRoomPost>>> GetPostsOfUser(string userId)
+	{
+		var apiResponse = await AppApi.GetChatRoomPostsOfUser(userId);
+		return apiResponse != null
+			? new OperationResult<IEnumerable<ChatRoomPost>>(OperationResultType.Ok)
+			{
+				Content = apiResponse
+			}
+			: new OperationResult<IEnumerable<ChatRoomPost>>(OperationResultType.Error)
+			{
+				Message = "Une erreur est survenue lors de la récupération de vos publications."
+			};
+	}
+
 	public async Task<OperationResult<ChatRoomPost>> CreatePost(ChatRoomPost post)
 	{
 		if (post.Title.Length > POST_TITLE_MAX_LENGTH)
@@ -103,6 +140,92 @@ public class ChatRoomsService : IChatRoomsService
 			: new OperationResult<ChatRoomPost>(OperationResultType.Error)
 			{
 				Message = "Une erreur est survenue, veuillez nous en excuser."
+			};
+	}
+
+	public async Task<OperationResult<ChatRoomPost>> UpdatePost(ChatRoomPost post)
+	{
+		var apiResponse = await AppApi.UpdateChatRoomPost(post);
+		return apiResponse
+			? new OperationResult<ChatRoomPost>(OperationResultType.Ok)
+			{
+				Message = "La publication a bien été mise à jour."
+			}
+			: new OperationResult<ChatRoomPost>(OperationResultType.Error)
+			{
+				Message = "La publication n'a pas pu être mise à jour."
+			};
+	}
+
+	public async Task<OperationResult<IEnumerable<ChatRoomComment>>> GetComments(ModerationStatus moderationStatus)
+	{
+		if (moderationStatus == ModerationStatus.Pending)
+		{
+			var apiResponse = await AppApi.GetUnpublishedComments();
+			return apiResponse != null
+				? new OperationResult<IEnumerable<ChatRoomComment>>(OperationResultType.Ok)
+				{
+					Content = apiResponse
+				}
+				: new OperationResult<IEnumerable<ChatRoomComment>>(OperationResultType.Error)
+				{
+					Message = "Une erreur est survenue lors de la récupération des commentaires en attente de modération."
+				};
+		}
+
+		return new OperationResult<IEnumerable<ChatRoomComment>>(OperationResultType.Error)
+		{
+			Message = "Impossible de récupérer les commentaires avec le statut de modération demandé."
+		};
+	}
+
+	public async Task<OperationResult<IEnumerable<ChatRoomComment>>> GetCommentsOfUser(string userId)
+	{
+		var apiResponse = await AppApi.GetChatRoomCommentsOfUser(userId);
+		return apiResponse != null
+			? new OperationResult<IEnumerable<ChatRoomComment>>(OperationResultType.Ok)
+			{
+				Content = apiResponse
+			}
+			: new OperationResult<IEnumerable<ChatRoomComment>>(OperationResultType.Error)
+			{
+				Message = "Une erreur est survenue lors de la récupération de vos commentaires."
+			};
+	}
+
+	public async Task<OperationResult<ChatRoomComment>> CreateComment(ChatRoomComment comment)
+	{
+		if (comment.Content.Length > COMMENT_MAX_LENGTH)
+		{
+			return new OperationResult<ChatRoomComment>(OperationResultType.Error)
+			{
+				Message = "Le commentaire est trop long."
+			};
+		}
+
+		var apiResponse = await AppApi.CreateChatRoomComment(comment);
+		return apiResponse
+			? new OperationResult<ChatRoomComment>(OperationResultType.Ok)
+			{
+				Message = "Votre commentaire a été envoyé. Une fois accepté par la modération, celui-ci sera public."
+			}
+			: new OperationResult<ChatRoomComment>(OperationResultType.Error)
+			{
+				Message = "Une erreur est survenue, veuillez nous en excuser."
+			};
+	}
+
+	public async Task<OperationResult<ChatRoomComment>> UpdateComment(ChatRoomComment comment)
+	{
+		var apiResponse = await AppApi.UpdateChatRoomComment(comment);
+		return apiResponse
+			? new OperationResult<ChatRoomComment>(OperationResultType.Ok)
+			{
+				Message = "Le commentaire a bien été mis à jour."
+			}
+			: new OperationResult<ChatRoomComment>(OperationResultType.Error)
+			{
+				Message = "Le commentaire n'a pas pu être mis à jour."
 			};
 	}
 }

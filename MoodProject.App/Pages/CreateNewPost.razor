@@ -62,16 +62,7 @@
         postForm.ModerationStatus = ModerationStatus.Pending;
         postForm.PublishedDate = DateTime.Now;
         postForm.Comments = new List<ChatRoomComment>();
-        /*
-        var newPost = new ChatRoomPost()
-        {
-            Title = postForm.Title,
-            Content = postForm.Content,
-            PublishedDate = DateTime.Now,
-            AuthorId = await GetUserId(),
-            ModerationStatus = ModerationStatus.Pending,
-        };
-        */
+
         CreateNewPostOperation = await RoomsService.CreatePost(postForm);
     }
 }

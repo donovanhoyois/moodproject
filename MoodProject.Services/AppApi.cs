@@ -55,14 +55,52 @@ public class AppApi : IAppApi
         return await ApiClient.GetFromJsonAsync<ChatRoom>($"ChatRooms/GetRoom?id={id}");
     }
 
+    public async Task<IEnumerable<ChatRoomPost>> GetUnpublishedPosts()
+    {
+        return await ApiClient.GetFromJsonAsync<IEnumerable<ChatRoomPost>>($"ChatRooms/GetPendingPosts");
+    }
+
     public async Task<ChatRoomPost> GetChatRoomPost(int id)
     {
         return await ApiClient.GetFromJsonAsync<ChatRoomPost>($"ChatRooms/GetPost?id={id}");
     }
 
+    public async Task<IEnumerable<ChatRoomPost>> GetChatRoomPostsOfUser(string userId)
+    {
+        return await ApiClient.GetFromJsonAsync<IEnumerable<ChatRoomPost>>($"ChatRooms/GetPostsOfUser?userId={userId}");
+    }
+
     public async Task<bool> CreateChatRoomPost(ChatRoomPost post)
     {
         var response = await ApiClient.PostAsJsonAsync($"ChatRooms/CreatePost", post);
+        return response.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> UpdateChatRoomPost(ChatRoomPost post)
+    {
+        var response = await ApiClient.PatchAsJsonAsync($"ChatRooms/UpdatePost", post);
+        return response.IsSuccessStatusCode;
+    }
+
+    public async Task<IEnumerable<ChatRoomComment>> GetUnpublishedComments()
+    {
+        return await ApiClient.GetFromJsonAsync<IEnumerable<ChatRoomComment>>($"ChatRooms/GetPendingComments");
+    }
+
+    public async Task<IEnumerable<ChatRoomComment>> GetChatRoomCommentsOfUser(string userId)
+    {
+        return await ApiClient.GetFromJsonAsync<IEnumerable<ChatRoomComment>>($"ChatRooms/GetCommentsOfUser?userId={userId}");
+    }
+
+    public async Task<bool> CreateChatRoomComment(ChatRoomComment comment)
+    {
+        var response = await ApiClient.PostAsJsonAsync($"ChatRooms/CreateComment", comment);
+        return response.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> UpdateChatRoomComment(ChatRoomComment comment)
+    {
+        var response = await ApiClient.PatchAsJsonAsync($"ChatRooms/UpdateComment", comment);
         return response.IsSuccessStatusCode;
     }
 }

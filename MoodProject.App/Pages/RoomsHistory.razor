@@ -1,0 +1,90 @@
+﻿@page "/Rooms/History"
+@using MoodProject.Core.Ports.In
+@using MoodProject.Core.Models
+@using MoodProject.Core.Enums
+@inject IChatRoomsService RoomsService
+
+@attribute [Authorize]
+
+@inherits MoodProject.App.Shared.Helpers.IdentityHelper
+
+@switch(postsHistoryOperation.Status)
+{
+    case OperationResultType.Pending:
+        <LoadingText/>
+        break;
+        
+    case OperationResultType.Ok:
+        if (postsHistoryOperation.Content.Any())
+        {
+            <div class="table-responsive-sm">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th colspan="4">Vos publications</th>
+                    </tr>
+                    <tr>
+                        <th scope="col">Titre</th>
+                        <th scope="col">Date de création</th>
+                        <th scope="col"></th>
+                        <th scope="col">Statut</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var post in postsHistoryOperation.Content)
+                    {
+                        <tr @key=post>
+                            <td>@post.Title</td>
+                            <td>@GetPublishedDateFormatted(post.PublishedDate)</td>
+                            <td>
+                                <a class="btn btn-primary" href="/room/@post.ChatRoomId/@post.Id">Voir</a>
+                            </td>
+                            <td>
+                                @switch (post.ModerationStatus)
+                                {
+                                    case ModerationStatus.Pending:
+                                        <WarningMessage Text="En attente de validation"/>
+                                        break;
+
+                                    case ModerationStatus.Published:
+                                        <SuccessMessage Text="Publié"/>
+                                        break;
+
+                                    case ModerationStatus.Refused:
+                                        <ErrorMessage Text="Refusé"/>
+                                        break;
+                                }
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <InfoMessage Text="Vous n'avez encore rien publié." />
+        }
+        break;
+            
+    case OperationResultType.Error:
+        <ErrorMessage Text="@postsHistoryOperation.Message"/>
+        break;
+}
+
+@code {
+    
+    private OperationResult<IEnumerable<ChatRoomPost>> postsHistoryOperation = new(OperationResultType.Pending);
+    private OperationResult<IEnumerable<ChatRoomComment>> commentsHistoryOperation = new(OperationResultType.Pending);
+    
+    protected override async Task OnInitializedAsync()
+    {
+        postsHistoryOperation = await RoomsService.GetPostsOfUser(await GetUserId());
+        commentsHistoryOperation = await RoomsService.GetCommentsOfUser(await GetUserId());
+    }
+    
+    private string GetPublishedDateFormatted(DateTime dateTime)
+    {
+        return $"Publié le {dateTime.Day}/{dateTime.Month}/{dateTime.Year} à {dateTime.Hour}:{dateTime.Minute}.";
+    }
+}
