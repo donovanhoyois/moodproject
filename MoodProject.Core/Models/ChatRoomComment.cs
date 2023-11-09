@@ -5,6 +5,7 @@ namespace MoodProject.Core.Models;
 public class ChatRoomComment
 {
 	public int Id { get; set; }
+	public ChatRoomPost Post { get; set; }
 	public string AuthorId { get; set; }
 	public string Content { get; set; }
 	public ModerationStatus ModerationStatus { get; set; }

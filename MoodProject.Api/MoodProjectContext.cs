@@ -23,12 +23,19 @@ public class MoodProjectContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+        /* old mysql
         var connectionString = "Server=localhost; User ID=root; Password=; Database=moodproject";
         optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+        */
+        const string connectionString =
+            "Host=flora.db.elephantsql.com;Database=einxmlgw;Username=einxmlgw;Password=l-zqSmHY366YOxf_iZTy3SipGL9rmjkp";
+        optionsBuilder.UseNpgsql(connectionString);
+
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        /*
 
         // Symptom <-> SymptomType
         modelBuilder.Entity<Symptom>()
@@ -43,7 +50,7 @@ public class MoodProjectContext : DbContext
             .WithOne()
             .HasForeignKey(value => value.SymptomId)
             .IsRequired();
-
+        */
         /*
         modelBuilder.Entity<FactorValue>()
             .HasOne(value => value.Symptom)
@@ -56,6 +63,6 @@ public class MoodProjectContext : DbContext
             .OnDelete(DeleteBehavior.NoAction);
         */
         
-        base.OnModelCreating(modelBuilder);
+        //base.OnModelCreating(modelBuilder);
     }
 }
