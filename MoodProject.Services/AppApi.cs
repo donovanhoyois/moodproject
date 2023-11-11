@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Json;
 using MoodProject.Core;
+using MoodProject.Core.Configuration;
 using MoodProject.Core.Models;
 using MoodProject.Core.Ports.Out;
 
@@ -8,9 +9,10 @@ namespace MoodProject.Services;
 public class AppApi : IAppApi
 {
     private HttpClient ApiClient;
-    public AppApi(HttpClient apiClient)
+    public AppApi(ApiConfiguration config, HttpClient apiClient)
     {
         ApiClient = apiClient;
+        ApiClient.BaseAddress = new Uri(config.BaseUrl);
     }
 
     public async Task<IEnumerable<SymptomType>> GetSymptomsTypes()
