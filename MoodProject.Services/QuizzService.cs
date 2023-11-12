@@ -129,7 +129,7 @@ public class QuizzService : IQuizzService
             var op = new OperationResult<float>(
                 float.NaN,
                 OperationResultType.Error,
-                "Pas assez de données disponibles pour établir une moyenne santé.");
+                "Pas assez de données disponibles pour établir une moyenne santé !");
             return op;
         }
 
