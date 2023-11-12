@@ -117,7 +117,8 @@ public class QuizzService : IQuizzService
             averages.Add(GetAverageValues(symptom, HEALTH_AVERAGE_VALUES_COUNT, offset: offset));
         }
 
-        return averages.Average();
+        
+        return averages.Count > 0 ? averages.Average() : Single.NaN;
     }
 
     public OperationResult<float> GetHealthAverageAsPercentage(IEnumerable<Symptom> symptoms, int offset = 0)

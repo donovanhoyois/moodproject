@@ -88,6 +88,6 @@ public class QuizzServiceTests
         var quizzService = new QuizzService(FakeApi);
         var r = await quizzService.Generate(string.Empty);
         Assert.That(r, Is.Not.Null);
-        Assert.That(r.Count(), Is.Not.Zero);
+        Assert.That(r.Content.Count(), Is.Not.Zero);
     }
 }

@@ -97,8 +97,11 @@
         CheckRetrievedSymptoms();
         CalculateHealthAverages();
 
-        var graphValues = CalculateGraphValues();
-        ConfigureHealthHistoryGraph(graphValues);
+        if (healthAveragePercentageOperation.Status == OperationResultType.Ok)
+        {
+            var graphValues = CalculateGraphValues();
+            ConfigureHealthHistoryGraph(graphValues);
+        }
     }
 
     /// <summary>
