@@ -67,7 +67,7 @@ namespace MoodProject.Api.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("PublishedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
@@ -99,7 +99,7 @@ namespace MoodProject.Api.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("PublishedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -152,7 +152,7 @@ namespace MoodProject.Api.Migrations
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("Timestamp")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<int>("Type")
                         .HasColumnType("integer");

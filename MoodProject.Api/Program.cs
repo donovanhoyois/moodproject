@@ -26,6 +26,7 @@ builder.Services.AddDbContext<MoodProjectContext>();
 
 // Custom injections
 builder.Services.AddSingleton(sp => new HttpClient());
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 
 var app = builder.Build();

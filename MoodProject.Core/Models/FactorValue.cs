@@ -1,9 +1,11 @@
-﻿using MoodProject.Core.Enums;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using MoodProject.Core.Enums;
 
 namespace MoodProject.Core.Models;
 
 public class FactorValue
 {
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
     public int SymptomId { get; set; }
     public FactorType Type { get; set; }

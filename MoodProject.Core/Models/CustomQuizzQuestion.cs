@@ -1,9 +1,11 @@
-﻿using MoodProject.Core.Enums;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using MoodProject.Core.Enums;
 
 namespace MoodProject.Core.Models;
 
 public class CustomQuizzQuestion
 {
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
     public QuestionType Type { get; set; }
     public SymptomType SymptomType { get; set; }

@@ -1,9 +1,11 @@
-﻿using MoodProject.Core.Enums;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using MoodProject.Core.Enums;
 
 namespace MoodProject.Core.Models;
 
 public class ChatRoomComment
 {
+	[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 	public int Id { get; set; }
 	public ChatRoomPost Post { get; set; }
 	public string AuthorId { get; set; }
