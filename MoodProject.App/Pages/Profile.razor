@@ -73,7 +73,10 @@
     }
 </div>
 <div class="graph my-3">
-    <!--<Chart Config="graphConfig"></Chart>-->
+    @if (graphConfig != null)
+    {
+        <Chart Config="graphConfig"></Chart>
+    }
 </div>
 
 @code {

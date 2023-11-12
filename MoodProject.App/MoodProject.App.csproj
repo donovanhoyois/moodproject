@@ -35,4 +35,8 @@
     <None Include="wwwroot\js\CircleProgress.js" />
   </ItemGroup>
 
+  <Target Name="PublishServiceWorker" AfterTargets="CopyFilesToPublishDirectory">
+    <WriteLinesToFile File="$(PublishDir)wwwroot\service-worker.js" Lines="/* $([System.Guid]::NewGuid()) */" />
+  </Target>
+
 </Project>
