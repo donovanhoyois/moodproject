@@ -8,6 +8,7 @@ using MoodProject.Core.Configuration;
 using MoodProject.Core.Ports.In;
 using MoodProject.Core.Ports.Out;
 using MoodProject.Services;
+using Toolbelt.Blazor.Extensions.DependencyInjection;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -23,6 +24,9 @@ builder.Services.AddOidcAuthentication(options =>
     //options.ProviderOptions.AdditionalProviderParameters.Add("audience", builder.Configuration["Auth0:Audience"]);
 });
 builder.Services.AddScoped(typeof(AccountClaimsPrincipalFactory<RemoteUserAccount>), typeof(CustomAccountFactory));
+
+// PWA Updated
+builder.Services.AddPWAUpdater();
 
 // Configuration
 builder.Services.AddSingleton(provider =>

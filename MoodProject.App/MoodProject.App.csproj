@@ -16,6 +16,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.7" PrivateAssets="all" />
     -->
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="7.0.7" />
+    <PackageReference Include="Toolbelt.Blazor.PWA.Updater" Version="2.1.0.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,10 +35,5 @@
   <ItemGroup>
     <None Include="wwwroot\js\CircleProgress.js" />
   </ItemGroup>
-
-  <Target Name="PublishServiceWorker" AfterTargets="CopyFilesToPublishDirectory">
-    <WriteLinesToFile File="$(PublishDir)wwwroot\service-worker.js" Lines="/* $([System.Guid]::NewGuid()) */" />
-    <WriteLinesToFile File="$(PublishDir)wwwroot\service-worker.published.js" />
-  </Target>
 
 </Project>
