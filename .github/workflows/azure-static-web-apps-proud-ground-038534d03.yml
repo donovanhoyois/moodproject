@@ -21,7 +21,7 @@ jobs:
         id: sub
         with:
           files: 'MoodProject.App/wwwroot/service-worker.published.js'
-          replacements: '%%CACHE_VERSION%%=$GITHUB_REF_NAME'
+          replacements: '%%CACHE_VERSION%%=${{ github.ref_name }}'
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
