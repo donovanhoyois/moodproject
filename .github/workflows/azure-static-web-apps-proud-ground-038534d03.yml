@@ -16,16 +16,12 @@ jobs:
         with:
           submodules: true
           lfs: false
-      - name: Get Version from Tag
-        uses: actions/checkout@v2
-      - name: Adding Version to environment variables
-        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
       - name: Update Version in service-worker
         uses: datamonsters/replace-action@v2
         id: sub
         with:
           files: 'MoodProject.App/wwwroot/service-worker.published.js'
-          replacements: '%%CACHE_VERSION%%=${{ env.RELEASE_VERSION }}'
+          replacements: '%%CACHE_VERSION%%=$GITHUB_REF_NAME'
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
