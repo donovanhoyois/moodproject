@@ -1,0 +1,28 @@
+﻿@using MoodProject.App.Shared.Helpers
+@using MoodProject.App.Services
+@inject CacheService CacheService
+@inject NavigationManager NavigationManager
+
+@if (InstalledVersion != string.Empty && InstalledVersion != CacheService.GetLastVersionAvailable())
+{
+    <div class="updatePopup" @onclick="Update">
+        <p>La nouvelle version @CacheService.GetLastVersionAvailable() est disponible ! <span class="cta">Mettre à jour maintenant</span></p>
+    </div>
+    
+}
+@code {
+    private string InstalledVersion { get; set; } = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        InstalledVersion = await CacheService.GetInstalledVersion();
+    }
+
+    private async Task Update()
+    {
+        //TODO: Implementer logique
+        await CacheService.Update();
+        NavigationManager.NavigateTo("/", true);
+    }
+
+}

@@ -1,8 +1,11 @@
 ﻿@using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
+@using MoodProject.App.Services
+@using MoodProject.App.Shared.Helpers
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager Navigation
 @inject SignOutSessionStateManager SignOutManager
+@inject CacheService CacheService
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -65,12 +68,22 @@
             </NotAuthorized>
         </AuthorizeView>
     </nav>
+    <div class="version">
+        <p>Version: @InstalledVersion</p>
+    </div>
 </div>
 
 @code {
     private bool collapseNavMenu = true;
 
     private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+    
+    private string InstalledVersion = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        InstalledVersion = await CacheService.GetInstalledVersion();
+    }
 
     private void ToggleNavMenu()
     {
