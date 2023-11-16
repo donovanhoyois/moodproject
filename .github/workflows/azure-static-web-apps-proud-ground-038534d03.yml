@@ -20,7 +20,13 @@ jobs:
         uses: datamonsters/replace-action@v2
         id: sub
         with:
-          files: 'MoodProject.App/wwwroot/service-worker.published.js, MoodProject.App/wwwroot/appsettings.Production.json'
+          files: 'MoodProject.App/wwwroot/service-worker.published.js'
+          replacements: '%%CACHE_VERSION%%=${{ github.ref_name }}'
+      - name: Update Version in appsettings
+        uses: datamonsters/replace-action@v2
+        id: sub
+        with:
+          files: 'MoodProject.App/wwwroot/appsettings.Production.json'
           replacements: '%%CACHE_VERSION%%=${{ github.ref_name }}'
       - name: Build And Deploy
         id: builddeploy
