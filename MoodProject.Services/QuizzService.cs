@@ -69,7 +69,7 @@ public class QuizzService : IQuizzService
         return questions.Any()
             ? new OperationResult<IEnumerable<QuizzQuestion>>(questions, OperationResultType.Ok)
             : new OperationResult<IEnumerable<QuizzQuestion>>(null, OperationResultType.Error,
-                "Aucun questionnaire n'est disponible pour vous aujourd'hui.");
+                "Aucun questionnaire n'est disponible pour vous aujourd'hui !");
     }
 
     public async Task<bool> Submit(IEnumerable<Symptom> symptoms,IEnumerable<FactorValue> values)
