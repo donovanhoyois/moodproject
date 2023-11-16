@@ -18,13 +18,13 @@ jobs:
           lfs: false
       - name: Update Version in service-worker
         uses: datamonsters/replace-action@v2
-        id: sub
+        id: update-version-sw
         with:
           files: 'MoodProject.App/wwwroot/service-worker.published.js'
           replacements: '%%CACHE_VERSION%%=${{ github.ref_name }}'
       - name: Update Version in appsettings
         uses: datamonsters/replace-action@v2
-        id: sub
+        id: update-version-appsettings
         with:
           files: 'MoodProject.App/wwwroot/appsettings.Production.json'
           replacements: '%%CACHE_VERSION%%=${{ github.ref_name }}'
