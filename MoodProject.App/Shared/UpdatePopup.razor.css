@@ -1,0 +1,17 @@
+﻿div.updatePopup{
+    width: 100%;
+    position: fixed;
+    text-align: center;
+    bottom: 0;
+    background-color: #E53E3EFF;
+    color: white;
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+}
+.updatePopup .cta{
+    text-decoration: underline;
+}
+.updatePopup .cta:hover{
+    cursor: pointer;
+}
