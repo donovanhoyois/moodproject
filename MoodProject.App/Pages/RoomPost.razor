@@ -78,6 +78,8 @@
     {
         FormComment.PostId = postOperation.Content.Id;
         FormComment.AuthorId = await GetUserId();
+        FormComment.ModerationStatus = ModerationStatus.Pending;
+        FormComment.PublishedDate = DateTime.Now;
         NewCommentOperation = await RoomsService.CreateComment(FormComment);
     }
 }

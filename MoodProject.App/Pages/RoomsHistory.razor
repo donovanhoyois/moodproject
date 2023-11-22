@@ -72,11 +72,62 @@
         break;
 }
 
+@switch (commentsHistoryOperation.Status)
+{
+    case OperationResultType.Pending:
+        <LoadingText />
+        break;
+        
+    case OperationResultType.Ok:
+        <div class="table-responsive-sm">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th colspan="4">Vos publications</th>
+                </tr>
+                <tr>
+                    <th scope="col">Titre</th>
+                    <th scope="col">Date de création</th>
+                    <th scope="col"></th>
+                    <th scope="col">Statut</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var comment in commentsHistoryOperation.Content)
+                {
+                    <tr @key=comment>
+                        <td>@comment.Content</td>
+                        <td>@GetPublishedDateFormatted(comment.PublishedDate)</td>
+                        <td>
+                            @switch (comment.ModerationStatus)
+                            {
+                                case ModerationStatus.Pending:
+                                    <WarningMessage Text="En attente de validation"/>
+                                    break;
+
+                                case ModerationStatus.Published:
+                                    <SuccessMessage Text="Publié"/>
+                                    break;
+
+                                case ModerationStatus.Refused:
+                                    <ErrorMessage Text="Refusé"/>
+                                    break;
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+        break;
+}
+
+
 @code {
     
     private OperationResult<IEnumerable<ChatRoomPost>> postsHistoryOperation = new(OperationResultType.Pending);
     private OperationResult<IEnumerable<ChatRoomComment>> commentsHistoryOperation = new(OperationResultType.Pending);
-    
+
     protected override async Task OnInitializedAsync()
     {
         postsHistoryOperation = await RoomsService.GetPostsOfUser(await GetUserId());
