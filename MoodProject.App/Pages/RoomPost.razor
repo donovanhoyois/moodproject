@@ -2,60 +2,82 @@
 @using MoodProject.Core.Models
 @using MoodProject.Core.Enums
 @using MoodProject.Core.Ports.In
+@using MoodProject.App.Models
 
 @inject IChatRoomsService RoomsService
 
 @inherits MoodProject.App.Shared.Helpers.IdentityHelper
 
-@switch (postOperation.Status)
+@if (postOperation.Status is OperationResultType.Pending)
 {
-    case OperationResultType.Pending:
-        <LoadingText />
-        break;
-        
-    case OperationResultType.Ok:
+    <LoadingText/>
+}
+else if (postOperation.Status is OperationResultType.Ok)
+{
+    <div class="card">
+        <div class="card-header">
+            @postOperation.Content.Title
+        </div>
+        <div class="card-body">
+            <p class="card-text">@postOperation.Content.Content</p>
+        </div>
+        <div class="card-footer">
+            Publié le @postOperation.Content.PublishedDate par @postOperation.Content.AuthorId
+        </div>
+            
+    </div>
+    @if (postOperation.Content.Comments.Any(comment => comment.ModerationStatus == ModerationStatus.Published))
+    {
         <div class="card">
             <div class="card-header">
-                @postOperation.Content.Title
+                @postOperation.Content.Comments.Count(comment => comment.ModerationStatus == ModerationStatus.Published) Commentaire(s)
             </div>
-            <div class="card-body">
-                <p class="card-text">@postOperation.Content.Content</p>
-                
-            </div>
-            <div class="card-footer">
-                Publié le @postOperation.Content.PublishedDate par @postOperation.Content.AuthorId
-            </div>
-            
-        </div>
-        <div class="card">
             <ul class="list-group list-group-flush">
-                @foreach (var comment in postOperation.Content.Comments)
+                @foreach (var comment in postOperation.Content.Comments.Where(comment => comment.ModerationStatus == ModerationStatus.Published))
                 {
                     <li class="list-group-item">@comment.Content</li>
                 }
             </ul>
         </div>
+    }
+    else
+    {
+        <InfoMessage Text="Il n'y a encore aucun commentaire sur ce post."/>
+    }
+    @if (NewCommentOperation.Status is OperationResultType.WaitingForUser or OperationResultType.Error)
+    {
         <EditForm Model="@FormComment" OnSubmit="SubmitNewComment">
-            <InputTextArea @bind-Value="@FormComment.Content" DisplayName="@FormComment.Content" class="form-control" />
-            <button type="submit" class="btn btn-primary">Envoyer</button>
+            <div class="form-group">
+                <label>Ajouter un commentaire</label>
+                <InputTextArea @bind-Value="@FormComment.Content" DisplayName="@FormComment.Content" placeholder="Votre commentaire ici..." class="form-control"/>
+            </div>
+            <div class="form-check">
+                <InputCheckbox @bind-Value="@FormComment.MandatoryBoxIsChecked" class="form-check-input"/>
+                <label class="form-check-label" for="exampleCheck1">J'ai lu le réglement des espaces de discussions</label>
+            </div>
+            @if (NewCommentOperation.Status is OperationResultType.Ok)
+            {
+                <SuccessMessage Text="@NewCommentOperation.Message"/>
+            }
+            else if (NewCommentOperation.Status is OperationResultType.Error)
+            {
+                <ErrorMessage Text="@NewCommentOperation.Message"/>
+            }
+            <button type="submit" class="btn btn-primary">Commenter</button>
         </EditForm>
-        @if (NewCommentOperation.Status is OperationResultType.Ok)
-        {
-            <SuccessMessage Text="@NewCommentOperation.Message" />
-            <a class="btn btn-primary">Retour à l'espace de discussion</a>
-        }
-        else if (NewCommentOperation.Status is OperationResultType.Error)
-        {
-            <ErrorMessage Text="@NewCommentOperation.Message"/>
-        }
-        
-        break;
-        
-    default:
-        <div class="alert alert-danger" role="alert">
-            @postOperation.Message
-        </div>
-        break;
+    }
+    else if (NewCommentOperation.Status is OperationResultType.Ok)
+    {
+        <SuccessMessage Text="@NewCommentOperation.Message" />
+        <button class="btn btn-primary" @onclick="ResetNewCommentForm">Ajouter un autre commentaire</button>
+    }
+
+}
+else if (postOperation.Status is OperationResultType.Error)
+{
+    <div class="alert alert-danger" role="alert">
+        @postOperation.Message
+    </div>
 }
 
 @code {
@@ -64,7 +86,7 @@
     [Parameter]
     public int PostId { get; set; }
 
-    private ChatRoomComment FormComment { get; set; } = new();
+    private NewChatRoomCommentForm FormComment { get; set; } = new();
     private OperationResult<ChatRoomComment> NewCommentOperation { get; set; } = new(OperationResultType.WaitingForUser);
 
     private OperationResult<ChatRoomPost> postOperation = new(OperationResultType.Pending);
@@ -72,15 +94,29 @@
     protected override async Task OnInitializedAsync()
     {
         postOperation = await RoomsService.GetPostById(PostId);
-        Console.WriteLine(postOperation.Content.Comments.Count());
     }
 
-    private async Task SubmitNewComment()
+    private async Task SubmitNewComment(EditContext editContext)
     {
+        if (!FormComment.MandatoryBoxIsChecked)
+        {
+            NewCommentOperation = new OperationResult<ChatRoomComment>(OperationResultType.Error)
+            {
+                Message = "Vous devez accepter le réglement avant de publier un commentaire dans cet espace de discussion."
+            };
+            return;
+        }
         FormComment.ChatRoomPostId = postOperation.Content.Id;
         FormComment.AuthorId = await GetUserId();
         FormComment.ModerationStatus = ModerationStatus.Pending;
         FormComment.PublishedDate = DateTime.Now;
         NewCommentOperation = await RoomsService.CreateComment(FormComment);
+    }
+
+    private void ResetNewCommentForm()
+    {
+        FormComment.MandatoryBoxIsChecked = false;
+        FormComment.Content = string.Empty;
+        NewCommentOperation = new(OperationResultType.WaitingForUser);
     }
 }

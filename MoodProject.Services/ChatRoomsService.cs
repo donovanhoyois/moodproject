@@ -115,6 +115,20 @@ public class ChatRoomsService : IChatRoomsService
 
 	public async Task<OperationResult<ChatRoomPost>> CreatePost(ChatRoomPost post)
 	{
+		if (post.Title is null or "")
+		{
+			return new OperationResult<ChatRoomPost>(OperationResultType.Error)
+			{
+				Message = "Le titre de la publication est trop court."
+			};
+		}
+		if (post.Content is null or "")
+		{
+			return new OperationResult<ChatRoomPost>(OperationResultType.Error)
+			{
+				Message = "Le contenu de la publication est trop court."
+			};
+		}
 		if (post.Title.Length > POST_TITLE_MAX_LENGTH)
 		{
 			return new OperationResult<ChatRoomPost>(OperationResultType.Error)
@@ -195,6 +209,13 @@ public class ChatRoomsService : IChatRoomsService
 
 	public async Task<OperationResult<ChatRoomComment>> CreateComment(ChatRoomComment comment)
 	{
+		if (comment.Content is null or "")
+		{
+			return new OperationResult<ChatRoomComment>(OperationResultType.Error)
+			{
+				Message = "Le commentaire est trop court."
+			};
+		}
 		if (comment.Content.Length > COMMENT_MAX_LENGTH)
 		{
 			return new OperationResult<ChatRoomComment>(OperationResultType.Error)
