@@ -57,6 +57,74 @@
         break;
 }
 
+@switch(commentsOperation.Status)
+{
+    case OperationResultType.Pending:
+        <LoadingText/>
+        break;
+        
+    case OperationResultType.Ok:
+        if (commentsOperation.Content.Any())
+        {
+            <div class="table-responsive-sm">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th colspan="4">Commentaires en attente de modération: @commentsOperation.Content.Count()</th>
+                    </tr>
+                    <tr>
+                        <th scope="col">Titre</th>
+                        <th scope="col">Date de création</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var comment in commentsOperation.Content)
+                    {
+                        <tr @key=comment>
+                            <td>@comment.Content</td>
+                            <td>@comment.PublishedDate</td>
+                            <td>
+                                
+                            </td>
+                            <td>
+                            @if (comment.ModerationStatus.Equals(ModerationStatus.Pending))
+                            {
+                                <a class="btn btn-primary" href="/room/@comment/@comment.Id">Voir</a>
+                                <button class="btn btn-success" @onclick="() => UpdateCommentStatus(comment, ModerationStatus.Published)">Accepter</button>
+                                <button class="btn btn-danger" @onclick="() => UpdateCommentStatus(comment, ModerationStatus.Refused)">Refuser</button>
+                            }
+                            else
+                            {
+                                @switch (comment.ModerationStatus)
+                                {
+                                    case ModerationStatus.Published:
+                                        <SuccessMessage Text="Publié"/>
+                                        break;
+
+                                    case ModerationStatus.Refused:
+                                        <ErrorMessage Text="Refusé"/>
+                                        break;
+                                }
+                            }
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <InfoMessage Text="Aucune publication en attente de modération." />
+        }
+        break;
+            
+    case OperationResultType.Error:
+        <ErrorMessage Text="@postsOperation.Message"/>
+        break;
+}
+
 @code{
 
     private OperationResult<IEnumerable<ChatRoomPost>> postsOperation = new(OperationResultType.Pending);
@@ -82,6 +150,17 @@
             {
                 StateHasChanged();
             }
+        }
+    }
+
+    private async Task UpdateCommentStatus(ChatRoomComment comment, ModerationStatus newStatus)
+    {
+        comment.ModerationStatus = newStatus;
+
+        var updateOperation = await RoomsService.UpdateComment(comment);
+        if (updateOperation.Status.Equals(OperationResultType.Ok))
+        {
+            StateHasChanged();
         }
     }
 }

@@ -72,11 +72,12 @@
     protected override async Task OnInitializedAsync()
     {
         postOperation = await RoomsService.GetPostById(PostId);
+        Console.WriteLine(postOperation.Content.Comments.Count());
     }
 
     private async Task SubmitNewComment()
     {
-        FormComment.PostId = postOperation.Content.Id;
+        FormComment.ChatRoomPostId = postOperation.Content.Id;
         FormComment.AuthorId = await GetUserId();
         FormComment.ModerationStatus = ModerationStatus.Pending;
         FormComment.PublishedDate = DateTime.Now;
