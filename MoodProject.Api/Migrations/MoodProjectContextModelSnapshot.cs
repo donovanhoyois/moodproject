@@ -56,6 +56,9 @@ namespace MoodProject.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int?>("ChatRoomPostId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("text");
@@ -71,7 +74,7 @@ namespace MoodProject.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PostId");
+                    b.HasIndex("ChatRoomPostId");
 
                     b.ToTable("ChatRoomComments");
                 });
@@ -264,13 +267,9 @@ namespace MoodProject.Api.Migrations
 
             modelBuilder.Entity("MoodProject.Core.Models.ChatRoomComment", b =>
                 {
-                    b.HasOne("MoodProject.Core.Models.ChatRoomPost", "Post")
+                    b.HasOne("MoodProject.Core.Models.ChatRoomPost", null)
                         .WithMany("Comments")
-                        .HasForeignKey("PostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Post");
+                        .HasForeignKey("ChatRoomPostId");
                 });
 
             modelBuilder.Entity("MoodProject.Core.Models.ChatRoomPost", b =>

@@ -5,6 +5,8 @@
 
 @inject IChatRoomsService RoomsService
 
+@inherits MoodProject.App.Shared.Helpers.IdentityHelper
+
 @switch (postOperation.Status)
 {
     case OperationResultType.Pending:
@@ -33,6 +35,20 @@
                 }
             </ul>
         </div>
+        <EditForm Model="@FormComment" OnSubmit="SubmitNewComment">
+            <InputTextArea @bind-Value="@FormComment.Content" DisplayName="@FormComment.Content" class="form-control" />
+            <button type="submit" class="btn btn-primary">Envoyer</button>
+        </EditForm>
+        @if (NewCommentOperation.Status is OperationResultType.Ok)
+        {
+            <SuccessMessage Text="@NewCommentOperation.Message" />
+            <a class="btn btn-primary">Retour à l'espace de discussion</a>
+        }
+        else if (NewCommentOperation.Status is OperationResultType.Error)
+        {
+            <ErrorMessage Text="@NewCommentOperation.Message"/>
+        }
+        
         break;
         
     default:
@@ -47,11 +63,21 @@
     public int RoomId { get; set; }
     [Parameter]
     public int PostId { get; set; }
-    
+
+    private ChatRoomComment FormComment { get; set; } = new();
+    private OperationResult<ChatRoomComment> NewCommentOperation { get; set; } = new(OperationResultType.WaitingForUser);
+
     private OperationResult<ChatRoomPost> postOperation = new(OperationResultType.Pending);
     
     protected override async Task OnInitializedAsync()
     {
         postOperation = await RoomsService.GetPostById(PostId);
+    }
+
+    private async Task SubmitNewComment()
+    {
+        FormComment.PostId = postOperation.Content.Id;
+        FormComment.AuthorId = await GetUserId();
+        NewCommentOperation = await RoomsService.CreateComment(FormComment);
     }
 }
