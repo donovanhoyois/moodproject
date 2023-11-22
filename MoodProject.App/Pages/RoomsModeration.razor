@@ -73,7 +73,7 @@
                         <th colspan="4">Commentaires en attente de modération: @commentsOperation.Content.Count()</th>
                     </tr>
                     <tr>
-                        <th scope="col">Titre</th>
+                        <th scope="col">Contenu</th>
                         <th scope="col">Date de création</th>
                         <th scope="col">Actions</th>
                     </tr>
@@ -85,12 +85,8 @@
                             <td>@comment.Content</td>
                             <td>@comment.PublishedDate</td>
                             <td>
-                                
-                            </td>
-                            <td>
                             @if (comment.ModerationStatus.Equals(ModerationStatus.Pending))
                             {
-                                <a class="btn btn-primary" href="/room/@comment/@comment.Id">Voir</a>
                                 <button class="btn btn-success" @onclick="() => UpdateCommentStatus(comment, ModerationStatus.Published)">Accepter</button>
                                 <button class="btn btn-danger" @onclick="() => UpdateCommentStatus(comment, ModerationStatus.Refused)">Refuser</button>
                             }
@@ -116,7 +112,7 @@
         }
         else
         {
-            <InfoMessage Text="Aucune publication en attente de modération." />
+            <InfoMessage Text="Aucun commentaire en attente de modération." />
         }
         break;
             
