@@ -58,7 +58,8 @@ public class ChatRoomsController
 	[HttpGet, ActionName("GetPendingPosts")]
 	public IEnumerable<ChatRoomPost> GetPendingPosts()
 	{
-		return DbContext.ChatRoomPosts.Where(p => p.ModerationStatus.Equals(ModerationStatus.Pending));
+		return DbContext.ChatRoomPosts
+			.Where(post => post.ModerationStatus.Equals(ModerationStatus.Pending));
 	}
 
 	[HttpGet, ActionName("GetPostsOfUser")]
@@ -91,7 +92,9 @@ public class ChatRoomsController
 	[HttpGet, ActionName("GetPendingComments")]
 	public IEnumerable<ChatRoomComment> GetPendingComments()
 	{
-		return DbContext.ChatRoomComments.Where(p => p.ModerationStatus.Equals(ModerationStatus.Pending));
+		return DbContext.ChatRoomComments
+			.Where(comment => comment.ModerationStatus.Equals(ModerationStatus.Pending))
+			.Include(comment => comment.Post);
 	}
 
 	[HttpGet, ActionName("GetCommentsOfUser")]

@@ -1,4 +1,4 @@
-﻿@page "/room/{RoomId:int}/create"
+﻿@page "/rooms/{RoomId:int}/create"
 @using MoodProject.Core.Models
 @using MoodProject.App.Models
 @using MoodProject.Core.Enums
@@ -57,7 +57,7 @@
             };
             return;
         }
-        postForm.ChatRoomId = RoomId;
+        postForm.Room = (await RoomsService.GetRoomById(RoomId)).Content;
         postForm.AuthorId = await GetUserId();
         postForm.ModerationStatus = ModerationStatus.Pending;
         postForm.PublishedDate = DateTime.Now;

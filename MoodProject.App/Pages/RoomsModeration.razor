@@ -36,7 +36,7 @@
                             <td>@post.Title</td>
                             <td>@post.PublishedDate</td>
                             <td>
-                                <a class="btn btn-primary" href="/room/@post.ChatRoomId/@post.Id">Voir</a>
+                                <a class="btn btn-primary" href="/rooms/post/@post.Id">Voir</a>
                                 <button class="btn btn-success" @onclick="() => UpdatePostStatus(post.Id, ModerationStatus.Published)">Accepter</button>
                                 <button class="btn btn-danger" @onclick="() => UpdatePostStatus(post.Id, ModerationStatus.Refused)">Refuser</button>
                             </td>
@@ -87,6 +87,7 @@
                             <td>
                             @if (comment.ModerationStatus.Equals(ModerationStatus.Pending))
                             {
+                                <a class="btn btn-primary" href="/rooms/post/@comment.Post.Id">Voir le post</a>
                                 <button class="btn btn-success" @onclick="() => UpdateCommentStatus(comment, ModerationStatus.Published)">Accepter</button>
                                 <button class="btn btn-danger" @onclick="() => UpdateCommentStatus(comment, ModerationStatus.Refused)">Refuser</button>
                             }

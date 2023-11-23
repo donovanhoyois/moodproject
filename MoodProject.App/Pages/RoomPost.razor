@@ -1,4 +1,4 @@
-﻿@page "/Room/{RoomId:int}/{PostId:int}"
+﻿@page "/Rooms/Post/{PostId:int}"
 @using MoodProject.Core.Models
 @using MoodProject.Core.Enums
 @using MoodProject.Core.Ports.In
@@ -106,7 +106,7 @@ else if (postOperation.Status is OperationResultType.Error)
             };
             return;
         }
-        FormComment.ChatRoomPostId = postOperation.Content.Id;
+        FormComment.Post = postOperation.Content;
         FormComment.AuthorId = await GetUserId();
         FormComment.ModerationStatus = ModerationStatus.Pending;
         FormComment.PublishedDate = DateTime.Now;

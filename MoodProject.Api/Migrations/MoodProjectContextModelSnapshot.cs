@@ -34,7 +34,7 @@ namespace MoodProject.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("SymptomId")
+                    b.Property<int?>("SymptomId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -56,9 +56,6 @@ namespace MoodProject.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("ChatRoomPostId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("text");
@@ -66,12 +63,15 @@ namespace MoodProject.Api.Migrations
                     b.Property<int>("ModerationStatus")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("PostId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("PublishedDate")
                         .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ChatRoomPostId");
+                    b.HasIndex("PostId");
 
                     b.ToTable("ChatRoomComments");
                 });
@@ -88,9 +88,6 @@ namespace MoodProject.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("ChatRoomId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("text");
@@ -101,13 +98,16 @@ namespace MoodProject.Api.Migrations
                     b.Property<DateTime>("PublishedDate")
                         .HasColumnType("timestamp without time zone");
 
+                    b.Property<int?>("RoomId")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ChatRoomId");
+                    b.HasIndex("RoomId");
 
                     b.ToTable("ChatRoomPosts");
                 });
@@ -255,29 +255,27 @@ namespace MoodProject.Api.Migrations
                 {
                     b.HasOne("MoodProject.Core.Models.Symptom", "Symptom")
                         .WithMany()
-                        .HasForeignKey("SymptomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("SymptomId");
 
                     b.Navigation("Symptom");
                 });
 
             modelBuilder.Entity("MoodProject.Core.Models.ChatRoomComment", b =>
                 {
-                    b.HasOne("MoodProject.Core.Models.ChatRoomPost", null)
+                    b.HasOne("MoodProject.Core.Models.ChatRoomPost", "Post")
                         .WithMany("Comments")
-                        .HasForeignKey("ChatRoomPostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PostId");
+
+                    b.Navigation("Post");
                 });
 
             modelBuilder.Entity("MoodProject.Core.Models.ChatRoomPost", b =>
                 {
-                    b.HasOne("MoodProject.Core.Models.ChatRoom", null)
+                    b.HasOne("MoodProject.Core.Models.ChatRoom", "Room")
                         .WithMany("Posts")
-                        .HasForeignKey("ChatRoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("RoomId");
+
+                    b.Navigation("Room");
                 });
 
             modelBuilder.Entity("MoodProject.Core.Models.CustomQuizzQuestion", b =>
