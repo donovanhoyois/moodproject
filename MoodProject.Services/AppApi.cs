@@ -9,7 +9,7 @@ namespace MoodProject.Services;
 
 public class AppApi : IAppApi
 {
-    private HttpClient ApiClient;
+    private readonly HttpClient ApiClient;
     public AppApi(ApiConfiguration config, HttpClient apiClient)
     {
         ApiClient = apiClient;

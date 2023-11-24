@@ -11,7 +11,7 @@ namespace MoodProject.Api.Controllers;
 [EnableCors]
 public class CustomQuizzQuestionsController
 {
-    private MoodProjectContext DbContext;
+    private readonly MoodProjectContext DbContext;
     
     public CustomQuizzQuestionsController(MoodProjectContext dbContext)
     {

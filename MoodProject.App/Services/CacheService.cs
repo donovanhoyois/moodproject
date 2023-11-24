@@ -7,8 +7,8 @@ public class CacheService
 {
     private const string INSTALLED_VERSION_KEY = "installedVersion";
     
-    private string LastVersionAvailable { get; init; } = string.Empty;
-    private ILocalStorageService LocalStorage { get; init; }
+    private string LastVersionAvailable { get; }
+    private ILocalStorageService LocalStorage { get; }
 
     public CacheService(CacheConfiguration cacheConfiguration, ILocalStorageService localStorage)
     {
@@ -25,7 +25,7 @@ public class CacheService
     {
         var installedVersion = await LocalStorage.GetItemAsync<string>(INSTALLED_VERSION_KEY);
         
-        if (installedVersion == null || installedVersion.Equals(string.Empty))
+        if (installedVersion == null || string.IsNullOrEmpty(installedVersion))
         {
             await LocalStorage.SetItemAsync(INSTALLED_VERSION_KEY, LastVersionAvailable);
             installedVersion = LastVersionAvailable;

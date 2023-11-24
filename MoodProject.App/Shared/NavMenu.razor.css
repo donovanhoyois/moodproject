@@ -82,9 +82,3 @@
         overflow-y: auto;
     }
 }
-
-@media (min-width: 640px){
-    .nav-scrollable{
-        
-    }
-}

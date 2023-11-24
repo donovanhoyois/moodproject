@@ -23,46 +23,9 @@ public class MoodProjectContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        /* old mysql
-        var connectionString = "Server=localhost; User ID=root; Password=; Database=moodproject";
-        optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
-        */
         const string connectionString =
             "Host=flora.db.elephantsql.com;Database=einxmlgw;Username=einxmlgw;Password=l-zqSmHY366YOxf_iZTy3SipGL9rmjkp;Include Error Detail=true";
         optionsBuilder.UseNpgsql(connectionString);
 
-    }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        /*
-
-        // Symptom <-> SymptomType
-        modelBuilder.Entity<Symptom>()
-            .HasOne(symptom => symptom.Type)
-            .WithMany()
-            .HasForeignKey(symptom => symptom.TypeId)
-            .IsRequired();
-
-        // Symptom <-> FactorValue
-        modelBuilder.Entity<Symptom>()
-            .HasMany(symptom => symptom.ValuesHistory)
-            .WithOne()
-            .HasForeignKey(value => value.SymptomId)
-            .IsRequired();
-        */
-        /*
-        modelBuilder.Entity<FactorValue>()
-            .HasOne(value => value.Symptom)
-            .WithMany(symptom => symptom.HarmfulnessFactorValuesHistory)
-            .OnDelete(DeleteBehavior.NoAction);
-        
-        modelBuilder.Entity<FactorValue>()
-            .HasOne(value => value.Symptom)
-            .WithMany(symptom => symptom.PresenceFactorValuesHistory)
-            .OnDelete(DeleteBehavior.NoAction);
-        */
-        
-        //base.OnModelCreating(modelBuilder);
     }
 }

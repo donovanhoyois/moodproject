@@ -8,20 +8,20 @@
 
 @inherits MoodProject.App.Shared.Helpers.IdentityHelper
 
-@switch(postsOperation.Status)
+@switch(PostsOperation.Status)
 {
     case OperationResultType.Pending:
         <LoadingText/>
         break;
         
     case OperationResultType.Ok:
-        if (postsOperation.Content.Any())
+        if (PostsOperation.Content.Any())
         {
             <div class="table-responsive-sm">
                 <table class="table">
                     <thead>
                     <tr>
-                        <th colspan="4">Publications en attente de modération: @(postsOperation.Content.Count())</th>
+                        <th colspan="4">Publications en attente de modération: @(PostsOperation.Content.Count())</th>
                     </tr>
                     <tr>
                         <th scope="col">Titre</th>
@@ -30,7 +30,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach (var post in postsOperation.Content)
+                    @foreach (var post in PostsOperation.Content)
                     {
                         <tr @key=post>
                             <td>@post.Title</td>
@@ -69,24 +69,24 @@
         break;
             
     case OperationResultType.Error:
-        <ErrorMessage Text="@postsOperation.Message"/>
+        <ErrorMessage Text="@PostsOperation.Message"/>
         break;
 }
 
-@switch(commentsOperation.Status)
+@switch(CommentsOperation.Status)
 {
     case OperationResultType.Pending:
         <LoadingText/>
         break;
         
     case OperationResultType.Ok:
-        if (commentsOperation.Content.Any())
+        if (CommentsOperation.Content.Any())
         {
             <div class="table-responsive-sm">
                 <table class="table">
                     <thead>
                     <tr>
-                        <th colspan="4">Commentaires en attente de modération: @commentsOperation.Content.Count()</th>
+                        <th colspan="4">Commentaires en attente de modération: @CommentsOperation.Content.Count()</th>
                     </tr>
                     <tr>
                         <th scope="col">Contenu</th>
@@ -95,7 +95,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach (var comment in commentsOperation.Content)
+                    @foreach (var comment in CommentsOperation.Content)
                     {
                         <tr @key=comment>
                             <td>@comment.Content</td>
@@ -134,24 +134,24 @@
         break;
             
     case OperationResultType.Error:
-        <ErrorMessage Text="@postsOperation.Message"/>
+        <ErrorMessage Text="@PostsOperation.Message"/>
         break;
 }
 
 @code{
 
-    private OperationResult<IEnumerable<ChatRoomPost>> postsOperation = new(OperationResultType.Pending);
-    private OperationResult<IEnumerable<ChatRoomComment>> commentsOperation = new(OperationResultType.Pending);
+    private OperationResult<IEnumerable<ChatRoomPost>> PostsOperation = new(OperationResultType.Pending);
+    private OperationResult<IEnumerable<ChatRoomComment>> CommentsOperation = new(OperationResultType.Pending);
     
     protected override async Task OnInitializedAsync()
     {
-        postsOperation = await RoomsService.GetPosts(ModerationStatus.Pending);
-        commentsOperation = await RoomsService.GetComments(ModerationStatus.Pending);
+        PostsOperation = await RoomsService.GetPosts(ModerationStatus.Pending);
+        CommentsOperation = await RoomsService.GetComments(ModerationStatus.Pending);
     }
 
     private async Task UpdatePostStatus(int id, ModerationStatus newStatus)
     {
-        var post = postsOperation.Content.FirstOrDefault(p => p.Id.Equals(id));
+        var post = PostsOperation.Content.FirstOrDefault(p => p.Id.Equals(id));
         if (post != null)
         {
             post.ModerationStatus = newStatus;

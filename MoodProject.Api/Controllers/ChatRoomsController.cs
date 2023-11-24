@@ -11,7 +11,7 @@ namespace MoodProject.Api.Controllers;
 [EnableCors]
 public class ChatRoomsController
 {
-	private MoodProjectContext DbContext;
+	private readonly MoodProjectContext DbContext;
     
 	public ChatRoomsController(MoodProjectContext dbContext)
 	{

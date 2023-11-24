@@ -28,8 +28,6 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
     
     
 // MySQL
-var connectionString = "datasource=127.0.0.1;port=3306;username=root;password=;database=moodproject;";
-var version = new MySqlServerVersion(new Version(10, 4, 11));
 builder.Services.AddDbContext<MoodProjectContext>();
 
 // Custom injections

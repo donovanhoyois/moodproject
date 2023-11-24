@@ -1,9 +1,9 @@
 ﻿function renderCircleProgress(){
     $(".progress").each(function() {
         
-        var value = $(this).attr('data-value');
-        var left = $(this).find('.progress-left .progress-bar');
-        var right = $(this).find('.progress-right .progress-bar');
+        const value = $(this).attr('data-value');
+        const left = $(this).find('.progress-left .progress-bar');
+        const right = $(this).find('.progress-right .progress-bar');
 
         if (value > 0) {
             if (value <= 50) {

@@ -9,10 +9,10 @@ namespace MoodProject.Services;
 
 public class SymptomsTypesService : ISymptomsTypesService
 {
-    private IAppApi ApiClient;
+    private readonly IAppApi ApiClient;
     public SymptomsTypesService(IAppApi apiClient)
     {
-        this.ApiClient = apiClient;
+        ApiClient = apiClient;
     }
     public async Task<IEnumerable<SymptomType>> GetAll()
     {

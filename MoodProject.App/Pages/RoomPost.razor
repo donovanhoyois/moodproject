@@ -8,32 +8,32 @@
 
 @inherits MoodProject.App.Shared.Helpers.IdentityHelper
 
-@if (postOperation.Status is OperationResultType.Pending)
+@if (PostOperation.Status is OperationResultType.Pending)
 {
     <LoadingText/>
 }
-else if (postOperation.Status is OperationResultType.Ok)
+else if (PostOperation.Status is OperationResultType.Ok)
 {
     <div class="card">
         <div class="card-header">
-            @postOperation.Content.Title
+            @PostOperation.Content.Title
         </div>
         <div class="card-body">
-            <p class="card-text">@postOperation.Content.Content</p>
+            <p class="card-text">@PostOperation.Content.Content</p>
         </div>
         <div class="card-footer">
-            Publié le @postOperation.Content.PublishedDate par @postOperation.Content.AuthorId
+            Publié le @PostOperation.Content.PublishedDate par @PostOperation.Content.AuthorId
         </div>
             
     </div>
-    @if (postOperation.Content.Comments.Any(comment => comment.ModerationStatus == ModerationStatus.Published))
+    @if (PostOperation.Content.Comments.Any(comment => comment.ModerationStatus == ModerationStatus.Published))
     {
         <div class="card">
             <div class="card-header">
-                @postOperation.Content.Comments.Count(comment => comment.ModerationStatus == ModerationStatus.Published) Commentaire(s)
+                @PostOperation.Content.Comments.Count(comment => comment.ModerationStatus == ModerationStatus.Published) Commentaire(s)
             </div>
             <ul class="list-group list-group-flush">
-                @foreach (var comment in postOperation.Content.Comments.Where(comment => comment.ModerationStatus == ModerationStatus.Published))
+                @foreach (var comment in PostOperation.Content.Comments.Where(comment => comment.ModerationStatus == ModerationStatus.Published))
                 {
                     <li class="list-group-item">@comment.Content</li>
                 }
@@ -73,10 +73,10 @@ else if (postOperation.Status is OperationResultType.Ok)
     }
 
 }
-else if (postOperation.Status is OperationResultType.Error)
+else if (PostOperation.Status is OperationResultType.Error)
 {
     <div class="alert alert-danger" role="alert">
-        @postOperation.Message
+        @PostOperation.Message
     </div>
 }
 
@@ -84,14 +84,14 @@ else if (postOperation.Status is OperationResultType.Error)
     [Parameter]
     public int PostId { get; set; }
 
-    private NewChatRoomCommentForm FormComment { get; set; } = new();
-    private OperationResult<ChatRoomComment> NewCommentOperation { get; set; } = new(OperationResultType.WaitingForUser);
+    private NewChatRoomCommentForm FormComment = new();
+    private OperationResult<ChatRoomComment> NewCommentOperation = new(OperationResultType.WaitingForUser);
 
-    private OperationResult<ChatRoomPost> postOperation = new(OperationResultType.Pending);
+    private OperationResult<ChatRoomPost> PostOperation = new(OperationResultType.Pending);
     
     protected override async Task OnInitializedAsync()
     {
-        postOperation = await RoomsService.GetPostById(PostId);
+        PostOperation = await RoomsService.GetPostById(PostId);
     }
 
     private async Task SubmitNewComment(EditContext editContext)

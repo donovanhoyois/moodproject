@@ -11,7 +11,7 @@ namespace MoodProject.Api.Controllers;
 [EnableCors]
 public class SymptomsController
 {
-    private MoodProjectContext DbContext;
+    private readonly MoodProjectContext DbContext;
     
     public SymptomsController(MoodProjectContext dbContext)
     {
@@ -21,7 +21,6 @@ public class SymptomsController
     [HttpGet, ActionName("Get")]
     public IEnumerable<Symptom> GetSymptoms(string userId)
     {
-        var t = DbContext.Symptoms.ToList();
         return DbContext.Symptoms.Where(symptom => symptom.UserId.Equals(userId) && !symptom.isDisabled).ToList();
     }
     
