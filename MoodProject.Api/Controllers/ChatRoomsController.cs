@@ -93,8 +93,7 @@ public class ChatRoomsController
 	public IEnumerable<ChatRoomComment> GetPendingComments()
 	{
 		return DbContext.ChatRoomComments
-			.Where(comment => comment.ModerationStatus.Equals(ModerationStatus.Pending))
-			.Include(comment => comment.Post);
+			.Where(comment => comment.ModerationStatus.Equals(ModerationStatus.Pending));
 	}
 
 	[HttpGet, ActionName("GetCommentsOfUser")]

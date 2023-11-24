@@ -7,7 +7,7 @@ public class ChatRoomPost
 {
 	[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 	public int Id { get; set; }
-	public ChatRoom? Room { get; set; }
+	public int ChatRoomId { get; set; }
 	public string AuthorId { get; set; }
 	public string Title { get; set; }
 	public string Content { get; set; }

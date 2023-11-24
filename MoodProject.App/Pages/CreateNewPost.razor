@@ -57,7 +57,7 @@
             };
             return;
         }
-        postForm.Room = (await RoomsService.GetRoomById(RoomId)).Content;
+        postForm.ChatRoomId = RoomId;
         postForm.AuthorId = await GetUserId();
         postForm.ModerationStatus = ModerationStatus.Pending;
         postForm.PublishedDate = DateTime.Now;

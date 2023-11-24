@@ -87,7 +87,7 @@
                             <td>
                             @if (comment.ModerationStatus.Equals(ModerationStatus.Pending))
                             {
-                                <a class="btn btn-primary" href="/rooms/post/@comment.Post.Id">Voir le post</a>
+                                <a class="btn btn-primary" href="/rooms/post/@comment.ChatRoomPostId">Voir le post</a>
                                 <button class="btn btn-success" @onclick="() => UpdateCommentStatus(comment, ModerationStatus.Published)">Accepter</button>
                                 <button class="btn btn-danger" @onclick="() => UpdateCommentStatus(comment, ModerationStatus.Refused)">Refuser</button>
                             }
