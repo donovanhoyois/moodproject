@@ -77,7 +77,7 @@ public class QuizzServiceTests
 
         var mock = new Mock<IAppApi>();
         mock
-            .Setup(api => api.GetSymptomsWithHistory(It.IsAny<string>()))
+            .Setup(api => api.GetSymptomsWithHistoryByUserId(It.IsAny<string>()))
             .ReturnsAsync(fakeSymptoms);
         FakeApi = mock.Object;
     }

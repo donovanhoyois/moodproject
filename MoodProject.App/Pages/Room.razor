@@ -30,7 +30,7 @@
                 <tbody>
                 @foreach (var post in roomOperation.Content.Posts.Where(p => p.ModerationStatus == ModerationStatus.Published))
                 {
-                    <tr @onclick="@(()=> NavigationManager.NavigateTo($"/room/{Id}/{post.Id}"))">
+                    <tr @onclick="@(()=> NavigationManager.NavigateTo($"/rooms/post/{post.Id}"))">
                         <td>@post.Title</td>
                         <td>@post.AuthorId</td>
                     </tr>
@@ -51,7 +51,7 @@
         break;
         
 }
-<td><a class="btn btn-primary" href="/room/@Id/create">Créer un nouveau post</a></td>
+<td><a class="btn btn-primary" href="/rooms/@Id/create">Créer un nouveau post</a></td>
 
 @code {
     [Parameter]

@@ -20,7 +20,7 @@ public class ChatRoomsService : IChatRoomsService
 	
 	public async Task<OperationResult<IEnumerable<ChatRoom>>> GetRooms(string userId)
 	{
-		var apiResponse = await AppApi.GetChatRooms(userId);
+		var apiResponse = await AppApi.GetRooms(userId);
 		return apiResponse.Any()
 			? new OperationResult<IEnumerable<ChatRoom>>(OperationResultType.Ok)
 			{
@@ -34,7 +34,7 @@ public class ChatRoomsService : IChatRoomsService
 
 	public async Task<OperationResult<ChatRoom>> GetRoomById(int id)
 	{
-		var apiResponse = await AppApi.GetChatRoom(id);
+		var apiResponse = await AppApi.GetRoom(id);
 		if (apiResponse == null)
 		{
 			return new OperationResult<ChatRoom>(OperationResultType.Error)
@@ -61,7 +61,7 @@ public class ChatRoomsService : IChatRoomsService
 
 	public async Task<OperationResult<ChatRoomPost>> GetPostById(int id)
 	{
-		var apiResponse = await AppApi.GetChatRoomPost(id);
+		var apiResponse = await AppApi.GetPost(id);
 		if (apiResponse == null)
 		{
 			return new OperationResult<ChatRoomPost>(OperationResultType.Error)
@@ -79,29 +79,21 @@ public class ChatRoomsService : IChatRoomsService
 
 	public async Task<OperationResult<IEnumerable<ChatRoomPost>>> GetPosts(ModerationStatus moderationStatus)
 	{
-		if (moderationStatus == ModerationStatus.Pending)
-		{
-			var apiResponse = await AppApi.GetUnpublishedPosts();
-			return apiResponse != null
-				? new OperationResult<IEnumerable<ChatRoomPost>>(OperationResultType.Ok)
-				{
-					Content = apiResponse
-				}
-				: new OperationResult<IEnumerable<ChatRoomPost>>(OperationResultType.Error)
-				{
-					Message = "Une erreur est survenue lors de la récupération des posts en attente de modération."
-				};
-		}
-
-		return new OperationResult<IEnumerable<ChatRoomPost>>(OperationResultType.Error)
-		{
-			Message = "Impossible de récupérer les posts avec le statut de modération demandé."
-		};
+		var apiResponse = await AppApi.GetPostsByModerationStatus(moderationStatus);
+		return apiResponse != null
+			? new OperationResult<IEnumerable<ChatRoomPost>>(OperationResultType.Ok)
+			{
+				Content = apiResponse
+			}
+			: new OperationResult<IEnumerable<ChatRoomPost>>(OperationResultType.Error)
+			{
+				Message = "Une erreur est survenue lors de la récupération des posts en attente de modération."
+			};
 	}
 
 	public async Task<OperationResult<IEnumerable<ChatRoomPost>>> GetPostsOfUser(string userId)
 	{
-		var apiResponse = await AppApi.GetChatRoomPostsOfUser(userId);
+		var apiResponse = await AppApi.GetPostsByUserId(userId);
 		return apiResponse != null
 			? new OperationResult<IEnumerable<ChatRoomPost>>(OperationResultType.Ok)
 			{
@@ -115,6 +107,20 @@ public class ChatRoomsService : IChatRoomsService
 
 	public async Task<OperationResult<ChatRoomPost>> CreatePost(ChatRoomPost post)
 	{
+		if (post.Title is null or "")
+		{
+			return new OperationResult<ChatRoomPost>(OperationResultType.Error)
+			{
+				Message = "Le titre de la publication est trop court."
+			};
+		}
+		if (post.Content is null or "")
+		{
+			return new OperationResult<ChatRoomPost>(OperationResultType.Error)
+			{
+				Message = "Le contenu de la publication est trop court."
+			};
+		}
 		if (post.Title.Length > POST_TITLE_MAX_LENGTH)
 		{
 			return new OperationResult<ChatRoomPost>(OperationResultType.Error)
@@ -131,7 +137,7 @@ public class ChatRoomsService : IChatRoomsService
 			};
 		}
 
-		var apiResponse = await AppApi.CreateChatRoomPost(post);
+		var apiResponse = await AppApi.CreatePost(post);
 		return apiResponse
 			? new OperationResult<ChatRoomPost>(OperationResultType.Ok)
 			{
@@ -145,7 +151,7 @@ public class ChatRoomsService : IChatRoomsService
 
 	public async Task<OperationResult<ChatRoomPost>> UpdatePost(ChatRoomPost post)
 	{
-		var apiResponse = await AppApi.UpdateChatRoomPost(post);
+		var apiResponse = await AppApi.UpdatePost(post);
 		return apiResponse
 			? new OperationResult<ChatRoomPost>(OperationResultType.Ok)
 			{
@@ -159,29 +165,21 @@ public class ChatRoomsService : IChatRoomsService
 
 	public async Task<OperationResult<IEnumerable<ChatRoomComment>>> GetComments(ModerationStatus moderationStatus)
 	{
-		if (moderationStatus == ModerationStatus.Pending)
-		{
-			var apiResponse = await AppApi.GetUnpublishedComments();
-			return apiResponse != null
-				? new OperationResult<IEnumerable<ChatRoomComment>>(OperationResultType.Ok)
-				{
-					Content = apiResponse
-				}
-				: new OperationResult<IEnumerable<ChatRoomComment>>(OperationResultType.Error)
-				{
-					Message = "Une erreur est survenue lors de la récupération des commentaires en attente de modération."
-				};
-		}
-
-		return new OperationResult<IEnumerable<ChatRoomComment>>(OperationResultType.Error)
-		{
-			Message = "Impossible de récupérer les commentaires avec le statut de modération demandé."
-		};
+		var apiResponse = await AppApi.GetCommentsByModerationStatus(moderationStatus);
+		return apiResponse != null
+			? new OperationResult<IEnumerable<ChatRoomComment>>(OperationResultType.Ok)
+			{
+				Content = apiResponse
+			}
+			: new OperationResult<IEnumerable<ChatRoomComment>>(OperationResultType.Error)
+			{
+				Message = "Une erreur est survenue lors de la récupération des commentaires en attente de modération."
+			};
 	}
 
 	public async Task<OperationResult<IEnumerable<ChatRoomComment>>> GetCommentsOfUser(string userId)
 	{
-		var apiResponse = await AppApi.GetChatRoomCommentsOfUser(userId);
+		var apiResponse = await AppApi.GetCommentsByUserId(userId);
 		return apiResponse != null
 			? new OperationResult<IEnumerable<ChatRoomComment>>(OperationResultType.Ok)
 			{
@@ -195,6 +193,13 @@ public class ChatRoomsService : IChatRoomsService
 
 	public async Task<OperationResult<ChatRoomComment>> CreateComment(ChatRoomComment comment)
 	{
+		if (comment.Content is null or "")
+		{
+			return new OperationResult<ChatRoomComment>(OperationResultType.Error)
+			{
+				Message = "Le commentaire est trop court."
+			};
+		}
 		if (comment.Content.Length > COMMENT_MAX_LENGTH)
 		{
 			return new OperationResult<ChatRoomComment>(OperationResultType.Error)
@@ -203,7 +208,7 @@ public class ChatRoomsService : IChatRoomsService
 			};
 		}
 
-		var apiResponse = await AppApi.CreateChatRoomComment(comment);
+		var apiResponse = await AppApi.CreateComment(comment);
 		return apiResponse
 			? new OperationResult<ChatRoomComment>(OperationResultType.Ok)
 			{
@@ -217,7 +222,7 @@ public class ChatRoomsService : IChatRoomsService
 
 	public async Task<OperationResult<ChatRoomComment>> UpdateComment(ChatRoomComment comment)
 	{
-		var apiResponse = await AppApi.UpdateChatRoomComment(comment);
+		var apiResponse = await AppApi.UpdateComment(comment);
 		return apiResponse
 			? new OperationResult<ChatRoomComment>(OperationResultType.Ok)
 			{

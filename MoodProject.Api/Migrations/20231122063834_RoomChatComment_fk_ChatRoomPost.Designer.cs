@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MoodProject.Api;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MoodProject.Api.Migrations
 {
     [DbContext(typeof(MoodProjectContext))]
-    partial class MoodProjectContextModelSnapshot : ModelSnapshot
+    [Migration("20231122063834_RoomChatComment_fk_ChatRoomPost")]
+    partial class RoomChatComment_fk_ChatRoomPost
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -56,7 +59,7 @@ namespace MoodProject.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("ChatRoomPostId")
+                    b.Property<int?>("ChatRoomPostId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Content")
@@ -64,6 +67,9 @@ namespace MoodProject.Api.Migrations
                         .HasColumnType("text");
 
                     b.Property<int>("ModerationStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("PostId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("PublishedDate")
@@ -266,9 +272,7 @@ namespace MoodProject.Api.Migrations
                 {
                     b.HasOne("MoodProject.Core.Models.ChatRoomPost", null)
                         .WithMany("Comments")
-                        .HasForeignKey("ChatRoomPostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ChatRoomPostId");
                 });
 
             modelBuilder.Entity("MoodProject.Core.Models.ChatRoomPost", b =>

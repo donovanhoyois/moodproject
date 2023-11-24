@@ -30,7 +30,7 @@ public class QuizzService : IQuizzService
 
     public async Task<OperationResult<IEnumerable<QuizzQuestion>>> Generate(string userId)
     {
-        var symptoms = await AppApi.GetSymptomsWithHistory(userId);
+        var symptoms = await AppApi.GetSymptomsWithHistoryByUserId(userId);
         var questions = new List<QuizzQuestion>();
 
         if (!symptoms.Any())

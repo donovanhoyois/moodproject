@@ -15,7 +15,7 @@ public class SymptomsService : ISymptomsService
 
     public async Task<IEnumerable<Symptom>> GetSymptoms(string userId)
     {
-        return await AppApi.GetSymptoms(userId);
+        return await AppApi.GetSymptomsByUserId(userId);
     }
 
     public async Task<bool> SaveSymptoms(IEnumerable<Symptom> symptoms)
@@ -25,6 +25,6 @@ public class SymptomsService : ISymptomsService
 
     public async Task<IEnumerable<Symptom>> GetSymptomsWithHistory(string userId)
     {
-        return await AppApi.GetSymptomsWithHistory(userId);
+        return await AppApi.GetSymptomsWithHistoryByUserId(userId);
     }
 }

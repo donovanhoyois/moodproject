@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MoodProject.Api;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MoodProject.Api.Migrations
 {
     [DbContext(typeof(MoodProjectContext))]
-    partial class MoodProjectContextModelSnapshot : ModelSnapshot
+    [Migration("20231112145703_fix_pk_ChatRoomPosts")]
+    partial class fix_pk_ChatRoomPosts
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -56,9 +59,6 @@ namespace MoodProject.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("ChatRoomPostId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("text");
@@ -66,12 +66,15 @@ namespace MoodProject.Api.Migrations
                     b.Property<int>("ModerationStatus")
                         .HasColumnType("integer");
 
+                    b.Property<int>("PostId")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime>("PublishedDate")
                         .HasColumnType("timestamp without time zone");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ChatRoomPostId");
+                    b.HasIndex("PostId");
 
                     b.ToTable("ChatRoomComments");
                 });
@@ -264,11 +267,13 @@ namespace MoodProject.Api.Migrations
 
             modelBuilder.Entity("MoodProject.Core.Models.ChatRoomComment", b =>
                 {
-                    b.HasOne("MoodProject.Core.Models.ChatRoomPost", null)
+                    b.HasOne("MoodProject.Core.Models.ChatRoomPost", "Post")
                         .WithMany("Comments")
-                        .HasForeignKey("ChatRoomPostId")
+                        .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Post");
                 });
 
             modelBuilder.Entity("MoodProject.Core.Models.ChatRoomPost", b =>

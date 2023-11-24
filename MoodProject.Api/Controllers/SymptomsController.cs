@@ -24,6 +24,16 @@ public class SymptomsController
         var t = DbContext.Symptoms.ToList();
         return DbContext.Symptoms.Where(symptom => symptom.UserId.Equals(userId) && !symptom.isDisabled).ToList();
     }
+    
+    [HttpGet, ActionName("GetSymptomsWithHistoryByUserId")]
+    public IEnumerable<Symptom> GetSymptomsHistory(string userId)
+    {
+        return DbContext.Symptoms
+            .Include(symptom => symptom.Type)
+            .Include(symptom => symptom.ValuesHistory.OrderByDescending(value => value.Timestamp))
+            .Where(s => s.UserId.Equals(userId) && !s.isDisabled)
+            .ToList();
+    }
 
     [HttpPost, ActionName("Update")]
     public void UpdateSymptoms(IEnumerable<Symptom> newSymptoms)
@@ -58,16 +68,6 @@ public class SymptomsController
         
         DbContext.Symptoms.AddRange(cleanedSymptoms);
         DbContext.SaveChanges();
-    }
-    
-    [HttpGet, ActionName("GetHistory")]
-    public IEnumerable<Symptom> GetSymptomsHistory(string userId)
-    {
-        return DbContext.Symptoms
-            .Include(symptom => symptom.Type)
-            .Include(symptom => symptom.ValuesHistory.OrderByDescending(value => value.Timestamp))
-            .Where(s => s.UserId.Equals(userId) && !s.isDisabled)
-            .ToList();
     }
 
     [HttpPost, ActionName("UpdateHistory")]
