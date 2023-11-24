@@ -24,8 +24,8 @@ public class ChatRoomsController
 		return DbContext.ChatRooms.Include(r => r.Posts);
 	}
 
-	[HttpGet, ActionName("GetRoomsAccessibleByUser")]
-	public IEnumerable<ChatRoom> GetRoomsAccessibleByUser(string userId)
+	[HttpGet, ActionName("GetRoomsByUserId")]
+	public IEnumerable<ChatRoom> GetRoomsByUserId(string userId)
 	{
 		var userSymptomsTypesIds =
 			DbContext.Symptoms
@@ -55,17 +55,17 @@ public class ChatRoomsController
 			.FirstOrDefault();
 	}
 
-	[HttpGet, ActionName("GetPosts")]
-	public IEnumerable<ChatRoomPost> GetPosts(ModerationStatus moderationStatus)
+	[HttpGet, ActionName("GetPostByUserId")]
+	public IEnumerable<ChatRoomPost> GetPostsByUserId(string userId)
+	{
+		return DbContext.ChatRoomPosts.Where(p => p.AuthorId.Equals(userId));
+	}
+	
+	[HttpGet, ActionName("GetPostsByModerationStatus")]
+	public IEnumerable<ChatRoomPost> GetPostsByModerationStatus(ModerationStatus moderationStatus)
 	{
 		return DbContext.ChatRoomPosts
 			.Where(post => post.ModerationStatus.Equals(moderationStatus));
-	}
-
-	[HttpGet, ActionName("GetPostsOfUser")]
-	public IEnumerable<ChatRoomPost> GetPostsOfUser(string userId)
-	{
-		return DbContext.ChatRoomPosts.Where(p => p.AuthorId.Equals(userId));
 	}
 
 	[HttpPost, ActionName("CreatePost")]
@@ -88,18 +88,18 @@ public class ChatRoomsController
 
 		return false;
 	}
+	
+	[HttpGet, ActionName("GetCommentsByUserId")]
+	public IEnumerable<ChatRoomComment> GetCommentsByUserId(string userId)
+	{
+		return DbContext.ChatRoomComments.Where(p => p.AuthorId.Equals(userId));
+	}
 
-	[HttpGet, ActionName("GetComments")]
-	public IEnumerable<ChatRoomComment> GetComments(ModerationStatus moderationStatus)
+	[HttpGet, ActionName("GetCommentsByModerationStatus")]
+	public IEnumerable<ChatRoomComment> GetCommentsByModerationStatus(ModerationStatus moderationStatus)
 	{
 		return DbContext.ChatRoomComments
 			.Where(comment => comment.ModerationStatus.Equals(moderationStatus));
-	}
-
-	[HttpGet, ActionName("GetCommentsOfUser")]
-	public IEnumerable<ChatRoomComment> GetCommentsOfUser(string userId)
-	{
-		return DbContext.ChatRoomComments.Where(p => p.AuthorId.Equals(userId));
 	}
 
 	[HttpPost, ActionName("CreateComment")]

@@ -20,7 +20,7 @@ public class ChatRoomsService : IChatRoomsService
 	
 	public async Task<OperationResult<IEnumerable<ChatRoom>>> GetRooms(string userId)
 	{
-		var apiResponse = await AppApi.GetChatRooms(userId);
+		var apiResponse = await AppApi.GetRooms(userId);
 		return apiResponse.Any()
 			? new OperationResult<IEnumerable<ChatRoom>>(OperationResultType.Ok)
 			{
@@ -34,7 +34,7 @@ public class ChatRoomsService : IChatRoomsService
 
 	public async Task<OperationResult<ChatRoom>> GetRoomById(int id)
 	{
-		var apiResponse = await AppApi.GetChatRoom(id);
+		var apiResponse = await AppApi.GetRoom(id);
 		if (apiResponse == null)
 		{
 			return new OperationResult<ChatRoom>(OperationResultType.Error)
@@ -61,7 +61,7 @@ public class ChatRoomsService : IChatRoomsService
 
 	public async Task<OperationResult<ChatRoomPost>> GetPostById(int id)
 	{
-		var apiResponse = await AppApi.GetChatRoomPost(id);
+		var apiResponse = await AppApi.GetPost(id);
 		if (apiResponse == null)
 		{
 			return new OperationResult<ChatRoomPost>(OperationResultType.Error)
@@ -79,7 +79,7 @@ public class ChatRoomsService : IChatRoomsService
 
 	public async Task<OperationResult<IEnumerable<ChatRoomPost>>> GetPosts(ModerationStatus moderationStatus)
 	{
-		var apiResponse = await AppApi.GetPosts(moderationStatus);
+		var apiResponse = await AppApi.GetPostsByModerationStatus(moderationStatus);
 		return apiResponse != null
 			? new OperationResult<IEnumerable<ChatRoomPost>>(OperationResultType.Ok)
 			{
@@ -93,7 +93,7 @@ public class ChatRoomsService : IChatRoomsService
 
 	public async Task<OperationResult<IEnumerable<ChatRoomPost>>> GetPostsOfUser(string userId)
 	{
-		var apiResponse = await AppApi.GetChatRoomPostsOfUser(userId);
+		var apiResponse = await AppApi.GetPostsByUserId(userId);
 		return apiResponse != null
 			? new OperationResult<IEnumerable<ChatRoomPost>>(OperationResultType.Ok)
 			{
@@ -137,7 +137,7 @@ public class ChatRoomsService : IChatRoomsService
 			};
 		}
 
-		var apiResponse = await AppApi.CreateChatRoomPost(post);
+		var apiResponse = await AppApi.CreatePost(post);
 		return apiResponse
 			? new OperationResult<ChatRoomPost>(OperationResultType.Ok)
 			{
@@ -151,7 +151,7 @@ public class ChatRoomsService : IChatRoomsService
 
 	public async Task<OperationResult<ChatRoomPost>> UpdatePost(ChatRoomPost post)
 	{
-		var apiResponse = await AppApi.UpdateChatRoomPost(post);
+		var apiResponse = await AppApi.UpdatePost(post);
 		return apiResponse
 			? new OperationResult<ChatRoomPost>(OperationResultType.Ok)
 			{
@@ -165,7 +165,7 @@ public class ChatRoomsService : IChatRoomsService
 
 	public async Task<OperationResult<IEnumerable<ChatRoomComment>>> GetComments(ModerationStatus moderationStatus)
 	{
-		var apiResponse = await AppApi.GetComments(moderationStatus);
+		var apiResponse = await AppApi.GetCommentsByModerationStatus(moderationStatus);
 		return apiResponse != null
 			? new OperationResult<IEnumerable<ChatRoomComment>>(OperationResultType.Ok)
 			{
@@ -179,7 +179,7 @@ public class ChatRoomsService : IChatRoomsService
 
 	public async Task<OperationResult<IEnumerable<ChatRoomComment>>> GetCommentsOfUser(string userId)
 	{
-		var apiResponse = await AppApi.GetChatRoomCommentsOfUser(userId);
+		var apiResponse = await AppApi.GetCommentsByUserId(userId);
 		return apiResponse != null
 			? new OperationResult<IEnumerable<ChatRoomComment>>(OperationResultType.Ok)
 			{
@@ -208,7 +208,7 @@ public class ChatRoomsService : IChatRoomsService
 			};
 		}
 
-		var apiResponse = await AppApi.CreateChatRoomComment(comment);
+		var apiResponse = await AppApi.CreateComment(comment);
 		return apiResponse
 			? new OperationResult<ChatRoomComment>(OperationResultType.Ok)
 			{
@@ -222,7 +222,7 @@ public class ChatRoomsService : IChatRoomsService
 
 	public async Task<OperationResult<ChatRoomComment>> UpdateComment(ChatRoomComment comment)
 	{
-		var apiResponse = await AppApi.UpdateChatRoomComment(comment);
+		var apiResponse = await AppApi.UpdateComment(comment);
 		return apiResponse
 			? new OperationResult<ChatRoomComment>(OperationResultType.Ok)
 			{

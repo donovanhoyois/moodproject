@@ -15,13 +15,13 @@
         break;
         
     case OperationResultType.Ok:
-        if (postsOperation.Content.Any(p => p.ModerationStatus is ModerationStatus.Pending))
+        if (postsOperation.Content.Any())
         {
             <div class="table-responsive-sm">
                 <table class="table">
                     <thead>
                     <tr>
-                        <th colspan="4">Publications en attente de modération: @(postsOperation.Content.Where(p => p.ModerationStatus is ModerationStatus.Pending).Count())</th>
+                        <th colspan="4">Publications en attente de modération: @(postsOperation.Content.Count())</th>
                     </tr>
                     <tr>
                         <th scope="col">Titre</th>
@@ -30,15 +30,31 @@
                     </tr>
                     </thead>
                     <tbody>
-                    @foreach (var post in postsOperation.Content.Where(p => p.ModerationStatus is ModerationStatus.Pending))
+                    @foreach (var post in postsOperation.Content)
                     {
                         <tr @key=post>
                             <td>@post.Title</td>
                             <td>@post.PublishedDate</td>
                             <td>
-                                <a class="btn btn-primary" href="/rooms/post/@post.Id">Voir</a>
-                                <button class="btn btn-success" @onclick="() => UpdatePostStatus(post.Id, ModerationStatus.Published)">Accepter</button>
-                                <button class="btn btn-danger" @onclick="() => UpdatePostStatus(post.Id, ModerationStatus.Refused)">Refuser</button>
+                                @if (post.ModerationStatus.Equals(ModerationStatus.Pending))
+                                {
+                                    <a class="btn btn-primary" href="/rooms/post/@post.Id">Voir</a>
+                                    <button class="btn btn-success" @onclick="() => UpdatePostStatus(post.Id, ModerationStatus.Published)">Accepter</button>
+                                    <button class="btn btn-danger" @onclick="() => UpdatePostStatus(post.Id, ModerationStatus.Refused)">Refuser</button>
+                                }
+                                else
+                                {
+                                    @switch (post.ModerationStatus)
+                                    {
+                                        case ModerationStatus.Published:
+                                            <SuccessMessage Text="Publié"/>
+                                            break;
+    
+                                        case ModerationStatus.Refused:
+                                            <ErrorMessage Text="Refusé"/>
+                                            break;
+                                    }
+                                }
                             </td>
                         </tr>
                     }

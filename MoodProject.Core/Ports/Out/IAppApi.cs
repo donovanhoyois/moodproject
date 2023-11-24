@@ -6,20 +6,20 @@ namespace MoodProject.Core.Ports.Out;
 public interface IAppApi
 {
     public Task<IEnumerable<SymptomType>> GetSymptomsTypes();
-    public Task<IEnumerable<Symptom>> GetSymptoms(string userId);
+    public Task<IEnumerable<Symptom>> GetSymptomsByUserId(string userId);
     public Task<bool> SaveSymptoms(IEnumerable<Symptom> symptoms);
-    public Task<IEnumerable<Symptom>> GetSymptomsWithHistory(string userId);
+    public Task<IEnumerable<Symptom>> GetSymptomsWithHistoryByUserId(string userId);
     public Task<bool> SaveSymptomsHistory(IEnumerable<FactorValue> values);
     public Task<IEnumerable<CustomQuizzQuestion>> GetCustomQuestions();
-    public Task<IEnumerable<ChatRoom>> GetChatRooms(string userId);
-    public Task<ChatRoom> GetChatRoom(int id);
-    public Task<IEnumerable<ChatRoomPost>> GetPosts(ModerationStatus moderationStatus);
-    public Task<ChatRoomPost> GetChatRoomPost(int id);
-    public Task<IEnumerable<ChatRoomPost>> GetChatRoomPostsOfUser(string userId);
-    public Task<bool> CreateChatRoomPost(ChatRoomPost post);
-    public Task<bool> UpdateChatRoomPost(ChatRoomPost post);
-    public Task<IEnumerable<ChatRoomComment>> GetComments(ModerationStatus moderationStatus);
-    public Task<IEnumerable<ChatRoomComment>> GetChatRoomCommentsOfUser(string userId);
-    public Task<bool> CreateChatRoomComment(ChatRoomComment comment);
-    public Task<bool> UpdateChatRoomComment(ChatRoomComment comment);
+    public Task<IEnumerable<ChatRoom>> GetRooms(string userId);
+    public Task<ChatRoom> GetRoom(int id);
+    public Task<IEnumerable<ChatRoomPost>> GetPostsByUserId(string userId);
+    public Task<IEnumerable<ChatRoomPost>> GetPostsByModerationStatus(ModerationStatus moderationStatus);
+    public Task<ChatRoomPost> GetPost(int id);
+    public Task<bool> CreatePost(ChatRoomPost post);
+    public Task<bool> UpdatePost(ChatRoomPost post);
+    public Task<IEnumerable<ChatRoomComment>> GetCommentsByUserId(string userId);
+    public Task<IEnumerable<ChatRoomComment>> GetCommentsByModerationStatus(ModerationStatus moderationStatus);
+    public Task<bool> CreateComment(ChatRoomComment comment);
+    public Task<bool> UpdateComment(ChatRoomComment comment);
 }
