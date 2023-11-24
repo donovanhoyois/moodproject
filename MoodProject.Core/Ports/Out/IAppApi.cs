@@ -1,4 +1,5 @@
-﻿using MoodProject.Core.Models;
+﻿using MoodProject.Core.Enums;
+using MoodProject.Core.Models;
 
 namespace MoodProject.Core.Ports.Out;
 
@@ -12,12 +13,12 @@ public interface IAppApi
     public Task<IEnumerable<CustomQuizzQuestion>> GetCustomQuestions();
     public Task<IEnumerable<ChatRoom>> GetChatRooms(string userId);
     public Task<ChatRoom> GetChatRoom(int id);
-    public Task<IEnumerable<ChatRoomPost>> GetUnpublishedPosts();
+    public Task<IEnumerable<ChatRoomPost>> GetPosts(ModerationStatus moderationStatus);
     public Task<ChatRoomPost> GetChatRoomPost(int id);
     public Task<IEnumerable<ChatRoomPost>> GetChatRoomPostsOfUser(string userId);
     public Task<bool> CreateChatRoomPost(ChatRoomPost post);
     public Task<bool> UpdateChatRoomPost(ChatRoomPost post);
-    public Task<IEnumerable<ChatRoomComment>> GetUnpublishedComments();
+    public Task<IEnumerable<ChatRoomComment>> GetComments(ModerationStatus moderationStatus);
     public Task<IEnumerable<ChatRoomComment>> GetChatRoomCommentsOfUser(string userId);
     public Task<bool> CreateChatRoomComment(ChatRoomComment comment);
     public Task<bool> UpdateChatRoomComment(ChatRoomComment comment);

@@ -55,11 +55,11 @@ public class ChatRoomsController
 			.FirstOrDefault();
 	}
 
-	[HttpGet, ActionName("GetPendingPosts")]
-	public IEnumerable<ChatRoomPost> GetPendingPosts()
+	[HttpGet, ActionName("GetPosts")]
+	public IEnumerable<ChatRoomPost> GetPosts(ModerationStatus moderationStatus)
 	{
 		return DbContext.ChatRoomPosts
-			.Where(post => post.ModerationStatus.Equals(ModerationStatus.Pending));
+			.Where(post => post.ModerationStatus.Equals(moderationStatus));
 	}
 
 	[HttpGet, ActionName("GetPostsOfUser")]
@@ -89,11 +89,11 @@ public class ChatRoomsController
 		return false;
 	}
 
-	[HttpGet, ActionName("GetPendingComments")]
-	public IEnumerable<ChatRoomComment> GetPendingComments()
+	[HttpGet, ActionName("GetComments")]
+	public IEnumerable<ChatRoomComment> GetComments(ModerationStatus moderationStatus)
 	{
 		return DbContext.ChatRoomComments
-			.Where(comment => comment.ModerationStatus.Equals(ModerationStatus.Pending));
+			.Where(comment => comment.ModerationStatus.Equals(moderationStatus));
 	}
 
 	[HttpGet, ActionName("GetCommentsOfUser")]

@@ -79,24 +79,16 @@ public class ChatRoomsService : IChatRoomsService
 
 	public async Task<OperationResult<IEnumerable<ChatRoomPost>>> GetPosts(ModerationStatus moderationStatus)
 	{
-		if (moderationStatus == ModerationStatus.Pending)
-		{
-			var apiResponse = await AppApi.GetUnpublishedPosts();
-			return apiResponse != null
-				? new OperationResult<IEnumerable<ChatRoomPost>>(OperationResultType.Ok)
-				{
-					Content = apiResponse
-				}
-				: new OperationResult<IEnumerable<ChatRoomPost>>(OperationResultType.Error)
-				{
-					Message = "Une erreur est survenue lors de la récupération des posts en attente de modération."
-				};
-		}
-
-		return new OperationResult<IEnumerable<ChatRoomPost>>(OperationResultType.Error)
-		{
-			Message = "Impossible de récupérer les posts avec le statut de modération demandé."
-		};
+		var apiResponse = await AppApi.GetPosts(moderationStatus);
+		return apiResponse != null
+			? new OperationResult<IEnumerable<ChatRoomPost>>(OperationResultType.Ok)
+			{
+				Content = apiResponse
+			}
+			: new OperationResult<IEnumerable<ChatRoomPost>>(OperationResultType.Error)
+			{
+				Message = "Une erreur est survenue lors de la récupération des posts en attente de modération."
+			};
 	}
 
 	public async Task<OperationResult<IEnumerable<ChatRoomPost>>> GetPostsOfUser(string userId)
@@ -173,24 +165,16 @@ public class ChatRoomsService : IChatRoomsService
 
 	public async Task<OperationResult<IEnumerable<ChatRoomComment>>> GetComments(ModerationStatus moderationStatus)
 	{
-		if (moderationStatus == ModerationStatus.Pending)
-		{
-			var apiResponse = await AppApi.GetUnpublishedComments();
-			return apiResponse != null
-				? new OperationResult<IEnumerable<ChatRoomComment>>(OperationResultType.Ok)
-				{
-					Content = apiResponse
-				}
-				: new OperationResult<IEnumerable<ChatRoomComment>>(OperationResultType.Error)
-				{
-					Message = "Une erreur est survenue lors de la récupération des commentaires en attente de modération."
-				};
-		}
-
-		return new OperationResult<IEnumerable<ChatRoomComment>>(OperationResultType.Error)
-		{
-			Message = "Impossible de récupérer les commentaires avec le statut de modération demandé."
-		};
+		var apiResponse = await AppApi.GetComments(moderationStatus);
+		return apiResponse != null
+			? new OperationResult<IEnumerable<ChatRoomComment>>(OperationResultType.Ok)
+			{
+				Content = apiResponse
+			}
+			: new OperationResult<IEnumerable<ChatRoomComment>>(OperationResultType.Error)
+			{
+				Message = "Une erreur est survenue lors de la récupération des commentaires en attente de modération."
+			};
 	}
 
 	public async Task<OperationResult<IEnumerable<ChatRoomComment>>> GetCommentsOfUser(string userId)

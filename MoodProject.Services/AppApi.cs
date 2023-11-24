@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Json;
 using MoodProject.Core;
 using MoodProject.Core.Configuration;
+using MoodProject.Core.Enums;
 using MoodProject.Core.Models;
 using MoodProject.Core.Ports.Out;
 
@@ -57,9 +58,9 @@ public class AppApi : IAppApi
         return await ApiClient.GetFromJsonAsync<ChatRoom>($"ChatRooms/GetRoom?id={id}");
     }
 
-    public async Task<IEnumerable<ChatRoomPost>> GetUnpublishedPosts()
+    public async Task<IEnumerable<ChatRoomPost>> GetPosts(ModerationStatus moderationStatus)
     {
-        return await ApiClient.GetFromJsonAsync<IEnumerable<ChatRoomPost>>($"ChatRooms/GetPendingPosts");
+        return await ApiClient.GetFromJsonAsync<IEnumerable<ChatRoomPost>>($"ChatRooms/GetPosts?moderationStatus={moderationStatus}");
     }
 
     public async Task<ChatRoomPost> GetChatRoomPost(int id)
@@ -84,9 +85,9 @@ public class AppApi : IAppApi
         return response.IsSuccessStatusCode;
     }
 
-    public async Task<IEnumerable<ChatRoomComment>> GetUnpublishedComments()
+    public async Task<IEnumerable<ChatRoomComment>> GetComments(ModerationStatus moderationStatus)
     {
-        return await ApiClient.GetFromJsonAsync<IEnumerable<ChatRoomComment>>($"ChatRooms/GetPendingComments");
+        return await ApiClient.GetFromJsonAsync<IEnumerable<ChatRoomComment>>($"ChatRooms/GetComments?moderationStatus={moderationStatus}");
     }
 
     public async Task<IEnumerable<ChatRoomComment>> GetChatRoomCommentsOfUser(string userId)
