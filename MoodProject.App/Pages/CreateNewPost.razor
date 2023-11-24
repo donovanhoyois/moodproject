@@ -34,7 +34,7 @@
 @if (CreateNewPostOperation.Status is OperationResultType.Ok)
 {
     <SuccessMessage Text="@CreateNewPostOperation.Message" />
-    <a class="btn btn-primary">Retour à l'espace de discussion</a>
+    <a class="btn btn-primary" href="/room/@RoomId">Retour à l'espace de discussion</a>
 }
 
 
