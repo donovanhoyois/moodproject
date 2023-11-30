@@ -7,6 +7,7 @@
 @using System.Text.Json
 @using MoodProject.App.Shared.Helpers
 
+@inject IUsersService UsersService
 @inject NavigationManager Navigation
 @inject IConfiguration Configuration
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -37,9 +38,17 @@
 @code{
     [Parameter]
     public string Action { get; set; }
-
+    
     protected override async Task OnInitializedAsync()
     {
-        
+        //TODO: make this working
+        if (Action.Equals("login-callback")){
+            var hasAcceptedGdpr = await UsersService.GetGdprConsent(await GetUserId());
+            if (!hasAcceptedGdpr)
+            {
+                Navigation.NavigateTo("/gdpr");
+            }
+            Navigation.NavigateTo("/profile");
+        }
     }
 }

@@ -3,15 +3,6 @@
 public class User
 {
     public int Id { get; set; }
-    public string AuthProviderUserId { get; set; }
-
-    public User()
-    {
-        
-    }
-    public User(int id, string authProviderUserId)
-    {
-        Id = id;
-        AuthProviderUserId = authProviderUserId;
-    }
+    public string AuthProviderUserId { get; set; } = string.Empty;
+    public bool HasAcceptedGdpr { get; set; }
 }

@@ -106,4 +106,10 @@ public class AppApi : IAppApi
         var response = await ApiClient.PatchAsJsonAsync($"ChatRooms/UpdateComment", comment);
         return response.IsSuccessStatusCode;
     }
+
+    public async Task<bool> GetGdprConsent(string authProviderId)
+    {
+        var response = await ApiClient.GetFromJsonAsync<bool>($"Users/GetGdprConsent?authProviderId={authProviderId}");
+        return response;
+    }
 }

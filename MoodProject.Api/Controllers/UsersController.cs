@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MoodProject.Core;
 
 namespace MoodProject.Api.Controllers;
@@ -12,7 +13,21 @@ namespace MoodProject.Api.Controllers;
 [EnableCors]
 public class UsersController
 {
+    private readonly MoodProjectContext DbContext;
     
+    public UsersController(MoodProjectContext dbContext)
+    {
+        DbContext = dbContext;
+    }
+    
+    [HttpGet, ActionName("GetGDPRConsent")]
+    public bool GetGdprConsent(string authProviderId)
+    {
+        return DbContext.Users
+            .FirstOrDefault(u => u.AuthProviderUserId.Equals(authProviderId))?
+            .HasAcceptedGdpr
+               ?? false;
+    }
 }
 /* 
  

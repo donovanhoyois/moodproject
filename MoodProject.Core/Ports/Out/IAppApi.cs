@@ -22,4 +22,5 @@ public interface IAppApi
     public Task<IEnumerable<ChatRoomComment>> GetCommentsByModerationStatus(ModerationStatus moderationStatus);
     public Task<bool> CreateComment(ChatRoomComment comment);
     public Task<bool> UpdateComment(ChatRoomComment comment);
+    public Task<bool> GetGdprConsent(string authProviderId);
 }

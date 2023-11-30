@@ -40,6 +40,7 @@ builder.Services.AddSingleton<ISymptomsTypesService, SymptomsTypesService>();
 builder.Services.AddSingleton<ISymptomsService, SymptomsService>();
 builder.Services.AddSingleton<IQuizzService, QuizzService>();
 builder.Services.AddSingleton<IChatRoomsService, ChatRoomsService>();
+builder.Services.AddSingleton<IUsersService, UsersService>();
 
 // Blazor-specific services
 builder.Services.AddScoped<CacheService>();
