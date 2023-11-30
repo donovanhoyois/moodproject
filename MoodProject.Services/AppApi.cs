@@ -112,4 +112,10 @@ public class AppApi : IAppApi
         var response = await ApiClient.GetFromJsonAsync<bool>($"Users/GetGdprConsent?authProviderId={authProviderId}");
         return response;
     }
+
+    public async Task<bool> AcceptGdpr(string authProviderId)
+    {
+        var response = await ApiClient.PostAsJsonAsync($"Users/AcceptGdpr?authProviderId={authProviderId}", "");
+        return response.IsSuccessStatusCode;
+    }
 }

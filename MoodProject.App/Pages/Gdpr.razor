@@ -1,7 +1,63 @@
 ﻿@page "/Gdpr"
-<h3>Gdpr</h3>
-<p>Gdpr</p>
+@using MoodProject.Core.Ports.In
+@inject IUsersService UsersService
+@inject NavigationManager Navigation
+
+@inherits MoodProject.App.Shared.Helpers.IdentityHelper
+
+@attribute [Authorize]
+
+<h1>Réglement général de protection des données</h1><br />
+<div class="gdpr">
+    <div class="gdpr-chapter">
+        <h2>1. Informations générales</h2>
+        <p>Le Règlement Général sur la Protection des Données (RGPD) est un ensemble de règles de protection des données personnelles applicables dans l'Union européenne (UE) depuis le 25 mai 2018. Il vise à renforcer les droits des individus en matière de confidentialité et à harmoniser les réglementations relatives à la protection des données à travers l'UE.</p>
+    </div>
+    <div class="gdpr-chapter">
+        <h2>2. Collecte de Données Médicales</h2>
+        <p>Nous collectons des données médicales uniquement à des fins fonctionnelles nécessaires au bon fonctionnement de notre application. Ces données peuvent inclure, sans s'y limiter, des informations sur la santé nécessaires pour personnaliser l'expérience de l'utilisateur en fonction de ses besoins médicaux spécifiques. Nous nous engageons à traiter ces données avec le plus grand soin et à les sécuriser conformément aux normes de sécurité appropriées.</p>
+        <p>Ces données sont les suivantes:</p>
+        <ul>
+            <li>Symptômes du patient</li>
+            <li>Présence de ces symptômes</li>
+            <li>Nuisibilité de ces symptômes</li>
+            <li>État de santé général en fonction des symptomes renseignés dans l'application</li>
+        </ul>
+    </div>
+    <div class="gdpr-chapter">
+        <h2>3. Cookies</h2>
+        <p>Notre site utilise des cookies pour assurer son bon fonctionnement et améliorer l'expérience de l'utilisateur. Les cookies sont de petits fichiers texte stockés sur votre appareil qui nous aident à analyser l'utilisation du site, à personnaliser le contenu et à offrir des fonctionnalités liées aux médias sociaux. En utilisant notre site, vous consentez à l'utilisation de cookies conformément à notre politique de confidentialité.</p>
+    </div>
+    <div class="gdpr-chapter">
+        <h2>4. Consentement</h2>
+        <p>En utilisant notre application, vous consentez expressément à la collecte et au traitement de données médicales à des fins fonctionnelles, conformément à cette politique de confidentialité. Vous avez le droit de retirer ce consentement à tout moment en modifiant les paramètres de confidentialité dans l'application.</p>
+    </div>
+    <div class="gdpr-chapter">
+        <h2>5. Sécurité des Données</h2>
+        <p>Nous mettons en place des mesures de sécurité appropriées pour protéger vos données, y compris les données médicales, contre tout accès non autorisé, divulgation, altération et destruction. Nous nous engageons à assurer la confidentialité et l'intégrité de vos informations médicales.</p>
+    </div>
+    <div class="gdpr-chapter">
+        <h2>6. Droits des Utilisateurs</h2>
+        <p>Vous avez le droit d'accéder, de rectifier, de supprimer ou de limiter le traitement de vos données médicales. Pour exercer ces droits ou poser des questions sur notre politique de confidentialité, veuillez nous contacter à [adresse e-mail/contact].</p>
+    </div>
+    <EditForm Model="@IsBoxChecked" OnSubmit="AcceptGdpr">
+        <div class="form-check">
+            <InputCheckbox @bind-Value="@IsBoxChecked" class="form-check-input"/>
+            <label class="form-check-label" for="gdprCheck">J'ai lu et j'accepte le réglement de protection des données</label>
+        </div>
+        <button type="submit" id="gdprCheck" class="btn btn-primary" disabled="@(!IsBoxChecked)">Accepter</button>
+    </EditForm>
+</div>
 
 @code {
-    
+    private bool IsBoxChecked = false;
+
+    private async Task AcceptGdpr(EditContext editContext)
+    {
+        var gdprAcceptOperation = await UsersService.AcceptGdpr(await GetUserId());
+        if (gdprAcceptOperation)
+        {
+            Navigation.NavigateTo("/profile");
+        }
+    }
 }

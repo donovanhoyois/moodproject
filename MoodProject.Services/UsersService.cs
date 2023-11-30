@@ -16,4 +16,9 @@ public class UsersService : IUsersService
     {
         return await AppApi.GetGdprConsent(authProviderId);
     }
+
+    public async Task<bool> AcceptGdpr(string authProviderId)
+    {
+        return await AppApi.AcceptGdpr(authProviderId);
+    }
 }

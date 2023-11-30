@@ -28,6 +28,18 @@ public class UsersController
             .HasAcceptedGdpr
                ?? false;
     }
+
+    [HttpPost, ActionName("AcceptGDPR")]
+    public void AcceptGdpr(string authProviderId)
+    {
+        var user = DbContext.Users
+            .FirstOrDefault(u => u.AuthProviderUserId.Equals(authProviderId));
+        if (user != null)
+        {
+            user.HasAcceptedGdpr = true;
+            DbContext.SaveChanges();
+        }
+    }
 }
 /* 
  
