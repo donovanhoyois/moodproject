@@ -1,7 +1,9 @@
 ﻿@page "/Gdpr"
 @using MoodProject.Core.Ports.In
+@using MoodProject.App.Services
 @inject IUsersService UsersService
 @inject NavigationManager Navigation
+@inject CacheService CacheService
 
 @inherits MoodProject.App.Shared.Helpers.IdentityHelper
 
@@ -55,6 +57,7 @@
     private async Task AcceptGdpr(EditContext editContext)
     {
         var gdprAcceptOperation = await UsersService.AcceptGdpr(await GetUserId());
+        await CacheService.UpdateHasAcceptedGdpr(gdprAcceptOperation);
         if (gdprAcceptOperation)
         {
             Navigation.NavigateTo("/profile");

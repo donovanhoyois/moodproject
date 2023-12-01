@@ -35,7 +35,8 @@
 @code{
     [Parameter]
     public string Action { get; set; }
-    [CascadingParameter] protected Task<AuthenticationState> AuthenticationStateTask { get; set; }
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthenticationStateTask { get; set; }
     
     protected override async Task OnParametersSetAsync()
     {

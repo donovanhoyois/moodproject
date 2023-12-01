@@ -93,8 +93,7 @@
     protected override async Task OnInitializedAsync()
     {
         InstalledVersion = await CacheService.GetInstalledVersion();
-        HasAcceptedGdpr = await UsersService.GetGdprConsent(await GetUserId());
-        //TODO: Refresh gdpr on change
+        HasAcceptedGdpr = await CacheService.GetHasAcceptedGdpr(await GetUserId());
     }
 
     private void ToggleNavMenu()
