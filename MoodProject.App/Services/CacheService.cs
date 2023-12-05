@@ -46,11 +46,11 @@ public class CacheService
     public async Task<bool> GetHasAcceptedGdpr(string authProviderId)
     {
         var hasAcceptedGdpr = await LocalStorage.GetItemAsync<bool>(HAS_ACCEPTED_GDPR_KEY);
-        if (!hasAcceptedGdpr)
+        if (!hasAcceptedGdpr && authProviderId != string.Empty)
         {
             hasAcceptedGdpr = await UsersService.GetGdprConsent(authProviderId);
-            await LocalStorage.SetItemAsync(HAS_ACCEPTED_GDPR_KEY, hasAcceptedGdpr);
         }
+        await LocalStorage.SetItemAsync(HAS_ACCEPTED_GDPR_KEY, hasAcceptedGdpr);
         HasAcceptedGdpr = hasAcceptedGdpr;
         return HasAcceptedGdpr;
     }
