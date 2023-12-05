@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MoodProject.Core;
+using MoodProject.Core.Models;
 
 namespace MoodProject.Api.Controllers;
 
@@ -37,8 +38,17 @@ public class UsersController
         if (user != null)
         {
             user.HasAcceptedGdpr = true;
-            DbContext.SaveChanges();
         }
+        else
+        {
+            var newUser = new User()
+            {
+                AuthProviderUserId = authProviderId,
+                HasAcceptedGdpr = true
+            };
+            DbContext.Users.Add(newUser);
+        }
+        DbContext.SaveChanges();
     }
 }
 /* 

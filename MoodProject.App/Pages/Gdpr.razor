@@ -60,7 +60,7 @@
         await CacheService.UpdateHasAcceptedGdpr(gdprAcceptOperation);
         if (gdprAcceptOperation)
         {
-            Navigation.NavigateTo("/profile");
+            Navigation.NavigateTo("/profile", true);
         }
     }
 }

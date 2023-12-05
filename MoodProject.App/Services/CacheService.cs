@@ -58,5 +58,6 @@ public class CacheService
     public async Task UpdateHasAcceptedGdpr(bool newValue)
     {
         HasAcceptedGdpr = newValue;
+        await LocalStorage.SetItemAsync(HAS_ACCEPTED_GDPR_KEY, newValue);
     }
 }
