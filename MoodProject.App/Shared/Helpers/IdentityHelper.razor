@@ -11,7 +11,6 @@
         if (UserId.Equals(string.Empty) && authState.User.Claims.Any())
         {
             var sidString = authState.User.Claims.First(c => c.Type.Equals("sub")).Value;
-            UserId = sidString.Replace("auth0|", string.Empty);
             return UserId;
         }
         return UserId;
