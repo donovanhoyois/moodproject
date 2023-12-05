@@ -8,20 +8,18 @@
     public async Task<string> GetUserId()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        if (UserId.Equals(string.Empty))
+        if (UserId.Equals(string.Empty) && authState.User.Claims.Any())
         {
-            if (authState.User != null)
-            {
-                var sidString = authState.User.Claims.First(c => c.Type.Equals("sub")).Value;
-                UserId = sidString.Replace("auth0|", string.Empty);
-                return UserId;
-            }
-        }
-        else
-        {
+            var sidString = authState.User.Claims.First(c => c.Type.Equals("sub")).Value;
+            UserId = sidString.Replace("auth0|", string.Empty);
             return UserId;
         }
-        
-        return null;
+        return UserId;
+    }
+
+    public async Task<bool> IsAuthenticated()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        return authState.User.Claims.Any();
     }
 }

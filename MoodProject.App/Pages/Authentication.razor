@@ -2,11 +2,9 @@
 
 @page "/authentication/{action}"
 @using MoodProject.Core.Ports.In
-@using MoodProject.Core
-@using System.Security.Claims
-@using System.Text.Json
 @using MoodProject.App.Shared.Helpers
 
+@inject IUsersService UsersService
 @inject NavigationManager Navigation
 @inject IConfiguration Configuration
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -37,9 +35,16 @@
 @code{
     [Parameter]
     public string Action { get; set; }
-
-    protected override async Task OnInitializedAsync()
+    [CascadingParameter]
+    protected Task<AuthenticationState> AuthenticationStateTask { get; set; }
+    
+    protected override async Task OnParametersSetAsync()
     {
-        
+        await AuthenticationStateTask;
+        if (Action.Equals("login-callback") && await IsAuthenticated())
+        {
+            var hasAcceptedGdpr = await UsersService.GetGdprConsent(await GetUserId());
+            Navigation.NavigateTo(!hasAcceptedGdpr ? "/gdpr" : "/profile");
+        }
     }
 }

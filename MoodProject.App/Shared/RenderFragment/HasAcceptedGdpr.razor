@@ -1,0 +1,21 @@
+﻿@using MoodProject.App.Services
+@inject CacheService CacheService
+
+@inherits MoodProject.App.Shared.Helpers.IdentityHelper
+
+@if (HasAcceptedGdprVariable)
+{
+    @ChildContent
+}
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    
+    private bool HasAcceptedGdprVariable { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        HasAcceptedGdprVariable = await CacheService.GetHasAcceptedGdpr(await GetUserId());
+    }
+
+}
