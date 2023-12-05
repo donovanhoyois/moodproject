@@ -10,7 +10,7 @@
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         if (UserId.Equals(string.Empty) && authState.User.Claims.Any())
         {
-            var sidString = authState.User.Claims.First(c => c.Type.Equals("sub")).Value;
+            UserId = authState.User.Claims.First(c => c.Type.Equals("sub")).Value;
             return UserId;
         }
         return UserId;
