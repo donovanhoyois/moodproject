@@ -4,14 +4,27 @@ namespace MoodProject.App.Models;
 
 public class MedicationForm : Medication
 {
-    public readonly CheckableDayOfTheWeek[] DaysOfTheWeek = new CheckableDayOfTheWeek[7];
-    public List<int> DaysOfTheMonth = new();
+    public int UsagePerDay = 1;
+
+    public Stack<DayUsage> DayUsages = new();
+    public Stack<int> DaysOfTheMonth = new();
 
     public MedicationForm()
     {
-        for (var i = 0; i < DaysOfTheWeek.Length; i++)
+
+        UpdateListLength();
+    }
+
+    public void UpdateListLength()
+    {
+        while (DayUsages.Count < UsagePerDay)
         {
-            DaysOfTheWeek[i] = new CheckableDayOfTheWeek(i + 1, false);
+            DayUsages.Push(new DayUsage(new DateTime()));
+        }
+
+        while (DayUsages.Count > UsagePerDay)
+        {
+            DayUsages.Pop();
         }
     }
 }

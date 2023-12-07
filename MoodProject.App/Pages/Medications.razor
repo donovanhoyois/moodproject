@@ -77,8 +77,15 @@
                             @if (MedicationForm.Usage == MedicationUsage.PER_DAY)
                             {
                                 <label>Combien de fois par jour prennez-vous ce médicament ?</label>
-                                // TODO
-                                
+                                <input type="number" @bind-value="@MedicationForm.UsagePerDay" @onchange="@MedicationForm.UpdateListLength" @bind-value:event="oninput" class="form-control"/>
+                                if (MedicationForm.UsagePerDay > 0)
+                                {
+                                    <label>A quelle heure prennez-vous ce médicament ?</label>
+                                    @foreach (var dayUsage in MedicationForm.DayUsages)
+                                    {
+                                        <InputDate Type="InputDateType.Time" @bind-Value:format="hh:mm:ss" @bind-Value="@dayUsage.Time" class="form-control dayUsageTimePicker"/>
+                                    }
+                                }
                             }
                             @if (MedicationForm.Usage == MedicationUsage.PER_MONTH)
                             {
@@ -98,13 +105,12 @@
 @code {
     private OperationResult<IEnumerable<Medication>> MedicationOperation = new OperationResult<IEnumerable<Medication>>(OperationResultType.Pending);
     private MedicationForm MedicationForm = new();
-    private List<string> DaysOfTheWeek = new() { "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche" };
 
     protected override async Task OnInitializedAsync()
     {
         MedicationOperation = await MedicationService.GetMedicationsOfUser(await GetUserId());
         InsertFirstScheduleInForm();
-        Console.WriteLine(MedicationForm.DaysOfTheWeek);
+        //Console.WriteLine(MedicationForm.DayUsagesHours[index]);
     }
 
     private void InsertFirstScheduleInForm()
