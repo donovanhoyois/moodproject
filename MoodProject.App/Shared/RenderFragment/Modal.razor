@@ -1,0 +1,33 @@
+﻿<div class="modal fade" id="@Id" tabindex="-1" aria-labelledby="${@Id}Label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="${@Id}Label">Ajouter un médicament</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @ChildContent
+            </div>
+            <div class="modal-footer">
+                @if (!string.IsNullOrEmpty(SecondaryButtonText))
+                {
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@SecondaryButtonText</button>
+                }
+                @if (!string.IsNullOrEmpty(PrimaryButtonText))
+                {
+                    <button type="button" class="btn btn-primary">@PrimaryButtonText</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+@code {
+    [Parameter, EditorRequired]
+    public required string Id { get; set; }
+    [Parameter, EditorRequired]
+    public RenderFragment ChildContent { get; set; }
+    [Parameter]
+    public string PrimaryButtonText { get; set; } = string.Empty;
+    [Parameter]
+    public string SecondaryButtonText { get; set; } = string.Empty;
+}

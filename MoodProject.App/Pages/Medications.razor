@@ -1,0 +1,126 @@
+﻿@page "/Medications"
+
+@attribute [Authorize]
+
+@using MoodProject.Core.Models
+@using MoodProject.Core.Enums
+@using MoodProject.Core.Ports.In
+@using MoodProject.Services
+@using Microsoft.AspNetCore.Components
+@using MoodProject.App.Models
+@inject IMedicationService MedicationService
+
+@inherits MoodProject.App.Shared.Helpers.IdentityHelper
+
+<h1 class="display-1">Vos médicaments</h1>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Ajouter un médicament</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="symptoms my-3">
+    <div class="card">
+      <div class="card-header">
+        Médicaments enregistrés
+      </div>
+      <div class="card-body">
+        @if (MedicationOperation.Status == OperationResultType.Pending)
+        {
+            <LoadingText />
+        }
+        else
+        {
+            if (MedicationOperation.Content.Any())
+            {
+                <ul class="list-group list-group-flush">
+                    @foreach (var medication in MedicationOperation.Content)
+                    {
+                        <li class="list-group-item">
+                            @medication.Name
+                        </li>
+                    }
+                </ul>
+            }
+            else
+            {
+                <InfoMessage Text="Vous n'avez encore enregistré aucun médicament." />
+            }
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMedicationModal">Ajouter un médicament</button>
+            <Modal Id="addMedicationModal" PrimaryButtonText="Ajouter" SecondaryButtonText="Annuler">
+                <EditForm Model="@MedicationForm" OnSubmit="SubmitMedicationForm">
+                    <div class="form-group">
+                        <label>Nom</label>
+                        <InputText @bind-Value="@MedicationForm.Name" DisplayName="@MedicationForm.Name" placeholder="Nom du médicament" class="form-control"/>
+                        <label>Type de prise</label>
+                        <InputSelect @bind-Value="@MedicationForm.Usage" placeholder="Utilisation" class="form-control">
+                            @foreach (var usage in Enum.GetValues(typeof(MedicationUsage)))
+                            {
+                                <option value="@usage">@usage</option>
+                            }
+                        </InputSelect>
+                        @foreach (var schedule in MedicationForm.MedicationSchedules)
+                        {
+                            var scheduleToBind = schedule;
+                            @if (MedicationForm.Usage == MedicationUsage.PER_DAY)
+                            {
+                                <label>Combien de fois par jour prennez-vous ce médicament ?</label>
+                                // TODO
+                                
+                            }
+                            @if (MedicationForm.Usage == MedicationUsage.PER_MONTH)
+                            {
+                                <label>Combien de fois par mois prennez-vous ce médicament ?</label>
+                                // TODO
+                            }
+                        }
+                    </div>
+                    <button type="submit" class="btn btn-primary">AjouterForm</button>
+                </EditForm>
+            </Modal>
+        }
+      </div>
+    </div>
+</div>
+
+@code {
+    private OperationResult<IEnumerable<Medication>> MedicationOperation = new OperationResult<IEnumerable<Medication>>(OperationResultType.Pending);
+    private MedicationForm MedicationForm = new();
+    private List<string> DaysOfTheWeek = new() { "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        MedicationOperation = await MedicationService.GetMedicationsOfUser(await GetUserId());
+        InsertFirstScheduleInForm();
+        Console.WriteLine(MedicationForm.DaysOfTheWeek);
+    }
+
+    private void InsertFirstScheduleInForm()
+    {
+        if (MedicationForm.MedicationSchedules.Count == 0)
+        {
+            MedicationForm.MedicationSchedules.Add(new MedicationSchedule()
+            {
+                DateTime = DateTime.Today
+            });
+        }
+    }
+
+    private void SubmitMedicationForm()
+    {
+        Console.Write("submit");
+        // TODO
+    }
+}

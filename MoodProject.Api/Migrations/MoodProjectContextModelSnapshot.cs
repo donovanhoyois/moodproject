@@ -167,6 +167,54 @@ namespace MoodProject.Api.Migrations
                     b.ToTable("FactorValues");
                 });
 
+            modelBuilder.Entity("MoodProject.Core.Models.Medication", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsDisabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Usage")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Medications");
+                });
+
+            modelBuilder.Entity("MoodProject.Core.Models.MedicationSchedule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("MedicationId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MedicationId");
+
+                    b.ToTable("MedicationSchedules");
+                });
+
             modelBuilder.Entity("MoodProject.Core.Models.QuizzAnswer", b =>
                 {
                     b.Property<int>("Id")
@@ -303,6 +351,15 @@ namespace MoodProject.Api.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("MoodProject.Core.Models.MedicationSchedule", b =>
+                {
+                    b.HasOne("MoodProject.Core.Models.Medication", null)
+                        .WithMany("MedicationSchedules")
+                        .HasForeignKey("MedicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("MoodProject.Core.Models.QuizzAnswer", b =>
                 {
                     b.HasOne("MoodProject.Core.Models.CustomQuizzQuestion", null)
@@ -334,6 +391,11 @@ namespace MoodProject.Api.Migrations
             modelBuilder.Entity("MoodProject.Core.Models.CustomQuizzQuestion", b =>
                 {
                     b.Navigation("AnswerPossibilities");
+                });
+
+            modelBuilder.Entity("MoodProject.Core.Models.Medication", b =>
+                {
+                    b.Navigation("MedicationSchedules");
                 });
 
             modelBuilder.Entity("MoodProject.Core.Models.Symptom", b =>

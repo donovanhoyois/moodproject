@@ -24,4 +24,6 @@ public interface IAppApi
     public Task<bool> UpdateComment(ChatRoomComment comment);
     public Task<bool> GetGdprConsent(string authProviderId);
     public Task<bool> AcceptGdpr(string authProviderId);
+    public Task<IEnumerable<Medication>> GetMedicationsByUserId(string userId);
+    public Task<bool> UpdateMedications(IEnumerable<Medication> medications);
 }

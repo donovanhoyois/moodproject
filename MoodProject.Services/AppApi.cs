@@ -118,4 +118,15 @@ public class AppApi : IAppApi
         var response = await ApiClient.PostAsJsonAsync($"Users/AcceptGdpr?authProviderId={authProviderId}", "");
         return response.IsSuccessStatusCode;
     }
+
+    public async Task<IEnumerable<Medication>> GetMedicationsByUserId(string userId)
+    {
+        return await ApiClient.GetFromJsonAsync<IEnumerable<Medication>>($"Medications/GetMedicationsByUserId?userId={userId}");
+    }
+
+    public async Task<bool> UpdateMedications(IEnumerable<Medication> medications)
+    {
+        var response = await ApiClient.PatchAsJsonAsync($"Medications/UpdateMedications", medications);
+        return response.IsSuccessStatusCode;
+    }
 }
