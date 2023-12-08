@@ -43,4 +43,21 @@ public class MedicationService : IMedicationService
                 Message = "Une erreur est survenue lors de la mise à jour des médicaments."
             };
     }
+
+    public async Task<OperationResult<Medication>> UpdateMedication(Medication medication)
+    {
+        Console.WriteLine(medication.Name);
+        var apiResponse = await AppApi.UpdateMedications(new List<Medication>(){ medication });
+        return apiResponse
+            ? new OperationResult<Medication>(OperationResultType.Ok)
+            {
+                Content = medication,
+                Message = "Les médicaments ont bien été mis à jour."
+            }
+            : new OperationResult<Medication>(OperationResultType.Error)
+            {
+                Content = medication,
+                Message = "Une erreur est survenue lors de la mise à jour des médicaments."
+            };
+    }
 }

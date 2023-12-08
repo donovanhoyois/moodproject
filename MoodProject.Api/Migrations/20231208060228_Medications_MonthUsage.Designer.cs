@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MoodProject.Api;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MoodProject.Api.Migrations
 {
     [DbContext(typeof(MoodProjectContext))]
-    partial class MoodProjectContextModelSnapshot : ModelSnapshot
+    [Migration("20231208060228_Medications_MonthUsage")]
+    partial class Medications_MonthUsage
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -215,7 +218,28 @@ namespace MoodProject.Api.Migrations
 
                     b.HasIndex("MedicationId");
 
-                    b.ToTable("MedicationDayUsages");
+                    b.ToTable("MedicationDayUsage");
+                });
+
+            modelBuilder.Entity("MoodProject.Core.Models.MedicationSchedule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("MedicationId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MedicationId");
+
+                    b.ToTable("MedicationSchedules");
                 });
 
             modelBuilder.Entity("MoodProject.Core.Models.QuizzAnswer", b =>
@@ -363,6 +387,15 @@ namespace MoodProject.Api.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("MoodProject.Core.Models.MedicationSchedule", b =>
+                {
+                    b.HasOne("MoodProject.Core.Models.Medication", null)
+                        .WithMany("MedicationSchedules")
+                        .HasForeignKey("MedicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("MoodProject.Core.Models.QuizzAnswer", b =>
                 {
                     b.HasOne("MoodProject.Core.Models.CustomQuizzQuestion", null)
@@ -399,6 +432,8 @@ namespace MoodProject.Api.Migrations
             modelBuilder.Entity("MoodProject.Core.Models.Medication", b =>
                 {
                     b.Navigation("DayUsages");
+
+                    b.Navigation("MedicationSchedules");
                 });
 
             modelBuilder.Entity("MoodProject.Core.Models.Symptom", b =>

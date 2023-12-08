@@ -1,5 +1,7 @@
-﻿.dayUsageTimePicker{
+﻿.modal{
+    background-color: blue;
+}
+
+::deep .dayUsageTimePicker{
     margin: 10px 0;
-    background-color: red;
-    /*TODO: CSS*/
 }

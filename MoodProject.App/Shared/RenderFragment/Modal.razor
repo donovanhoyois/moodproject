@@ -1,4 +1,4 @@
-﻿<div class="modal fade" id="@Id" tabindex="-1" aria-labelledby="${@Id}Label" aria-hidden="true">
+﻿<div class="modal fade show" id="@Id" tabindex="-1" aria-labelledby="${@Id}Label" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -11,11 +11,11 @@
             <div class="modal-footer">
                 @if (!string.IsNullOrEmpty(SecondaryButtonText))
                 {
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@SecondaryButtonText</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="SecondaryButtonClick">@SecondaryButtonText</button>
                 }
                 @if (!string.IsNullOrEmpty(PrimaryButtonText))
                 {
-                    <button type="button" class="btn btn-primary">@PrimaryButtonText</button>
+                    <button type="button" class="btn btn-primary" @onclick="PrimaryButtonClick">@PrimaryButtonText</button>
                 }
             </div>
         </div>
@@ -30,4 +30,18 @@
     public string PrimaryButtonText { get; set; } = string.Empty;
     [Parameter]
     public string SecondaryButtonText { get; set; } = string.Empty;
+    [Parameter]
+    public Action? OnPrimaryButtonClick { get; set; }
+    [Parameter]
+    public Action? OnSecondaryButtonClick { get; set; }
+
+    private void PrimaryButtonClick()
+    {
+        OnPrimaryButtonClick?.Invoke();
+    }
+
+    private void SecondaryButtonClick()
+    {
+        OnSecondaryButtonClick?.Invoke();
+    }
 }

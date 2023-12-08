@@ -10,6 +10,12 @@ public class Medication
     public string UserId { get; set; }
     public string Name { get; set; }
     public MedicationUsage Usage { get; set; }
-    public List<MedicationSchedule> MedicationSchedules { get; set; } = new();
+    public Stack<MedicationDayUsage> DayUsages { get; set; } = new();
+    public MedicationMonthUsage MonthUsage { get; set; } = MedicationMonthUsage.NONE;
     public bool IsDisabled { get; set; }
+
+    public Medication()
+    {
+        
+    }
 }

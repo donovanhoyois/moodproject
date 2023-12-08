@@ -119,7 +119,7 @@
     /// <summary>
     /// Submit the checkboxes form
     /// </summary>
-    private async Task SymptomsSubmit()
+        private async Task SymptomsSubmit()
     {
         var updatedSymptomsList = new List<Symptom>();
         foreach (var symptomType in _symptomTypesForm.symptomsTypesCheckboxes.Where(symptomType => symptomType.IsChecked))

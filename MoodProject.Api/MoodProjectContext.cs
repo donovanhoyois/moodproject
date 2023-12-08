@@ -16,7 +16,7 @@ public class MoodProjectContext : DbContext
     public DbSet<ChatRoomPost> ChatRoomPosts { get; set; }
     public DbSet<ChatRoomComment> ChatRoomComments { get; set; }
     public DbSet<Medication> Medications { get; set; }
-    public DbSet<MedicationSchedule> MedicationSchedules { get; set; }
+    public DbSet<MedicationDayUsage> MedicationDayUsages { get; set; }
 
     public MoodProjectContext()
     {

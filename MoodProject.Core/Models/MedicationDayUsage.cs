@@ -2,10 +2,10 @@
 
 namespace MoodProject.Core.Models;
 
-public class MedicationSchedule
+public class MedicationDayUsage
 {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
     public int MedicationId { get; set; }
-    public DateTime DateTime { get; set; }
+    public TimeOnly TimeOfTheDay { get; set; }
 }
