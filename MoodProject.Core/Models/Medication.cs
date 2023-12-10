@@ -10,7 +10,7 @@ public class Medication
     public string UserId { get; set; }
     public string Name { get; set; }
     public MedicationUsage Usage { get; set; }
-    public Stack<MedicationDayUsage> DayUsages { get; set; } = new();
+    public List<MedicationDayUsage> DayUsages { get; set; } = new();
     public MedicationMonthUsage MonthUsage { get; set; } = MedicationMonthUsage.NONE;
     public bool IsDisabled { get; set; }
 

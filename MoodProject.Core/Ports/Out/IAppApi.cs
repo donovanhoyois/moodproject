@@ -26,4 +26,5 @@ public interface IAppApi
     public Task<bool> AcceptGdpr(string authProviderId);
     public Task<IEnumerable<Medication>> GetMedicationsByUserId(string userId);
     public Task<bool> UpdateMedications(IEnumerable<Medication> medications);
+    public Task<bool> DeleteMedications(IEnumerable<Medication> medications);
 }

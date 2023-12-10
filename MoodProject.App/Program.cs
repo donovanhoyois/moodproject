@@ -45,5 +45,6 @@ builder.Services.AddSingleton<IMedicationService, MedicationService>();
 
 // Blazor-specific services
 builder.Services.AddScoped<CacheService>();
+builder.Services.AddScoped<JsService>();
 
 await builder.Build().RunAsync();

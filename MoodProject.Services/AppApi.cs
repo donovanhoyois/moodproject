@@ -1,5 +1,4 @@
 ﻿using System.Net.Http.Json;
-using MoodProject.Core;
 using MoodProject.Core.Configuration;
 using MoodProject.Core.Enums;
 using MoodProject.Core.Models;
@@ -127,6 +126,12 @@ public class AppApi : IAppApi
     public async Task<bool> UpdateMedications(IEnumerable<Medication> medications)
     {
         var response = await ApiClient.PatchAsJsonAsync($"Medications/UpdateMedications", medications);
+        return response.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> DeleteMedications(IEnumerable<Medication> medications)
+    {
+        var response = await ApiClient.PostAsJsonAsync("Medications/DeleteMedications", medications);
         return response.IsSuccessStatusCode;
     }
 }

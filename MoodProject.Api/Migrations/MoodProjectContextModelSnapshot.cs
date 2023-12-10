@@ -41,7 +41,7 @@ namespace MoodProject.Api.Migrations
 
                     b.HasIndex("SymptomId");
 
-                    b.ToTable("ChatRooms");
+                    b.ToTable("ChatRooms", (string)null);
                 });
 
             modelBuilder.Entity("MoodProject.Core.Models.ChatRoomComment", b =>
@@ -73,7 +73,7 @@ namespace MoodProject.Api.Migrations
 
                     b.HasIndex("ChatRoomPostId");
 
-                    b.ToTable("ChatRoomComments");
+                    b.ToTable("ChatRoomComments", (string)null);
                 });
 
             modelBuilder.Entity("MoodProject.Core.Models.ChatRoomPost", b =>
@@ -109,7 +109,7 @@ namespace MoodProject.Api.Migrations
 
                     b.HasIndex("ChatRoomId");
 
-                    b.ToTable("ChatRoomPosts");
+                    b.ToTable("ChatRoomPosts", (string)null);
                 });
 
             modelBuilder.Entity("MoodProject.Core.Models.CustomQuizzQuestion", b =>
@@ -137,7 +137,7 @@ namespace MoodProject.Api.Migrations
 
                     b.HasIndex("SymptomTypeId");
 
-                    b.ToTable("QuizzQuestions");
+                    b.ToTable("QuizzQuestions", (string)null);
                 });
 
             modelBuilder.Entity("MoodProject.Core.Models.FactorValue", b =>
@@ -164,7 +164,7 @@ namespace MoodProject.Api.Migrations
 
                     b.HasIndex("SymptomId");
 
-                    b.ToTable("FactorValues");
+                    b.ToTable("FactorValues", (string)null);
                 });
 
             modelBuilder.Entity("MoodProject.Core.Models.Medication", b =>
@@ -194,7 +194,7 @@ namespace MoodProject.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Medications");
+                    b.ToTable("Medications", (string)null);
                 });
 
             modelBuilder.Entity("MoodProject.Core.Models.MedicationDayUsage", b =>
@@ -215,7 +215,7 @@ namespace MoodProject.Api.Migrations
 
                     b.HasIndex("MedicationId");
 
-                    b.ToTable("MedicationDayUsages");
+                    b.ToTable("MedicationDayUsages", (string)null);
                 });
 
             modelBuilder.Entity("MoodProject.Core.Models.QuizzAnswer", b =>
@@ -240,7 +240,7 @@ namespace MoodProject.Api.Migrations
 
                     b.HasIndex("CustomQuizzQuestionId");
 
-                    b.ToTable("QuizzAnswers");
+                    b.ToTable("QuizzAnswers", (string)null);
                 });
 
             modelBuilder.Entity("MoodProject.Core.Models.Symptom", b =>
@@ -265,7 +265,7 @@ namespace MoodProject.Api.Migrations
 
                     b.HasIndex("TypeId");
 
-                    b.ToTable("Symptoms");
+                    b.ToTable("Symptoms", (string)null);
                 });
 
             modelBuilder.Entity("MoodProject.Core.Models.SymptomType", b =>
@@ -282,7 +282,7 @@ namespace MoodProject.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SymptomTypes");
+                    b.ToTable("SymptomTypes", (string)null);
                 });
 
             modelBuilder.Entity("MoodProject.Core.Models.User", b =>
@@ -302,7 +302,7 @@ namespace MoodProject.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("MoodProject.Core.Models.ChatRoom", b =>

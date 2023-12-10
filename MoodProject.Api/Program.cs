@@ -20,13 +20,6 @@ builder.Services.AddCors(c => c.AddPolicy("dev", builder =>
         .AllowAnyMethod();
 }));
 
-// JSON SerializerSettings (to avoid loops)
-builder.Services.AddControllers().AddNewtonsoftJson(options =>
-{
-    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-});
-    
-    
 // MySQL
 var connectionString = "datasource=127.0.0.1;port=3306;username=root;password=;database=moodproject;";
 var version = new MySqlServerVersion(new Version(10, 4, 11));

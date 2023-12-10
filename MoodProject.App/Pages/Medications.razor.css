@@ -1,7 +1,17 @@
-﻿.modal{
+﻿.medication-list{
+    margin-bottom: 25px;
+}
+
+.medication-item:hover{
+    background-color: rgba(0,0,0, .03);
+    cursor: pointer;
+}
+
+.modal{
     background-color: blue;
 }
 
 ::deep .dayUsageTimePicker{
     margin: 10px 0;
 }
+
