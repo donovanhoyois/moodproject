@@ -1,13 +1,28 @@
 ﻿@page "/"
-@using System.Text.Json
-@using System.Text.Json.Serialization
+@using Microsoft.AspNetCore.SignalR.Client
+@using MoodProject.App.Services
+@using System.Security.Claims
+@using MoodProject.Core.Ports.In
+@using MoodProject.Services
+@implements IAsyncDisposable
+@inject IAccessTokenProvider TokenProvider 
+@inject IApiAuthService ApiAuthService
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject CacheService CacheService
+
+@inherits IdentityHelper
 
 <PageTitle>Index</PageTitle>
 
 <h1>Bienvenue</h1>
 
 Welcome to your new app.
+<ul>
+    @foreach (var message in Messages)
+    {
+        <li>@message</li>
+    }
+</ul>
 
 <AuthorizeView>
     <Authorized>
@@ -19,9 +34,38 @@ Welcome to your new app.
 
 @code{
     private string test;
+    private HubConnection? HubConnection;
+    private readonly List<string> Messages = new();
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        // TODO: Refactor this in a service
+        var token = await ApiAuthService.GetToken(await GetUserId());
+        
+        HubConnection = new HubConnectionBuilder()
+            .WithUrl(
+                "https://localhost:7073/notifications",
+                options =>
+                {
+                    options.AccessTokenProvider = () => Task.FromResult<string?>(token);
+                })
+            .Build();
+
+        HubConnection.On<string>("ReceiveNotification", message =>
+        {
+            Console.WriteLine("Message received.");
+            Messages.Add(message);
+            InvokeAsync(StateHasChanged);
+        });
+        await HubConnection.StartAsync();
     }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (HubConnection is not null)
+        {
+            await HubConnection.DisposeAsync();
+        }
+    }
+
 }

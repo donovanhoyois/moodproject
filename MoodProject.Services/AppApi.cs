@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Json;
+﻿using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using MoodProject.Core.Configuration;
 using MoodProject.Core.Enums;
 using MoodProject.Core.Models;
@@ -8,11 +9,18 @@ namespace MoodProject.Services;
 
 public class AppApi : IAppApi
 {
-    private HttpClient ApiClient;
+    private readonly HttpClient ApiClient;
     public AppApi(ApiConfiguration config, HttpClient apiClient)
     {
         ApiClient = apiClient;
         ApiClient.BaseAddress = new Uri(config.BaseUrl);
+    }
+
+    public async Task<string> GetToken(string userId)
+    {
+        var newToken = await ApiClient.GetFromJsonAsync<Token>($"Authentication/GetToken?userId={userId}");
+        ApiClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", newToken.Value);
+        return newToken.Value;
     }
 
     public async Task<IEnumerable<SymptomType>> GetSymptomsTypes()

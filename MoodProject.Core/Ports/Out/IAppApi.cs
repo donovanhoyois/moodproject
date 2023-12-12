@@ -5,6 +5,7 @@ namespace MoodProject.Core.Ports.Out;
 
 public interface IAppApi
 {
+    public Task<string> GetToken(string userId);
     public Task<IEnumerable<SymptomType>> GetSymptomsTypes();
     public Task<IEnumerable<Symptom>> GetSymptomsByUserId(string userId);
     public Task<bool> SaveSymptoms(IEnumerable<Symptom> symptoms);

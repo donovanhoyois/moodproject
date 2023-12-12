@@ -16,7 +16,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddSingleton(sp => new HttpClient());
+builder.Services.AddTransient<HttpClient>(sp => new HttpClient());
 
 // Auth0
 builder.Services.AddOidcAuthentication(options =>
@@ -36,6 +36,7 @@ builder.Services.AddBlazoredLocalStorageAsSingleton();
 
 // Services
 builder.Services.AddSingleton<IAppApi, AppApi>();
+builder.Services.AddSingleton<IApiAuthService, ApiAuthService>();
 builder.Services.AddSingleton<ISymptomsTypesService, SymptomsTypesService>();
 builder.Services.AddSingleton<ISymptomsService, SymptomsService>();
 builder.Services.AddSingleton<IQuizzService, QuizzService>();

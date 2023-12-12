@@ -2,12 +2,14 @@
 
 @page "/authentication/{action}"
 @using MoodProject.Core.Ports.In
-@using MoodProject.App.Shared.Helpers
+@using MoodProject.App.Services
 
 @inject IUsersService UsersService
-@inject NavigationManager Navigation
 @inject IConfiguration Configuration
+@inject IApiAuthService ApiAuthService
+@inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject CacheService CacheService
 
 @inherits IdentityHelper
 
@@ -44,6 +46,7 @@
         if (Action.Equals("login-callback") && await IsAuthenticated())
         {
             var hasAcceptedGdpr = await UsersService.GetGdprConsent(await GetUserId());
+            await CacheService.GetApiToken(await GetUserId(), true);
             Navigation.NavigateTo(!hasAcceptedGdpr ? "/gdpr" : "/profile");
         }
     }

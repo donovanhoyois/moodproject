@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MoodProject.Core.Models;
+using MoodProject.Core.Models.Notifications;
 
 namespace MoodProject.Api.Controllers;
 
@@ -10,10 +11,12 @@ namespace MoodProject.Api.Controllers;
 [EnableCors]
 public class MedicationsController
 {
+    private readonly ILogger<MedicationsController> Logger;
     private readonly MoodProjectContext DbContext;
     
-    public MedicationsController(MoodProjectContext dbContext)
+    public MedicationsController(ILogger<MedicationsController> logger, MoodProjectContext dbContext)
     {
+        Logger = logger;
         DbContext = dbContext;
     }
     
@@ -81,4 +84,5 @@ public class MedicationsController
         });
         return DbContext.SaveChanges() > 0;
     }
+    
 }
