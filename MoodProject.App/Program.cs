@@ -1,12 +1,10 @@
 using Blazored.LocalStorage;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using MoodProject.App;
 using MoodProject.App.Configuration;
 using MoodProject.App.Services;
-using MoodProject.Core;
 using MoodProject.Core.Configuration;
 using MoodProject.Core.Ports.In;
 using MoodProject.Core.Ports.Out;
@@ -30,6 +28,7 @@ builder.Services.AddScoped(typeof(AccountClaimsPrincipalFactory<RemoteUserAccoun
 // Configuration
 builder.Services.AddSingleton(provider => provider.GetService<IConfiguration>().GetSection("Api").Get<ApiConfiguration>());
 builder.Services.AddSingleton(provider => provider.GetService<IConfiguration>().GetSection("Cache").Get<CacheConfiguration>());
+builder.Services.AddSingleton(provider => provider.GetService<IConfiguration>().GetSection("Notifications").Get<NotificationsConfiguration>());
 
 // External Services
 builder.Services.AddBlazoredLocalStorageAsSingleton();
@@ -43,9 +42,11 @@ builder.Services.AddSingleton<IQuizzService, QuizzService>();
 builder.Services.AddSingleton<IChatRoomsService, ChatRoomsService>();
 builder.Services.AddSingleton<IUsersService, UsersService>();
 builder.Services.AddSingleton<IMedicationService, MedicationService>();
+builder.Services.AddSingleton<INotificationService, NotificationService>();
 
 // Blazor-specific services
 builder.Services.AddScoped<CacheService>();
 builder.Services.AddScoped<JsService>();
+builder.Services.AddScoped<NotificationClient>();
 
 await builder.Build().RunAsync();

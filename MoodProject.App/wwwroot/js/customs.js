@@ -1,3 +1,7 @@
-﻿export function CloseModal(modalId) {
-    $(modalId).modal('hide');
-}
+﻿(function () {
+    window.BootstrapManager = {
+        closeModal: (modalId) => {
+            $(modalId).modal('hide');
+        }
+    }
+})();

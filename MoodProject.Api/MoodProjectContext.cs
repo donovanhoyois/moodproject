@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MoodProject.Core;
 using MoodProject.Core.Models;
+using MoodProject.Core.Models.Notifications;
 
 namespace MoodProject.Api;
 
@@ -17,6 +17,7 @@ public class MoodProjectContext : DbContext
     public DbSet<ChatRoomComment> ChatRoomComments { get; set; }
     public DbSet<Medication> Medications { get; set; }
     public DbSet<MedicationDayUsage> MedicationDayUsages { get; set; }
+    public DbSet<NotificationSubscription> NotificationSubscriptions { get; set; }
 
     public MoodProjectContext()
     {

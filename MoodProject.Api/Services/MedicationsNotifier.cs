@@ -96,7 +96,7 @@ public class MedicationsNotifier : BackgroundService
             sentNotifications.Add(
                 Context.Clients
                     .User(notificationToSend.UserId)
-                    .ReceiveNotification($"Il est l'heure de prendre votre médicament: {notificationToSend.MedicationName}"));
+                    .ReceiveMedicationNotification($"Il est l'heure de prendre votre médicament: {notificationToSend.MedicationName}"));
                     
             await Task.WhenAll(sentNotifications);
         }

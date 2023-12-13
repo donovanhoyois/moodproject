@@ -5,7 +5,6 @@ namespace MoodProject.App.Services;
 public class JsService
 {
     private IJSRuntime JsRuntime { get; }
-    private IJSObjectReference? JsObjectRef { get; set; }
 
     public JsService(IJSRuntime jsRuntime)
     {
@@ -14,11 +13,11 @@ public class JsService
 
     public async Task Execute(string functionName, string paramArgs)
     {
-        JsObjectRef ??= await JsRuntime.InvokeAsync<IJSObjectReference>("import", "/js/customs.js");
-        if (JsObjectRef != null)
-        {
-            await JsObjectRef.InvokeVoidAsync(functionName, paramArgs);
-        }
-        
+        await JsRuntime.InvokeVoidAsync(functionName, paramArgs);
+    }
+
+    public async Task<T?> Execute<T>(string functionName) where T : new()
+    {
+        return await JsRuntime.InvokeAsync<T>(functionName);
     }
 }

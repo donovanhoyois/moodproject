@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using MoodProject.Core.Configuration;
 using MoodProject.Core.Enums;
 using MoodProject.Core.Models;
+using MoodProject.Core.Models.Notifications;
 using MoodProject.Core.Ports.Out;
 
 namespace MoodProject.Services;
@@ -140,6 +141,12 @@ public class AppApi : IAppApi
     public async Task<bool> DeleteMedications(IEnumerable<Medication> medications)
     {
         var response = await ApiClient.PostAsJsonAsync("Medications/DeleteMedications", medications);
+        return response.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> RegisterNewNotificationSubscription(NotificationSubscription notificationSubscription)
+    {
+        var response = await ApiClient.PutAsJsonAsync("NotificationSubscriptions/RegisterNewNotificationSubscription", notificationSubscription);
         return response.IsSuccessStatusCode;
     }
 }

@@ -2,5 +2,5 @@
 
 public interface INotificationClient
 {
-    Task ReceiveNotification(string message);
+    Task ReceiveMedicationNotification(string message);
 }

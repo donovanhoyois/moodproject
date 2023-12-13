@@ -1,4 +1,5 @@
 ﻿using MoodProject.App.Models;
+using MoodProject.Core.Enums;
 using MoodProject.Core.Models;
 
 namespace MoodProject.App.Converters;
@@ -10,20 +11,34 @@ public static class MedicationFormConverter
         var medication = (Medication) medicationForm;
         medication.UserId = userId;
         medication.DayUsages = new List<MedicationDayUsage>();
-        foreach (var formDayUsage in medicationForm.FormDayUsages)
+        switch (medicationForm.Usage)
         {
-            var medicationDayUsage = new MedicationDayUsage(formDayUsage.Time);
-            medicationDayUsage.Id = formDayUsage.Id;
-            medicationDayUsage.MedicationId = medicationForm.Id;
-            medication.DayUsages.Add(medicationDayUsage);
+            case MedicationUsage.PER_DAY:
+                medication.AreNotificationsEnabled = medicationForm.AreNotificationsEnabled;
+                foreach (var formDayUsage in medicationForm.FormDayUsages)
+                {
+                    var medicationDayUsage = new MedicationDayUsage(formDayUsage.Time)
+                    {
+                        Id = formDayUsage.Id,
+                        MedicationId = medicationForm.Id
+                    };
+                    medication.DayUsages.Add(medicationDayUsage);
+                }
+                break;
+            
+            case MedicationUsage.PER_MONTH:
+                medication.AreNotificationsEnabled = false;
+                medication.MonthUsage = medicationForm.MonthUsage;
+                break;
         }
+        
 
         return medication;
     }
 
     public static MedicationForm ConvertModelToForm(Medication medication)
     {
-        var medicationForm = new MedicationForm()
+        var medicationForm = new MedicationForm
         {
             Id = medication.Id,
             UserId = medication.UserId,
@@ -32,8 +47,9 @@ public static class MedicationFormConverter
             DayUsages = medication.DayUsages,
             MonthUsage = medication.MonthUsage,
             IsDisabled = medication.IsDisabled,
+            FormDayUsages = new List<FormDayUsage>(),
+            AreNotificationsEnabled = medication.AreNotificationsEnabled
         };
-        medicationForm.FormDayUsages = new List<FormDayUsage>();
         foreach (var dayUsage in medication.DayUsages)
         {
             medicationForm.FormDayUsages.Add(new FormDayUsage(dayUsage.Id, new DateTime(dayUsage.TimeOfTheDay.Ticks)));

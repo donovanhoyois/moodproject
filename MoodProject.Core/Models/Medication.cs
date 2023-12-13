@@ -12,6 +12,7 @@ public class Medication
     public MedicationUsage Usage { get; set; }
     public List<MedicationDayUsage> DayUsages { get; set; } = new();
     public MedicationMonthUsage MonthUsage { get; set; } = MedicationMonthUsage.NONE;
+    public bool AreNotificationsEnabled { get; set; }
     public bool IsDisabled { get; set; }
 
     public Medication()

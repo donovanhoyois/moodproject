@@ -11,6 +11,8 @@
 @using MoodProject.App.Services
 @inject IMedicationService MedicationService
 @inject JsService JsService
+@inject NotificationClient NotificationClient
+@inject IJSRuntime JsRuntime
 
 @inherits MoodProject.App.Shared.Helpers.IdentityHelper
 
@@ -88,6 +90,8 @@
                                         <InputDate Type="InputDateType.Time" @bind-Value:format="hh:mm:ss" @bind-Value="@dayUsage.Time" class="form-control dayUsageTimePicker"/>
                                     }
                                 }
+                                <InputCheckbox @bind-Value="@MedicationForm.AreNotificationsEnabled" />
+                                <label class="form-check-label">Recevoir des notifications pour ce médicament</label>
                             }
                             @if (MedicationForm.Usage == MedicationUsage.PER_MONTH)
                             {
@@ -125,7 +129,7 @@
         SubmitMedicationFormOperation = await MedicationService.UpdateMedication(medication);
         if (SubmitMedicationFormOperation.Status == OperationResultType.Ok)
         {
-            await JsService.Execute("CloseModal", "#medicationModal");
+            await JsService.Execute("BootstrapManager.closeModal", "#medicationModal");
             await ReloadMedications();
         }
     }
@@ -134,6 +138,10 @@
     {
         MedicationOperation = new OperationResult<IEnumerable<Medication>>(OperationResultType.Pending);
         MedicationOperation = await MedicationService.GetMedicationsOfUser(await GetUserId());
+        if (MedicationOperation.Status == OperationResultType.Ok && MedicationOperation.Content.Any(med => med.AreNotificationsEnabled))
+        {
+            await NotificationClient.RequestAccess(await GetUserId());
+        }
         StateHasChanged();
     }
 
@@ -153,7 +161,7 @@
         DeleteMedicationOperation = await MedicationService.DeleteMedication(medication);
         if (DeleteMedicationOperation.Status == OperationResultType.Ok)
         {
-            await JsService.Execute("CloseModal", "#medicationModal");
+            await JsService.Execute("BootstrapManager.closeModal", "#medicationModal");
             await ReloadMedications();
         }
     }

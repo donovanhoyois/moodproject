@@ -1,5 +1,6 @@
 ﻿using MoodProject.Core.Enums;
 using MoodProject.Core.Models;
+using MoodProject.Core.Models.Notifications;
 
 namespace MoodProject.Core.Ports.Out;
 
@@ -28,4 +29,5 @@ public interface IAppApi
     public Task<IEnumerable<Medication>> GetMedicationsByUserId(string userId);
     public Task<bool> UpdateMedications(IEnumerable<Medication> medications);
     public Task<bool> DeleteMedications(IEnumerable<Medication> medications);
+    public Task<bool> RegisterNewNotificationSubscription(NotificationSubscription notificationSubscription);
 }
