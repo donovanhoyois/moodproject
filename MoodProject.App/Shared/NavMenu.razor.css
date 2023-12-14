@@ -7,6 +7,9 @@
     flex-flow: column;
     justify-content: space-between;
 }
+.collapse {
+    display: none;
+}
 
 .top-row {
     height: 3.5rem;
