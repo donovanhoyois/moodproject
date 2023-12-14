@@ -17,7 +17,7 @@ public class QuizzService : IQuizzService
     private const int HEALTH_AVERAGE_VALUES_COUNT = 3;
     
 
-    private Dictionary<FactorType, float> FactorWeights = new Dictionary<FactorType, float>()
+    private Dictionary<FactorType, decimal> FactorWeights = new Dictionary<FactorType, decimal>()
     {
         {FactorType.Presence, 1},
         {FactorType.Harmfulness, 3}
@@ -78,7 +78,7 @@ public class QuizzService : IQuizzService
         return await AppApi.SaveSymptomsHistory(values);
     }
 
-    public float GetAverageValues(Symptom symptom, int max = 5, int offset = 0, FactorType? type = null)
+    public decimal GetAverageValues(Symptom symptom, int max = 5, int offset = 0, FactorType? type = null)
     {
         if (type != null)
         {
@@ -94,7 +94,7 @@ public class QuizzService : IQuizzService
         }
 
         var values = symptom.ValuesHistory.Skip(offset*2).Take(max).ToList();
-        var sum = 0f;
+        var sum = 0m;
         foreach (var weight in FactorWeights)
         {
             var factorTypeValues = values.Where(v => v.Type.Equals(weight.Key));
@@ -109,37 +109,37 @@ public class QuizzService : IQuizzService
     }
     
 
-    public float GetHealthAverage(IEnumerable<Symptom> symptoms, int offset = 0)
+    public decimal? GetHealthAverage(IEnumerable<Symptom> symptoms, int offset = 0)
     {
-        var averages = new List<float>();
+        var averages = new List<decimal>();
         foreach (var symptom in symptoms)
         {
             averages.Add(GetAverageValues(symptom, HEALTH_AVERAGE_VALUES_COUNT, offset: offset));
         }
 
         
-        return averages.Count > 0 ? averages.Average() : Single.NaN;
+        return averages.Count > 0 ? (decimal) averages.Average() : null;
     }
 
-    public OperationResult<float> GetHealthAverageAsPercentage(IEnumerable<Symptom> symptoms, int offset = 0)
+    public OperationResult<decimal?> GetHealthAverageAsPercentage(IEnumerable<Symptom> symptoms, int offset = 0)
     {
         var average = GetHealthAverage(symptoms, offset);
-        if (float.IsNaN(average))
+        if (average == null)
         {
-            var op = new OperationResult<float>(
-                float.NaN,
+            var op = new OperationResult<decimal?>(
+                null,
                 OperationResultType.Error,
                 "Pas assez de données disponibles pour établir une moyenne santé.");
             return op;
         }
 
         Console.WriteLine($"Health average: {average}");
-        return new OperationResult<float>(50 + average*50, OperationResultType.Ok);
+        return new OperationResult<decimal?>(50 + average*50, OperationResultType.Ok);
     }
 
-    public IEnumerable<float> GetHealthAverageHistory(IEnumerable<Symptom> symptoms, int depth = 10)
+    public IEnumerable<decimal?> GetHealthAverageHistory(IEnumerable<Symptom> symptoms, int depth = 10)
     {
-        var valuesHistory = new List<float>();
+        var valuesHistory = new List<decimal?>();
         var maxHistoryDepth = symptoms.Select(s => s.ValuesHistory.Count()).Max();
         for (var i = 0; i < maxHistoryDepth && i < depth; i++)
         {
@@ -157,11 +157,13 @@ public class QuizzService : IQuizzService
         return valuesHistory;
     }
 
-    private double GetRequiredDaysBeforeNextQuizz(Symptom symptom)
+    private decimal GetRequiredDaysBeforeNextQuizz(Symptom symptom)
     {
+        
+        //TODO: adapt to decimal
         var average = GetAverageValues(symptom);
         var daysRequired = Math.Round(4 * Math.Sqrt(1 + average), MidpointRounding.ToZero);
-        return double.IsNaN(daysRequired) ? 0 : daysRequired;
+        return daysRequired == null ? 0 : daysRequired;
     }
 
     private QuizzQuestion GenerateQuestion(Symptom symptom, FactorType factorType, IEnumerable<CustomQuizzQuestion> customQuizzQuestions)

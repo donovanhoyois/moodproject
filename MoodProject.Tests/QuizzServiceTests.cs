@@ -90,4 +90,36 @@ public class QuizzServiceTests
         Assert.That(r, Is.Not.Null);
         Assert.That(r.Content.Count(), Is.Not.Zero);
     }
+
+    [Test]
+    public void GetAverageValues_ShouldReturnCorrectAverage()
+    {
+        var quizzService = new QuizzService(FakeApi);
+        var fakeSymptomValues = new List<FactorValue>();
+        for (int i = 1; i <= 20; i++)
+        {
+            fakeSymptomValues.Add(new FactorValue()
+            {
+                Id = i,
+                SymptomId = 1,
+                Type = i%2 == 0 ? FactorType.Harmfulness : FactorType.Presence,
+                Value = 0 + MathF.Round(i/20f, 2, MidpointRounding.ToEven),
+                Timestamp = new DateTime((new TimeSpan(DateTime.Now.Ticks) - TimeSpan.FromDays(10 - Math.Round(i/2f, MidpointRounding.AwayFromZero))).Ticks)
+            });
+        }
+        var symptom = new Symptom()
+        {
+            Type = new SymptomType()
+            {
+                Id = 1,
+                Name = "Symptom"
+            },
+            Id = 1,
+            isDisabled = false,
+            TypeId = 1,
+            UserId = "userid",
+            ValuesHistory = fakeSymptomValues
+        };
+        var r = quizzService.GetAverageValues(symptom);
+    }
 }
