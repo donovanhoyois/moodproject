@@ -3,6 +3,8 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 @code {
+    
+    // TODO: Use IdentityService instead of this helper.
     public string UserId { get; set; } = string.Empty;
     
     public async Task<string> GetUserId()

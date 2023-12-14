@@ -1,6 +1,10 @@
-using Microsoft.EntityFrameworkCore;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using MoodProject.Api;
-using Newtonsoft.Json;
+using MoodProject.Api.Configuration;
+using MoodProject.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +15,29 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Configuration
+builder.Services.AddSingleton(provider => provider.GetService<IConfiguration>().GetSection("Authentication:Schemes:Bearer").Get<AuthConfiguration>());
+builder.Services.AddSingleton(provider => provider.GetService<IConfiguration>().GetSection("Notification").Get<NotificationConfiguration>());
+
+// Security
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidIssuer = builder.Configuration["Authentication:Schemes:Bearer:ValidIssuer"],
+        ValidAudiences = builder.Configuration.GetSection("Authentication:Schemes:Bearer:ValidAudiences").Get<string[]>(),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Authentication:Schemes:Bearer:Secret"]))
+    };
+});
+
+// SignalR
+builder.Services.AddSignalR();
+builder.Services.AddHostedService<MedicationsNotifier>();
+
+// Notification Service
+builder.Services.AddSingleton<NotificationService>();
+
 // CORS Policy
 builder.Services.AddCors(c => c.AddPolicy("dev", builder =>
 {
@@ -20,16 +47,7 @@ builder.Services.AddCors(c => c.AddPolicy("dev", builder =>
         .AllowAnyMethod();
 }));
 
-// JSON SerializerSettings (to avoid loops)
-builder.Services.AddControllers().AddNewtonsoftJson(options =>
-{
-    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-});
-    
-    
-// MySQL
-var connectionString = "datasource=127.0.0.1;port=3306;username=root;password=;database=moodproject;";
-var version = new MySqlServerVersion(new Version(10, 4, 11));
+// Database
 builder.Services.AddDbContext<MoodProjectContext>();
 
 // Custom injections
@@ -50,7 +68,10 @@ app.UseCors("dev");
 
 app.UseHttpsRedirection();
 
+// SignalR
 app.UseAuthorization();
+
+app.MapHub<NotificationsHub>("notifications");
 
 app.MapControllers();
 

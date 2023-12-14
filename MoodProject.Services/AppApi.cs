@@ -1,19 +1,27 @@
-﻿using System.Net.Http.Json;
-using MoodProject.Core;
+﻿using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using MoodProject.Core.Configuration;
 using MoodProject.Core.Enums;
 using MoodProject.Core.Models;
+using MoodProject.Core.Models.Notifications;
 using MoodProject.Core.Ports.Out;
 
 namespace MoodProject.Services;
 
 public class AppApi : IAppApi
 {
-    private HttpClient ApiClient;
+    private readonly HttpClient ApiClient;
     public AppApi(ApiConfiguration config, HttpClient apiClient)
     {
         ApiClient = apiClient;
         ApiClient.BaseAddress = new Uri(config.BaseUrl);
+    }
+
+    public async Task<string> GetToken(string userId)
+    {
+        var newToken = await ApiClient.GetFromJsonAsync<Token>($"Authentication/GetToken?userId={userId}");
+        ApiClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", newToken.Value);
+        return newToken.Value;
     }
 
     public async Task<IEnumerable<SymptomType>> GetSymptomsTypes()
@@ -116,6 +124,29 @@ public class AppApi : IAppApi
     public async Task<bool> AcceptGdpr(string authProviderId)
     {
         var response = await ApiClient.PostAsJsonAsync($"Users/AcceptGdpr?authProviderId={authProviderId}", "");
+        return response.IsSuccessStatusCode;
+    }
+
+    public async Task<IEnumerable<Medication>> GetMedicationsByUserId(string userId)
+    {
+        return await ApiClient.GetFromJsonAsync<IEnumerable<Medication>>($"Medications/GetMedicationsByUserId?userId={userId}");
+    }
+
+    public async Task<bool> UpdateMedications(IEnumerable<Medication> medications)
+    {
+        var response = await ApiClient.PatchAsJsonAsync($"Medications/UpdateMedications", medications);
+        return response.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> DeleteMedications(IEnumerable<Medication> medications)
+    {
+        var response = await ApiClient.PostAsJsonAsync("Medications/DeleteMedications", medications);
+        return response.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> RegisterNewNotificationSubscription(NotificationSubscription notificationSubscription)
+    {
+        var response = await ApiClient.PutAsJsonAsync("NotificationSubscriptions/RegisterNewNotificationSubscription", notificationSubscription);
         return response.IsSuccessStatusCode;
     }
 }

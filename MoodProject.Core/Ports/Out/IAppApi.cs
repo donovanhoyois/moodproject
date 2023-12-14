@@ -1,10 +1,12 @@
 ﻿using MoodProject.Core.Enums;
 using MoodProject.Core.Models;
+using MoodProject.Core.Models.Notifications;
 
 namespace MoodProject.Core.Ports.Out;
 
 public interface IAppApi
 {
+    public Task<string> GetToken(string userId);
     public Task<IEnumerable<SymptomType>> GetSymptomsTypes();
     public Task<IEnumerable<Symptom>> GetSymptomsByUserId(string userId);
     public Task<bool> SaveSymptoms(IEnumerable<Symptom> symptoms);
@@ -24,4 +26,8 @@ public interface IAppApi
     public Task<bool> UpdateComment(ChatRoomComment comment);
     public Task<bool> GetGdprConsent(string authProviderId);
     public Task<bool> AcceptGdpr(string authProviderId);
+    public Task<IEnumerable<Medication>> GetMedicationsByUserId(string userId);
+    public Task<bool> UpdateMedications(IEnumerable<Medication> medications);
+    public Task<bool> DeleteMedications(IEnumerable<Medication> medications);
+    public Task<bool> RegisterNewNotificationSubscription(NotificationSubscription notificationSubscription);
 }

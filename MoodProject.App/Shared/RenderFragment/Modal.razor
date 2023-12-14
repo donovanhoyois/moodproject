@@ -1,0 +1,64 @@
+﻿<div class="modal fade" id="@Id" tabindex="-1" aria-labelledby="${@Id}Label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="${@Id}Label">@Title</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @ChildContent
+            </div>
+            <div class="modal-footer">
+                @if (!string.IsNullOrEmpty(DangerButtonText))
+                {
+                    <button type="button" class="btn btn-danger me-auto" @onclick="DangerButtonClick">@DangerButtonText</button>
+                }
+                @if (!string.IsNullOrEmpty(SecondaryButtonText))
+                {
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="SecondaryButtonClick">@SecondaryButtonText</button>
+                }
+                @if (!string.IsNullOrEmpty(PrimaryButtonText))
+                {
+                    <button type="button" class="btn btn-primary" @onclick="PrimaryButtonClick">@PrimaryButtonText</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+@code {
+    [Parameter, EditorRequired]
+    public required string Id { get; set; }
+    [Parameter, EditorRequired]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = string.Empty;
+    [Parameter]
+    public string PrimaryButtonText { get; set; } = string.Empty;
+    [Parameter]
+    public string SecondaryButtonText { get; set; } = string.Empty;
+
+    [Parameter]
+    public string DangerButtonText { get; set; } = string.Empty;
+    [Parameter]
+    public Action? OnPrimaryButtonClick { get; set; }
+    [Parameter]
+    public Action? OnSecondaryButtonClick { get; set; }
+    [Parameter]
+    public Action? OnDangerButtonClick { get; set; }
+
+    private void PrimaryButtonClick()
+    {
+        OnPrimaryButtonClick?.Invoke();
+    }
+
+    private void SecondaryButtonClick()
+    {
+        OnSecondaryButtonClick?.Invoke();
+    }
+
+    private void DangerButtonClick()
+    {
+        OnDangerButtonClick?.Invoke();
+    }
+}

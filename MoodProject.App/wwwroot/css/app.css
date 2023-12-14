@@ -99,3 +99,12 @@ a, .btn-link {
     .loading-progress-text:after {
         content: var(--blazor-load-percentage-text, "Loading");
     }
+    
+.modal.show{
+    /*TODO: css animation*/
+    transition: width 2s, height 4s;
+    transition-timing-function: ease;
+    transition-duration: 2s;
+    display: block;
+    background-color: rgba(0, 0, 0, 0.6);
+}

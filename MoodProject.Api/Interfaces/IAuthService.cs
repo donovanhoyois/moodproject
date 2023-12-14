@@ -1,4 +1,4 @@
-﻿namespace MoodProject.Core.Ports.In;
+﻿namespace MoodProject.Api.Interfaces;
 
 public interface IAuthService
 {

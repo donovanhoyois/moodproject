@@ -1,0 +1,1 @@
+﻿let CACHE_VERSION = 0.12

@@ -167,6 +167,85 @@ namespace MoodProject.Api.Migrations
                     b.ToTable("FactorValues");
                 });
 
+            modelBuilder.Entity("MoodProject.Core.Models.Medication", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("AreNotificationsEnabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDisabled")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("MonthUsage")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Usage")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Medications");
+                });
+
+            modelBuilder.Entity("MoodProject.Core.Models.MedicationDayUsage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("MedicationId")
+                        .HasColumnType("integer");
+
+                    b.Property<TimeOnly>("TimeOfTheDay")
+                        .HasColumnType("time without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MedicationId");
+
+                    b.ToTable("MedicationDayUsages");
+                });
+
+            modelBuilder.Entity("MoodProject.Core.Models.Notifications.NotificationSubscription", b =>
+                {
+                    b.Property<int?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int?>("Id"));
+
+                    b.Property<string>("Auth")
+                        .HasColumnType("text");
+
+                    b.Property<string>("P256dh")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Url")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("NotificationSubscriptions");
+                });
+
             modelBuilder.Entity("MoodProject.Core.Models.QuizzAnswer", b =>
                 {
                     b.Property<int>("Id")
@@ -303,6 +382,15 @@ namespace MoodProject.Api.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("MoodProject.Core.Models.MedicationDayUsage", b =>
+                {
+                    b.HasOne("MoodProject.Core.Models.Medication", null)
+                        .WithMany("DayUsages")
+                        .HasForeignKey("MedicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("MoodProject.Core.Models.QuizzAnswer", b =>
                 {
                     b.HasOne("MoodProject.Core.Models.CustomQuizzQuestion", null)
@@ -334,6 +422,11 @@ namespace MoodProject.Api.Migrations
             modelBuilder.Entity("MoodProject.Core.Models.CustomQuizzQuestion", b =>
                 {
                     b.Navigation("AnswerPossibilities");
+                });
+
+            modelBuilder.Entity("MoodProject.Core.Models.Medication", b =>
+                {
+                    b.Navigation("DayUsages");
                 });
 
             modelBuilder.Entity("MoodProject.Core.Models.Symptom", b =>
