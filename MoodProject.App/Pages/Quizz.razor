@@ -70,8 +70,8 @@
                     Value = question.Result
                 });
             }
-            
-            var symptoms = quizz.Questions.Select(q => q.Symptom).ToList();
+
+            var symptoms = quizz.Questions.Select(q => q.Symptom).ToHashSet();
             await QuizzService.Submit(symptoms, valuesToSubmit);
         }
         StateHasChanged();

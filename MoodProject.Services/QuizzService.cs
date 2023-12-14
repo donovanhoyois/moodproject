@@ -1,4 +1,5 @@
 ﻿using System.Net.NetworkInformation;
+using Microsoft.Extensions.Logging;
 using MoodProject.Core.Enums;
 using MoodProject.Core.Models;
 using MoodProject.Core.Ports.In;
@@ -9,6 +10,7 @@ namespace MoodProject.Services;
 public class QuizzService : IQuizzService
 {
     private readonly IAppApi AppApi;
+    private readonly ILogger<QuizzService> Logger;
     private const int MAX_DAYS_SINCE_LAST_QUIZZ = 7;
     private const int MIN_DAYS_SINCE_LAST_QUIZZ = 1;
     private const float MAX_POSITIVE_VALUE = 1f;
@@ -97,14 +99,17 @@ public class QuizzService : IQuizzService
         var sum = 0f;
         foreach (var weight in FactorWeights)
         {
+            Console.WriteLine("Calculating average for {0}", weight.Key);
             var factorTypeValues = values.Where(v => v.Type.Equals(weight.Key));
             if (factorTypeValues.Any())
             {
                 sum += factorTypeValues.Sum(v => v.Value) * weight.Value;
             }
+            Console.WriteLine("Sum for {0}: {1}", weight.Key, sum);
         }
 
         var average = sum / values.Count();
+        Console.WriteLine("Average: {0} | Values count: {1}", sum, values.Count());
         return average;
     }
     
@@ -195,9 +200,33 @@ public class QuizzService : IQuizzService
     {
         foreach (var value in newValues)
         {
+            Console.WriteLine("Form value => SymptomId: {0} | FactorType:{1} | Value: {2}", value.SymptomId, value.Type.ToString(), value.Value);
             var average = GetAverageValues(symptoms.FirstOrDefault(s => s.Id.Equals(value.SymptomId)), VALUES_DERIVATION_LENGTH, type: value.Type);
+            if (average < 0)
+            {
+                value.Value += average;
+            }
             value.Value += average;
+            GetTendancy(symptoms.FirstOrDefault(s => s.Id.Equals(value.SymptomId)), value.Type, VALUES_DERIVATION_LENGTH);
+            Console.WriteLine("After derivation => Average: {0} | Value: {1}", average, value.Value);
         }
         return newValues;
+    }
+
+    private int GetTendancy(Symptom symptom, FactorType factorType, int max = 5)
+    {
+        var tendency = 0;
+        var factorValues = symptom.ValuesHistory.Where(value => value.Type.Equals(factorType)).ToList();
+        for (var i = 0; i < max; i++)
+        {
+            if (i > 0)
+            {
+                Console.WriteLine("Checking tendency: {0} <=> {1}", factorValues[i].Value, factorValues[i - 1].Value);
+                tendency += (factorValues[i].Value > factorValues[i - 1].Value) ? 1 : -1;
+            }
+        }
+
+        Console.WriteLine("Tendency for depth {0}: {1}", max, tendency);
+        return tendency;
     }
 }

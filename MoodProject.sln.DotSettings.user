@@ -2,13 +2,36 @@
 	<s:String x:Key="/Default/Environment/AssemblyExplorer/XmlDocument/@EntryValue">&lt;AssemblyExplorer&gt;&#xD;
   &lt;Assembly Path="C:\Users\donov\.nuget\packages\microsoft.aspnetcore.http.connections.client\7.0.14\lib\net7.0\Microsoft.AspNetCore.Http.Connections.Client.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=2cfcf7a8_002Dbf73_002D4dcd_002D854d_002Dbab47d78b7d2/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="GetAverageValues_ShouldReturnCorrectAverage #2" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::04A3CC42-4E2F-4B03-BF46-46ACE8BF0F46::net7.0::MoodProject.Tests.QuizzServiceTests.GetAverageValues_ShouldReturnCorrectAverage&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=391e5248_002D11ce_002D4c09_002Da3be_002De576acfeba29/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="GetAverageValues_ShouldReturnCorrectAverage #3" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::04A3CC42-4E2F-4B03-BF46-46ACE8BF0F46::net7.0::MoodProject.Tests.QuizzServiceTests.GetAverageValues_ShouldReturnCorrectAverage&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=39c1ff39_002Da029_002D4b35_002D8c0a_002Daf38a8a2d62f/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Test1" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;NUnit3x::04A3CC42-4E2F-4B03-BF46-46ACE8BF0F46::net7.0::MoodProject.Tests.QuizzServiceTests.GenerateQuizz_ShouldReturnAQuizz&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=4174fea8_002Dc017_002D46e2_002D8f38_002D156cbfa1b00f/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="GetAverageValues_ShouldReturnCorrectAverage" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::04A3CC42-4E2F-4B03-BF46-46ACE8BF0F46::net7.0::MoodProject.Tests.QuizzServiceTests.GetAverageValues_ShouldReturnCorrectAverage&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=49fd1195_002D600f_002D4169_002D835f_002Dd85ba98a2f66/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="GenerateQuizz_ShouldReturnAQuizz" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;NUnit3x::04A3CC42-4E2F-4B03-BF46-46ACE8BF0F46::net7.0::MoodProject.Tests.QuizzServiceTests.GenerateQuizz_ShouldReturnAQuizz&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
-&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
+&lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=4cd6b40d_002D64e7_002D4f52_002Db840_002Decaec282d4a3/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="GetAverageValues_ShouldReturnCorrectAverage #4" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::04A3CC42-4E2F-4B03-BF46-46ACE8BF0F46::net7.0::MoodProject.Tests.QuizzServiceTests.GetAverageValues_SpecificType_ShouldReturnCorrectAverage&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::04A3CC42-4E2F-4B03-BF46-46ACE8BF0F46::net7.0::MoodProject.Tests.QuizzServiceTests.GenerateQuizz_ShouldReturnAQuizz&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::04A3CC42-4E2F-4B03-BF46-46ACE8BF0F46::net7.0::MoodProject.Tests.QuizzServiceTests.GetAverageValues_MixedTypes_ShouldReturnCorrectAverage&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	</wpf:ResourceDictionary>
