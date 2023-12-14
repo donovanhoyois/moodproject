@@ -1,6 +1,6 @@
 ﻿(function () {
     // Note: Replace with your own key pair before deploying
-    const applicationServerPublicKey = 'BLC8GOevpcpjQiLkO7JmVClQjycvTCYWm6Cq_a7wJZlstGTVZvwGFFHMYfXt6Njyvgx_GlXJeo5cSiZ1y4JOx1o';
+    const applicationServerPublicKey = 'BBX-NVGCKMcssQIN-G5bz7j4XYzZZBkVwtTLpm__iSSitFMehBSqft6vGkMpezgiF186dfLEAoUJk3yTmr8PTBw';
 
     window.blazorPushNotifications = {
         requestSubscription: async () => {
@@ -9,7 +9,6 @@
             if (!existingSubscription) {
                 const newSubscription = await subscribe(worker);
                 if (newSubscription) {
-                    console.log(newSubscription)
                     return {
                         url: newSubscription.endpoint,
                         p256dh: arrayBufferToBase64(newSubscription.getKey('p256dh')),

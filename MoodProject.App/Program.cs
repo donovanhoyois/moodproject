@@ -45,6 +45,7 @@ builder.Services.AddSingleton<IMedicationService, MedicationService>();
 builder.Services.AddSingleton<INotificationService, NotificationService>();
 
 // Blazor-specific services
+builder.Services.AddScoped<IdentityService>();
 builder.Services.AddScoped<CacheService>();
 builder.Services.AddScoped<JsService>();
 builder.Services.AddScoped<NotificationClient>();

@@ -1,10 +1,15 @@
-﻿@using MoodProject.Core
-@using MoodProject.Core.Models
-@inject AuthenticationStateProvider AuthenticationStateProvider
+﻿using Microsoft.AspNetCore.Components.Authorization;
 
-@code {
+namespace MoodProject.App.Services;
+
+public class IdentityService
+{
+    private readonly AuthenticationStateProvider AuthenticationStateProvider;
     
-    // TODO: Use IdentityService instead of this helper.
+    public IdentityService(AuthenticationStateProvider authenticationStateProvider)
+    {
+        AuthenticationStateProvider = authenticationStateProvider;
+    }
     public string UserId { get; set; } = string.Empty;
     
     public async Task<string> GetUserId()

@@ -40,22 +40,25 @@ public class NotificationService
         var medicationNotifications = new List<MedicationNotification>();
         foreach (var dayUsage in dayUsages)
         {
-            var todayTimespan = new TimeSpan(minTimeSpan.Days, dayUsage.TimeOfTheDay.Hour, dayUsage.TimeOfTheDay.Minute, dayUsage.TimeOfTheDay.Minute);
+            var todayTimespan = new TimeSpan(minTimeSpan.Days, dayUsage.TimeOfTheDay.Hour, dayUsage.TimeOfTheDay.Minute, dayUsage.TimeOfTheDay.Second);
             var nextNotificationTimespan = todayTimespan < new TimeSpan(DateTime.Now.Ticks)
-                ? new TimeSpan(minTimeSpan.Days, dayUsage.TimeOfTheDay.Hour, dayUsage.TimeOfTheDay.Minute,
-                    dayUsage.TimeOfTheDay.Minute)
+                ? new TimeSpan(minTimeSpan.Days + 1, dayUsage.TimeOfTheDay.Hour, dayUsage.TimeOfTheDay.Minute,
+                    dayUsage.TimeOfTheDay.Second)
                 : todayTimespan;
             var correspondingMedication = DbContext.Medications.First(med => med.Id.Equals(dayUsage.MedicationId));
-            medicationNotifications.Add(new MedicationNotification( correspondingMedication.UserId, correspondingMedication.Name, nextNotificationTimespan));
+            var userNotificationSubscription = DbContext.NotificationSubscriptions.FirstOrDefault(subscription => subscription.UserId.Equals(correspondingMedication.UserId));
+            medicationNotifications.Add(
+                new MedicationNotification(
+                    "Rappel de médicament",
+                    $"Il est l'heure de prendre votre {correspondingMedication.Name}",
+                    userNotificationSubscription,
+                    correspondingMedication.UserId,
+                    correspondingMedication.Name,
+                    nextNotificationTimespan
+                )
+            );
         }
 
-        // TODO: Remove
-        var debugQueue = new Queue<MedicationNotification>();
-        debugQueue.Enqueue(new MedicationNotification("testUser", "Medicament test", new TimeSpan(DateTime.Now.Ticks) + TimeSpan.FromSeconds(4)));
-        debugQueue.Enqueue(new MedicationNotification("testUser2", "Medicament test 2", new TimeSpan(DateTime.Now.Ticks) + TimeSpan.FromSeconds(4)));
-        debugQueue.Enqueue(new MedicationNotification("testUser", "Medicament test", new TimeSpan(DateTime.Now.Ticks) + TimeSpan.FromSeconds(8)));
-        return debugQueue;
-        
-        return new Queue<MedicationNotification>(medicationNotifications.OrderBy(medNotification => medNotification.Time));
+        return new Queue<MedicationNotification>(medicationNotifications.FindAll(notification => notification.NotificationSubscription != null).OrderBy(medNotification => medNotification.Time));
     }
 }

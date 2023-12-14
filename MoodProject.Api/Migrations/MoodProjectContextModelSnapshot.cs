@@ -22,31 +22,6 @@ namespace MoodProject.Api.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("MoodProject.App.Models.Notifications.NotificationSubscription", b =>
-                {
-                    b.Property<int?>("NotificationSubscriptionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int?>("NotificationSubscriptionId"));
-
-                    b.Property<string>("Auth")
-                        .HasColumnType("text");
-
-                    b.Property<string>("P256dh")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Url")
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.HasKey("NotificationSubscriptionId");
-
-                    b.ToTable("NotificationSubscriptions");
-                });
-
             modelBuilder.Entity("MoodProject.Core.Models.ChatRoom", b =>
                 {
                     b.Property<int>("Id")
@@ -244,6 +219,31 @@ namespace MoodProject.Api.Migrations
                     b.HasIndex("MedicationId");
 
                     b.ToTable("MedicationDayUsages");
+                });
+
+            modelBuilder.Entity("MoodProject.Core.Models.Notifications.NotificationSubscription", b =>
+                {
+                    b.Property<int?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int?>("Id"));
+
+                    b.Property<string>("Auth")
+                        .HasColumnType("text");
+
+                    b.Property<string>("P256dh")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Url")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("NotificationSubscriptions");
                 });
 
             modelBuilder.Entity("MoodProject.Core.Models.QuizzAnswer", b =>

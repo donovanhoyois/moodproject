@@ -1,9 +1,12 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using MoodProject.Api.Configuration;
 using MoodProject.Api.Controllers;
 using MoodProject.Api.Interfaces;
 using MoodProject.Core.Models.Notifications;
+using WebPush;
 using TimeSpan = System.TimeSpan;
 
 namespace MoodProject.Api.Services;
@@ -13,7 +16,7 @@ namespace MoodProject.Api.Services;
 /// </summary>
 public class MedicationsNotifier : BackgroundService
 {
-    private static readonly TimeSpan DefaultServiceRequestPeriod = TimeSpan.FromSeconds(30);
+    private static readonly TimeSpan DefaultServiceRequestPeriod = TimeSpan.FromHours(1);
     private static readonly TimeSpan DefaultSendNotificationPeriod = TimeSpan.FromSeconds(1);
     private readonly ILogger<MedicationsNotifier> Logger;
     private readonly IHubContext<NotificationsHub, INotificationClient> Context;
@@ -22,14 +25,17 @@ public class MedicationsNotifier : BackgroundService
     private Queue<MedicationNotification> NotificationsQueue = new();
     private PeriodicTimer ServiceRequestTimer = new(DefaultServiceRequestPeriod);
     private PeriodicTimer SendNotificationTimer = new(DefaultSendNotificationPeriod);
+    
+    private readonly VapidDetails VapidKeys;
 
     private bool FirstServiceRequest = true;
 
-    public MedicationsNotifier(ILogger<MedicationsNotifier> logger, IHubContext<NotificationsHub, INotificationClient> context, NotificationService notificationService)
+    public MedicationsNotifier(ILogger<MedicationsNotifier> logger, IHubContext<NotificationsHub, INotificationClient> context, NotificationService notificationService, NotificationConfiguration notificationConfiguration)
     {
         Logger = logger;
         Context = context;
         NotificationService = notificationService;
+        VapidKeys = new VapidDetails(notificationConfiguration.Subject, notificationConfiguration.PublicKey, notificationConfiguration.PrivateKey);
     }
     
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -90,13 +96,30 @@ public class MedicationsNotifier : BackgroundService
     private async Task SendNotifications()
     {
         var sentNotifications = new List<Task>();
-        while (NotificationsQueue.Any() && NotificationsQueue.Peek().Time < new TimeSpan(DateTime.Now.Ticks))
+        while (NotificationsQueue.Any() && NotificationsQueue.Peek().Time < new TimeSpan(DateTime.Now.Ticks) + TimeSpan.FromSeconds(1))
         {
             var notificationToSend = NotificationsQueue.Dequeue();
+            var pushSubscription = new PushSubscription(notificationToSend.NotificationSubscription.Url, notificationToSend.NotificationSubscription.P256dh, notificationToSend.NotificationSubscription.Auth);
+            var webPushClient = new WebPushClient();
+            try
+            {
+                var message = $"Il est l'heure de prendre votre médicament: {notificationToSend.MedicationName}";
+                var payload = JsonSerializer.Serialize(new
+                {
+                    notificationToSend,
+                    url = "medications",
+                });
+                await webPushClient.SendNotificationAsync(pushSubscription, payload, VapidKeys);
+            }
+            catch (Exception e)
+            {
+                Logger.LogWarning("Error while trying to send notification to {}: {}", notificationToSend.UserId, e);
+            }
+ 
             sentNotifications.Add(
                 Context.Clients
                     .User(notificationToSend.UserId)
-                    .ReceiveMedicationNotification($"Il est l'heure de prendre votre médicament: {notificationToSend.MedicationName}"));
+                    .ReceiveMedicationNotification(notificationToSend));
                     
             await Task.WhenAll(sentNotifications);
         }

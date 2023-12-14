@@ -7,6 +7,18 @@ self.importScripts('./service-worker-assets.js');
 self.addEventListener('install', event => event.waitUntil(onInstall(event)));
 self.addEventListener('activate', event => event.waitUntil(onActivate(event)));
 self.addEventListener('fetch', event => event.respondWith(onFetch(event)));
+// push notifications
+self.addEventListener('push', event => {
+    const payload = event.data.json();
+    event.waitUntil(
+        self.registration.showNotification(payload.notificationToSend.Title, {
+            body: payload.notificationToSend.Content,
+            icon: 'img/icon-512.png',
+            vibrate: [100, 50, 100],
+            data: { url: payload.url }
+        })
+    );
+});
 /*
 self.addEventListener('message', event => {
     if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
@@ -55,3 +67,5 @@ async function onFetch(event) {
 
     return cachedResponse || fetch(event.request);
 }
+
+

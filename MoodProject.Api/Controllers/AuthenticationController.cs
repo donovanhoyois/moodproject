@@ -32,7 +32,7 @@ public class AuthenticationController
             },
             expires: DateTime.Now.AddHours(AuthConfiguration.HoursBeforeTokenExpiration),
             signingCredentials: new SigningCredentials(
-                new SymmetricSecurityKey(Guid.NewGuid().ToByteArray()),
+                new SymmetricSecurityKey(Encoding.ASCII.GetBytes(AuthConfiguration.Secret)),
                 SecurityAlgorithms.HmacSha256
             )
         );

@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
+﻿using System.Text.Json;
+using Microsoft.AspNetCore.SignalR.Client;
 using MoodProject.App.Configuration;
 using MoodProject.Core.Models.Notifications;
 using MoodProject.Core.Ports.In;
+using WebPush;
 
 namespace MoodProject.App.Services;
 
@@ -11,7 +13,7 @@ public class NotificationClient : IAsyncDisposable
     private readonly INotificationService NotificationService;
     private readonly CacheService CacheService;
     private readonly JsService JsService;
-    
+
     private HubConnection? HubConnection;
 
     public NotificationClient(NotificationsConfiguration notificationsConfiguration, INotificationService notificationService, CacheService cacheService, JsService jsService)
@@ -45,11 +47,8 @@ public class NotificationClient : IAsyncDisposable
                 })
             .Build();
 
-        HubConnection.On<string>("ReceiveMedicationNotification", message =>
-        {
-            // TODO: push notifications
-            Console.WriteLine("");
-        });
+        // TODO: Use SignalR hub to receive notifications
+        
         await HubConnection.StartAsync();
     }
     

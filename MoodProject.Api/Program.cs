@@ -17,10 +17,19 @@ builder.Services.AddSwaggerGen();
 
 // Configuration
 builder.Services.AddSingleton(provider => provider.GetService<IConfiguration>().GetSection("Authentication:Schemes:Bearer").Get<AuthConfiguration>());
+builder.Services.AddSingleton(provider => provider.GetService<IConfiguration>().GetSection("Notification").Get<NotificationConfiguration>());
 
 // Security
 builder.Services.AddAuthorization();
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidIssuer = builder.Configuration["Authentication:Schemes:Bearer:ValidIssuer"],
+        ValidAudiences = builder.Configuration.GetSection("Authentication:Schemes:Bearer:ValidAudiences").Get<string[]>(),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Authentication:Schemes:Bearer:Secret"]))
+    };
+});
 
 // SignalR
 builder.Services.AddSignalR();

@@ -1,4 +1,8 @@
-﻿@inherits LayoutComponentBase
+﻿@inject NotificationClient NotificationClient
+@inject IdentityService IdentityService
+
+@using MoodProject.App.Services
+@inherits LayoutComponentBase
 
 <div class="page">
     <div class="sidebar">
@@ -16,3 +20,10 @@
     </main>
 </div>
 <UpdatePopup />
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        NotificationClient.Connect(await IdentityService.GetUserId());
+    }
+}
