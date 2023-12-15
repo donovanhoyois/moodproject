@@ -203,7 +203,7 @@
     
     private IEnumerable<double> CalculateGraphValues()
     {
-        return QuizzService.GetHealthAverageHistory(symptoms, 100)
+        return QuizzService.GetHealthAverageHistory(symptoms, 10)
                 .Reverse()
                 .Select(v => Math.Round(v, MidpointRounding.ToEven));
     }
