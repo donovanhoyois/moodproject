@@ -15,9 +15,9 @@ public class QuizzService : IQuizzService
     private const int MIN_DAYS_SINCE_LAST_QUIZZ = 1;
     private const float MIN_FACTOR_VALUE = 0f;
     private const float MAX_FACTOR_VALUE = 100f;
-    private const int VALUES_DERIVATION_LENGTH = 3;
-    private const int HEALTH_AVERAGE_VALUES_COUNT = 3;
-    private const float TENDENCY_WEIGHT = 0.25f;
+    private const int VALUES_DERIVATION_LENGTH = 4;
+    private const int HEALTH_AVERAGE_VALUES_COUNT = 1;
+    private const float TENDENCY_WEIGHT = 0.1f;
     
 
     private Dictionary<FactorType, float> FactorWeights = new Dictionary<FactorType, float>()
@@ -100,21 +100,19 @@ public class QuizzService : IQuizzService
         var sum = 0f;
         foreach (var weight in FactorWeights)
         {
-            // TODO: fix this ? average of multiple factors seems to be incorrect
-            var factorTypeValues = values.Where(v => v.Type.Equals(weight.Key));
+            var factorTypeValues =
+                symptom.ValuesHistory
+                    .Where(v => v.Type.Equals(weight.Key))
+                    .Skip(offset)
+                    .Take(max)
+                    .ToList();
             if (factorTypeValues.Any())
             {
-                foreach (var factorTypeValue in factorTypeValues)
-                {
-                    Console.WriteLine("value: {0}", factorTypeValue);
-                }
-
                 sum += factorTypeValues.Sum(v => v.Value) * weight.Value;
             }
         }
 
-        var average = sum / values.Count();
-        Console.WriteLine(average);
+        var average = sum / values.Count() / 4;
         return average;
     }
     
@@ -153,7 +151,6 @@ public class QuizzService : IQuizzService
         for (var i = 0; i < maxHistoryDepth && i < depth; i++)
         {
             var v = GetHealthAverageAsPercentage(symptoms, offset: i);
-            Console.WriteLine($"Health average {i}:{v.Content}");
             if (v.Status.Equals(OperationResultType.Ok))
             {
                 valuesHistory.Add(v.Content);
@@ -192,11 +189,11 @@ public class QuizzService : IQuizzService
         };
         newQuestion.CustomQuestion.AnswerPossibilities = new List<QuizzAnswer>()
         {
-            {new QuizzAnswer() {Text = $"Pas du tout", Weight = 5f}},
-            {new QuizzAnswer() {Text = $"Très peu", Weight = 2.5f}},
+            {new QuizzAnswer() {Text = $"Pas du tout", Weight = 6f}},
+            {new QuizzAnswer() {Text = $"Très peu", Weight = 4f}},
             {new QuizzAnswer() {Text = $"Peu", Weight = 0f}},
-            {new QuizzAnswer() {Text = $"Légèrement", Weight = -2.5f}},
-            {new QuizzAnswer() {Text = $"Fortement", Weight = -5f}},
+            {new QuizzAnswer() {Text = $"Légèrement", Weight = -4f}},
+            {new QuizzAnswer() {Text = $"Fortement", Weight = -6f}},
         };
         return newQuestion;
     }
@@ -205,7 +202,7 @@ public class QuizzService : IQuizzService
     {
         foreach (var value in newValues)
         {
-            var average = GetAverageValues(symptoms.FirstOrDefault(s => s.Id.Equals(value.SymptomId)), VALUES_DERIVATION_LENGTH, type: value.Type);
+            var average = GetAverageValues(symptoms.FirstOrDefault(s => s.Id.Equals(value.SymptomId)), 1, type: value.Type);
             value.Value += average;
             var tendency = GetTendency(symptoms.FirstOrDefault(s => s.Id.Equals(value.SymptomId)), value.Type, value, VALUES_DERIVATION_LENGTH);
             value.Value += (tendency * MAX_FACTOR_VALUE / 10) * TENDENCY_WEIGHT;
@@ -232,16 +229,25 @@ public class QuizzService : IQuizzService
         {
             if (i > 0)
             {
-                tendency += (factorValues[i].Value < factorValues[i - 1].Value) ? 1 : -1;
+                if (factorValues[i].Value < factorValues[i - 1].Value)
+                {
+                    tendency += 1;
+                }
+                else if (factorValues[i].Value > factorValues[i - 1].Value)
+                {
+                    tendency += -1;
+                }
+                //tendency += (factorValues[i].Value < factorValues[i - 1].Value) ? 1 : -1;
             }
             lastElement = factorValues[i];
         }
+        
         
         if (lastElement != null)
         {
             tendency += newValue.Value > lastElement.Value ? 1 : -1;
         }
-
+        
         return tendency;
     }
 }
