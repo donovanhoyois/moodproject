@@ -10,7 +10,7 @@
 @inherits MoodProject.App.Shared.Helpers.IdentityHelper
 
 <PageTitle>Questionnaire</PageTitle>
-<h3>Questionnaire</h3>
+<h1>Questionnaire</h1>
 <div>
     @if (quizzQuestionsOperation.Status == OperationResultType.Pending)
     {
@@ -18,8 +18,9 @@
     }
     else if(quizzQuestionsOperation.Status == OperationResultType.Ok)
     {
-        if (currentQuestion < quizz.Questions.Count())
+        if (currentQuestion < quizz.Questions.Count)
         {
+            <p>@(currentQuestion+1)/@quizz.Questions.Count</p>
             <QuizzQuestionCard
                 Question=quizz.Questions[currentQuestion]
                 OnClickValidateAction="() => Confirm()"

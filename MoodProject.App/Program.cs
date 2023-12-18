@@ -9,6 +9,7 @@ using MoodProject.Core.Configuration;
 using MoodProject.Core.Ports.In;
 using MoodProject.Core.Ports.Out;
 using MoodProject.Services;
+using MoodProject.Services.Configuration;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -29,6 +30,8 @@ builder.Services.AddScoped(typeof(AccountClaimsPrincipalFactory<RemoteUserAccoun
 builder.Services.AddSingleton(provider => provider.GetService<IConfiguration>().GetSection("Api").Get<ApiConfiguration>());
 builder.Services.AddSingleton(provider => provider.GetService<IConfiguration>().GetSection("Cache").Get<CacheConfiguration>());
 builder.Services.AddSingleton(provider => provider.GetService<IConfiguration>().GetSection("Notifications").Get<NotificationsConfiguration>());
+builder.Services.AddSingleton(provider => provider.GetService<IConfiguration>().GetSection("Quizz").Get<QuizzConfiguration>());
+
 
 // External Services
 builder.Services.AddBlazoredLocalStorageAsSingleton();

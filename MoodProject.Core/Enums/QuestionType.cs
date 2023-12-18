@@ -2,7 +2,7 @@
 
 public enum QuestionType
 {
-    None,
     QCM,
-    LikertScale
+    LikertScale,
+    Emojis
 }

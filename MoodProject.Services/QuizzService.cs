@@ -4,13 +4,14 @@ using MoodProject.Core.Enums;
 using MoodProject.Core.Models;
 using MoodProject.Core.Ports.In;
 using MoodProject.Core.Ports.Out;
+using MoodProject.Services.Configuration;
 
 namespace MoodProject.Services;
 
 public class QuizzService : IQuizzService
 {
     private readonly IAppApi AppApi;
-    private readonly ILogger<QuizzService> Logger;
+    private readonly QuizzConfiguration QuizzConfiguration;
     private const int MAX_DAYS_SINCE_LAST_QUIZZ = 7;
     private const int MIN_DAYS_SINCE_LAST_QUIZZ = 1;
     private const float MIN_FACTOR_VALUE = 0f;
@@ -26,9 +27,10 @@ public class QuizzService : IQuizzService
         {FactorType.Harmfulness, 3}
     };
 
-    public QuizzService(IAppApi appApi)
+    public QuizzService(IAppApi appApi, QuizzConfiguration quizzConfiguration)
     {
         AppApi = appApi;
+        QuizzConfiguration = quizzConfiguration;
     }
 
     public async Task<OperationResult<IEnumerable<QuizzQuestion>>> Generate(string userId)
@@ -41,32 +43,35 @@ public class QuizzService : IQuizzService
             return new OperationResult<IEnumerable<QuizzQuestion>>(questions, OperationResultType.Error, "Vous n'avez encore enregistré aucun symptôme sur votre profil.");
         }
         
-        var customQuestions = await AppApi.GetCustomQuestions();
+        var customQuestions = (await AppApi.GetCustomQuestions()).ToList();
 
         foreach (var symptom in symptoms)
         {
-            /* DEBUG QUIZZ TO ASK QUESTIONS EVERY TIME */
-            questions.Add(GenerateQuestion(symptom, FactorType.Presence, customQuestions));
-            questions.Add(GenerateQuestion(symptom, FactorType.Harmfulness, customQuestions));
-            
-            /*
-            // Min & Max days since last quizz
-            var lastValue = symptom.ValuesHistory.FirstOrDefault();
-            var daysSinceLastValue = DateTime.Now - lastValue?.Timestamp ?? TimeSpan.MaxValue;
-            switch (daysSinceLastValue.TotalDays)
-            {
-                case < MIN_DAYS_SINCE_LAST_QUIZZ:
-                    return new OperationResult<IEnumerable<QuizzQuestion>>(null, OperationResultType.Error,
-                        "Vous avez déjà répondu à votre questionnaire aujourd'hui.");
-            }
-            
-            var daysRequiredBeforeNextQuizz = GetRequiredDaysBeforeNextQuizz(symptom);
-            if (daysSinceLastValue.TotalDays >= daysRequiredBeforeNextQuizz)
+            Console.WriteLine("Config: "+QuizzConfiguration.IgnoreMinDaysToGenerateQuizz);
+            if (QuizzConfiguration.IgnoreMinDaysToGenerateQuizz)
             {
                 questions.Add(GenerateQuestion(symptom, FactorType.Presence, customQuestions));
                 questions.Add(GenerateQuestion(symptom, FactorType.Harmfulness, customQuestions));
             }
-            */
+            else
+            {
+                // Min & Max days since last quizz
+                var lastValue = symptom.ValuesHistory.FirstOrDefault();
+                var daysSinceLastValue = DateTime.Now - lastValue?.Timestamp ?? TimeSpan.MaxValue;
+                switch (daysSinceLastValue.TotalDays)
+                {
+                    case < MIN_DAYS_SINCE_LAST_QUIZZ:
+                        return new OperationResult<IEnumerable<QuizzQuestion>>(null, OperationResultType.Error,
+                            "Vous avez déjà répondu à votre questionnaire aujourd'hui.");
+                }
+            
+                var daysRequiredBeforeNextQuizz = GetRequiredDaysBeforeNextQuizz(symptom);
+                if (daysSinceLastValue.TotalDays >= daysRequiredBeforeNextQuizz)
+                {
+                    questions.Add(GenerateQuestion(symptom, FactorType.Presence, customQuestions));
+                    questions.Add(GenerateQuestion(symptom, FactorType.Harmfulness, customQuestions));
+                }
+            }
         }
 
         return questions.Any()
@@ -171,8 +176,16 @@ public class QuizzService : IQuizzService
         return double.IsNaN(daysRequired) ? 0 : daysRequired;
     }
 
-    private QuizzQuestion GenerateQuestion(Symptom symptom, FactorType factorType, IEnumerable<CustomQuizzQuestion> customQuizzQuestions)
+    private QuizzQuestion GenerateQuestion(Symptom symptom, FactorType factorType, IEnumerable<CustomQuizzQuestion> customQuizzQuestions, QuestionType? questionType = null)
     {
+        if (questionType == null)
+        {
+            var r = new Random().Next(Enum.GetNames(typeof(QuestionType)).Length+1);
+            questionType = (QuestionType)r;
+        }
+        //TODO: implement other questions types
+
+        Console.WriteLine(questionType);
         var word = factorType == FactorType.Presence ? "présent" : "nuisible";
         var newQuestion = new QuizzQuestion()
         {
@@ -237,7 +250,6 @@ public class QuizzService : IQuizzService
                 {
                     tendency += -1;
                 }
-                //tendency += (factorValues[i].Value < factorValues[i - 1].Value) ? 1 : -1;
             }
             lastElement = factorValues[i];
         }

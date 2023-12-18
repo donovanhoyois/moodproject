@@ -1,7 +1,15 @@
-﻿.bg-success.selected{
+﻿.list-group-item p {
+    text-align: center;
+}
+.selected{
     background-color: #479F76;
     color: white;
 }
 .btn-success{
     padding: 15px 0;
+}
+@media screen and (min-width: 1024px)  {
+    .list-group-item p {
+        text-align: left;
+    }
 }
