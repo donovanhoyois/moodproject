@@ -20,7 +20,10 @@
     {
         if (currentQuestion < quizz.Questions.Count())
         {
-            <QuizzQuestionCard Question=quizz.Questions[currentQuestion] OnClickValidateAction="() => Confirm()"/>
+            <QuizzQuestionCard
+                Question=quizz.Questions[currentQuestion]
+                OnClickValidateAction="() => Confirm()"
+                ValidateButtonText="@ValidateButtonText"/>
         }
         else
         {
@@ -30,9 +33,7 @@
     }
     else
     {
-        <div class="alert alert-danger" role="alert">
-            @quizzQuestionsOperation.Message
-        </div>
+        <ErrorMessage Text="@quizzQuestionsOperation.Message" />
     }
 </div>
 
@@ -40,8 +41,10 @@
 
     private QuizzForm quizz = new QuizzForm(new List<AnswerableQuizzQuestion>());
     private int currentQuestion = 0;
+    private string ValidateButtonText = string.Empty;
 
     private OperationResult<IEnumerable<QuizzQuestion>> quizzQuestionsOperation { get; set; } = new(OperationResultType.Pending);
+    
     
     protected override async Task OnInitializedAsync()
     {
@@ -50,12 +53,14 @@
         if (quizzQuestionsOperation.Status == OperationResultType.Ok)
         {
             quizz = new QuizzForm(quizzQuestionsOperation.Content);
+            ValidateButtonText = GetValidateButtonText();
         }
     }
 
     private async Task Confirm()
     {
         currentQuestion++;
+        ValidateButtonText = GetValidateButtonText();
         if (currentQuestion >= quizz.Questions.Count)
         {
             var valuesToSubmit = new List<FactorValue>();
@@ -74,5 +79,10 @@
             await QuizzService.Submit(symptoms, valuesToSubmit);
         }
         StateHasChanged();
+    }
+
+    private string GetValidateButtonText()
+    {
+        return currentQuestion + 1 >= quizz.Questions.Count ? "Terminer le questionnaire" : "Continuer";
     }
 }

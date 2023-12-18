@@ -1,4 +1,5 @@
 ﻿@using MoodProject.App.Models
+@using MoodProject.Core.Models
 
 <div class="card">
   <div class="card-header">
@@ -12,25 +13,41 @@
     <InputRadioGroup @bind-Value="Question.Result">
       @foreach (var answer in Question.CustomQuestion.AnswerPossibilities)
       {
-        <li class="list-group-item">
-          <InputRadio Value="answer.Weight"/>
-          <text>@answer.Text</text>
+        <li class="list-group-item @GetSelectedCssClass(answer)" @onclick="() => SelectRow(answer)">
+          <InputRadio Value="answer.Weight" hidden/>
+          <span></span>
+          <p>@answer.Text</p>
         </li>
       }
     </InputRadioGroup>
-    <button type="button" class="btn btn-success" onclick="@OnClickValidate">Valider</button>
   </ul>
+  <button type="button" class="btn btn-success" onclick="@OnClickValidate">@ValidateButtonText</button>
 </div>
 
 @code {
-    [Parameter]
+    [Parameter, EditorRequired]
     public AnswerableQuizzQuestion Question { get; set; }
+    [Parameter, EditorRequired]
+    public string ValidateButtonText { get; set; }
     [Parameter]
     public Action OnClickValidateAction { get; set; }
 
-    private void OnClickValidate()
+    private const string SelectedAnswerCssClass = "bg-success selected";
+
+  private void OnClickValidate()
     {
       OnClickValidateAction.Invoke();
+    }
+
+    private void SelectRow(QuizzAnswer? quizzAnswer)
+    {
+      Question.Result = quizzAnswer.Weight;
+      StateHasChanged();
+    }
+
+    private string GetSelectedCssClass(QuizzAnswer quizzAnswer)
+    {
+      return Question.Result.Equals(quizzAnswer.Weight) ? SelectedAnswerCssClass : string.Empty;
     }
     
 }
