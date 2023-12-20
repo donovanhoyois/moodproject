@@ -10,7 +10,6 @@
 @using ChartJs.Blazor.Common.Axes
 @using ChartJs.Blazor.Common.Enums
 @using ChartJs.Blazor.Util
-@inject IJSRuntime JsRuntime
 @inject ISymptomsTypesService TypesService
 @inject ISymptomsService SymptomsService
 @inject IQuizzService QuizzService
@@ -19,7 +18,7 @@
 
 @inherits MoodProject.App.Shared.Helpers.IdentityHelper
 
-<h1 class="display-1">Votre profil</h1>
+<h1>Votre profil</h1>
 <div class="symptoms my-3">
     <div class="card">
       <div class="card-header">

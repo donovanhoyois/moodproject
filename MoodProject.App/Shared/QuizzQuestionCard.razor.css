@@ -1,4 +1,7 @@
-﻿.list-group-item p {
+﻿.list-group-item:hover{
+    cursor: pointer;
+}
+.list-group-item p {
     text-align: center;
 }
 .selected{

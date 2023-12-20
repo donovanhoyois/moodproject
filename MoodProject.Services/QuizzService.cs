@@ -1,6 +1,4 @@
-﻿using System.Net.NetworkInformation;
-using Microsoft.Extensions.Logging;
-using MoodProject.Core.Enums;
+﻿using MoodProject.Core.Enums;
 using MoodProject.Core.Models;
 using MoodProject.Core.Ports.In;
 using MoodProject.Core.Ports.Out;
@@ -21,7 +19,7 @@ public class QuizzService : IQuizzService
     private const float TENDENCY_WEIGHT = 0.1f;
     
 
-    private Dictionary<FactorType, float> FactorWeights = new Dictionary<FactorType, float>()
+    private Dictionary<FactorType, float> FactorWeights = new Dictionary<FactorType, float>
     {
         {FactorType.Presence, 1},
         {FactorType.Harmfulness, 3}
@@ -183,32 +181,74 @@ public class QuizzService : IQuizzService
             var r = new Random().Next(Enum.GetNames(typeof(QuestionType)).Length+1);
             questionType = (QuestionType)r;
         }
-        //TODO: implement other questions types
-
-        Console.WriteLine(questionType);
+        
         var word = factorType == FactorType.Presence ? "présent" : "nuisible";
-        var newQuestion = new QuizzQuestion()
+        var newQuestion = new QuizzQuestion
         {
             CustomQuestion = 
                 customQuizzQuestions.FirstOrDefault(
                     q => q.SymptomType.Id.Equals(symptom.Id) && q.FactorType.Equals(factorType))
-                ?? new CustomQuizzQuestion()
+                ?? new CustomQuizzQuestion
                 {
-                    Text = $"Le symptôme suivant a-t-il été {word} aujourd'hui ?",
-                    Type = QuestionType.QCM,
+                    Text = GetDefaultQuestionText(questionType.Value, word, symptom.Type.Name),
+                    Type = questionType.Value,
                     FactorType = factorType
                 },
             Symptom = symptom
         };
-        newQuestion.CustomQuestion.AnswerPossibilities = new List<QuizzAnswer>()
-        {
-            {new QuizzAnswer() {Text = $"Pas du tout", Weight = 6f}},
-            {new QuizzAnswer() {Text = $"Très peu", Weight = 4f}},
-            {new QuizzAnswer() {Text = $"Peu", Weight = 0f}},
-            {new QuizzAnswer() {Text = $"Légèrement", Weight = -4f}},
-            {new QuizzAnswer() {Text = $"Fortement", Weight = -6f}},
-        };
+
+        newQuestion.CustomQuestion.AnswerPossibilities = GenerateAnswers(questionType.Value);
+
         return newQuestion;
+    }
+
+    private IEnumerable<QuizzAnswer> GenerateAnswers(QuestionType questionType)
+    {
+        //TODO: Custom answers ?
+        
+        switch (questionType)
+        {
+            case QuestionType.LikertScale:
+                return new List<QuizzAnswer>
+                {
+                    new() { Text = "1", Weight = 6f },
+                    new() { Text = "2", Weight = 4f },
+                    new() { Text = "3", Weight = 0f },
+                    new() { Text = "4", Weight = -4f },
+                    new() { Text = "5", Weight = -6f },
+                };
+            case QuestionType.Emojis:
+                return new List<QuizzAnswer>
+                {
+                    new() { Text = "Très mal", Weight = 6f },
+                    new() { Text = "Mal", Weight = 4f },
+                    new() { Text = "Normalement", Weight = 0f },
+                    new() { Text = "Bien", Weight = -4f },
+                    new() { Text = "Très bien", Weight = -6f },
+                };
+            default:
+                return new List<QuizzAnswer>
+                {
+                    new() { Text = "Pas du tout", Weight = 6f },
+                    new() { Text = "Très peu", Weight = 4f },
+                    new() { Text = "Peu", Weight = 0f },
+                    new() { Text = "Légèrement", Weight = -4f },
+                    new() { Text = "Fortement", Weight = -6f },
+                };
+        }
+    }
+
+    private string GetDefaultQuestionText(QuestionType questionType, string word, string symptomeTypeName)
+    {
+        switch (questionType)
+        {
+            case QuestionType.LikertScale:
+                return $"Sur une échelle de 1 à 5, à quel point le symptôme suivant a-t-il été {word} aujourd'hui ? {symptomeTypeName}";
+            case QuestionType.QCM:
+                return $"Comment vous sentez-vous par rapport à vos {symptomeTypeName.ToLower()} aujourd'hui ?";
+            default:
+                return $"Le symptôme suivant a-t-il été {word} aujourd'hui ? {symptomeTypeName}";
+        }
     }
 
     private IEnumerable<FactorValue> DerivateNewValues(IEnumerable<Symptom> symptoms, IEnumerable<FactorValue> newValues)
