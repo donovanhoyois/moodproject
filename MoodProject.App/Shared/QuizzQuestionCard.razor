@@ -1,28 +1,43 @@
 ﻿@using MoodProject.App.Models
+@using MoodProject.Core.Enums
 @using MoodProject.Core.Models
 
 <div class="card">
-  <div class="card-header">
-    <p>@Question.CustomQuestion.Text</p>
-    @if (Question.CustomQuestion.Id == 0)
+    <div class="card-header">
+        <p>@Question.CustomQuestion.Text</p>
+    </div>
+    @if (Question.CustomQuestion.Type.Equals(QuestionType.QCM))
     {
-      <p>@Question.Symptom.Type.Name</p>
+        <ul class="list-group list-group-flush">
+            <InputRadioGroup @bind-Value="Question.Result">
+                @foreach (var answer in Question.CustomQuestion.AnswerPossibilities)
+                {
+                    <li class="list-group-item @GetSelectedCssClass(answer)" @onclick="() => SelectAnswer(answer)">
+                        <InputRadio Value="answer.Weight" hidden/>
+                        <span></span>
+                        <p>@answer.Text</p>
+                    </li>
+                }
+            </InputRadioGroup> 
+        </ul>
     }
-  </div>
-  <ul class="list-group list-group-flush">
-    <InputRadioGroup @bind-Value="Question.Result">
-      @foreach (var answer in Question.CustomQuestion.AnswerPossibilities)
-      {
-        <li class="list-group-item @GetSelectedCssClass(answer)" @onclick="() => SelectRow(answer)">
-          <InputRadio Value="answer.Weight" hidden/>
-          <span></span>
-          <p>@answer.Text</p>
-        </li>
-      }
-    </InputRadioGroup>
-  </ul>
-  <button type="button" class="btn btn-success" onclick="@OnClickValidate">@ValidateButtonText</button>
+    @if (Question.CustomQuestion.Type.Equals(QuestionType.Emojis))
+    {
+        var index = 0;
+        <ul class="emojis-list mt-3">
+            @foreach (var answer in Question.CustomQuestion.AnswerPossibilities.Reverse())
+            {
+                <li><img class="emoji @GetSelectedCssClass(answer)" @onclick="() => SelectAnswer(answer)" src=@GetEmojiSrc(index) alt="@answer.Text"/></li>
+                index++;
+            }
+        </ul>
+    }
+    @if (Question.CustomQuestion.Type.Equals(QuestionType.LikertScale))
+    {
+        <p>NOT SUPPORTED FOR NOW</p>
+    }
 </div>
+<button type="button" class="btn btn-success w-100 mt-3" onclick="@OnClickValidate">@ValidateButtonText</button>
 
 @code {
     [Parameter, EditorRequired]
@@ -31,23 +46,29 @@
     public string ValidateButtonText { get; set; }
     [Parameter]
     public Action OnClickValidateAction { get; set; }
-
+    
     private const string SelectedAnswerCssClass = "selected";
+    private const string EmojisIconsLocation = "img/quizz";
 
-  private void OnClickValidate()
+    private void OnClickValidate()
     {
-      OnClickValidateAction.Invoke();
+        OnClickValidateAction.Invoke();
     }
 
-    private void SelectRow(QuizzAnswer? quizzAnswer)
+    private void SelectAnswer(QuizzAnswer quizzAnswer)
     {
-      Question.Result = quizzAnswer.Weight;
-      StateHasChanged();
+        Question.Result = quizzAnswer.Weight;
+        StateHasChanged();
     }
 
     private string GetSelectedCssClass(QuizzAnswer quizzAnswer)
     {
-      return Question.Result.Equals(quizzAnswer.Weight) ? SelectedAnswerCssClass : string.Empty;
+        return Question.Result.Equals(quizzAnswer.Weight) ? SelectedAnswerCssClass : string.Empty;
+    }
+
+    private string GetEmojiSrc(int index)
+    {
+        return $"{EmojisIconsLocation}/emoji_{index}.png";
     }
     
 }

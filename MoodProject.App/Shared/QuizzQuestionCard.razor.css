@@ -4,9 +4,27 @@
 .list-group-item p {
     text-align: center;
 }
-.selected{
+.list-group-item.selected{
     background-color: #479F76;
     color: white;
+}
+.emojis-list{
+    list-style: none;
+    display: flex;
+    flex-flow: row;
+    justify-content: space-around;
+}
+.emojis-list > li > img:hover{
+    cursor: pointer;
+}
+.emoji{
+    width: 10%;
+    min-width: 64px;
+    max-width: 128px;
+    filter: grayscale(100%);
+}
+.emoji.selected{
+    filter: grayscale(0%);
 }
 .btn-success{
     padding: 15px 0;
@@ -14,5 +32,10 @@
 @media screen and (min-width: 1024px)  {
     .list-group-item p {
         text-align: left;
+    }
+    .emojis-list{
+        width: 500px;
+        justify-content: space-between;
+        margin: auto;
     }
 }

@@ -48,8 +48,9 @@ public class QuizzService : IQuizzService
             Console.WriteLine("Config: "+QuizzConfiguration.IgnoreMinDaysToGenerateQuizz);
             if (QuizzConfiguration.IgnoreMinDaysToGenerateQuizz)
             {
-                questions.Add(GenerateQuestion(symptom, FactorType.Presence, customQuestions));
-                questions.Add(GenerateQuestion(symptom, FactorType.Harmfulness, customQuestions));
+                // FOR DEBUG
+                questions.Add(GenerateQuestion(symptom, FactorType.Presence, customQuestions, QuestionType.Emojis));
+                questions.Add(GenerateQuestion(symptom, FactorType.Harmfulness, customQuestions, QuestionType.Emojis));
             }
             else
             {
@@ -192,20 +193,17 @@ public class QuizzService : IQuizzService
                 {
                     Text = GetDefaultQuestionText(questionType.Value, word, symptom.Type.Name),
                     Type = questionType.Value,
-                    FactorType = factorType
+                    FactorType = factorType,
+                    AnswerPossibilities = GetDefaultAnswers(questionType.Value)
                 },
             Symptom = symptom
         };
 
-        newQuestion.CustomQuestion.AnswerPossibilities = GenerateAnswers(questionType.Value);
-
         return newQuestion;
     }
 
-    private IEnumerable<QuizzAnswer> GenerateAnswers(QuestionType questionType)
+    private IEnumerable<QuizzAnswer> GetDefaultAnswers(QuestionType questionType)
     {
-        //TODO: Custom answers ?
-        
         switch (questionType)
         {
             case QuestionType.LikertScale:
@@ -220,11 +218,11 @@ public class QuizzService : IQuizzService
             case QuestionType.Emojis:
                 return new List<QuizzAnswer>
                 {
-                    new() { Text = "Très mal", Weight = 6f },
-                    new() { Text = "Mal", Weight = 4f },
+                    new() { Text = "Très bien", Weight = 6f },
+                    new() { Text = "Bien", Weight = 4f },
                     new() { Text = "Normalement", Weight = 0f },
-                    new() { Text = "Bien", Weight = -4f },
-                    new() { Text = "Très bien", Weight = -6f },
+                    new() { Text = "Mal", Weight = -4f },
+                    new() { Text = "Très mal", Weight = -6f },
                 };
             default:
                 return new List<QuizzAnswer>
@@ -244,7 +242,7 @@ public class QuizzService : IQuizzService
         {
             case QuestionType.LikertScale:
                 return $"Sur une échelle de 1 à 5, à quel point le symptôme suivant a-t-il été {word} aujourd'hui ? {symptomeTypeName}";
-            case QuestionType.QCM:
+            case QuestionType.Emojis:
                 return $"Comment vous sentez-vous par rapport à vos {symptomeTypeName.ToLower()} aujourd'hui ?";
             default:
                 return $"Le symptôme suivant a-t-il été {word} aujourd'hui ? {symptomeTypeName}";
