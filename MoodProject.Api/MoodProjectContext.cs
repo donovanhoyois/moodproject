@@ -30,9 +30,7 @@ public class MoodProjectContext : DbContext
         var connectionString = "Server=localhost; User ID=root; Password=; Database=moodproject";
         optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
         */
-        const string connectionString =
-            "Host=localhost;Database=mp;Username=postgres;Password=postgres;Include Error Detail = true";
-            //"Host=flora.db.elephantsql.com;Database=einxmlgw;Username=einxmlgw;Password=l-zqSmHY366YOxf_iZTy3SipGL9rmjkp;Include Error Detail=true";
+        const string connectionString ="Host=flora.db.elephantsql.com;Database=einxmlgw;Username=einxmlgw;Password=l-zqSmHY366YOxf_iZTy3SipGL9rmjkp;Include Error Detail=true";
         optionsBuilder.UseNpgsql(connectionString);
 
     }
