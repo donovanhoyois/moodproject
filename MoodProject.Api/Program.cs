@@ -37,6 +37,7 @@ builder.Services.AddLogging(logging =>
 {
     logging.ClearProviders();
     logging.AddConsole();
+    logging.AddFile("logs/api-{Date}.txt");
     logging.AddDebug();
     logging.AddAzureWebAppDiagnostics();
 }).Configure<AzureFileLoggerOptions>(options =>

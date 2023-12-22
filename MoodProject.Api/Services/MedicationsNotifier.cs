@@ -50,7 +50,7 @@ public class MedicationsNotifier : BackgroundService
                 await SendNotifications();
                 RefreshNextNotificationTimer();
             }
-            Logger.LogInformation("{} is waiting for next service call.", nameof(MedicationsNotifier));
+            Logger.LogInformation($"{nameof(MedicationsNotifier)} is waiting for next service call.");
         }
     }
 
@@ -65,11 +65,11 @@ public class MedicationsNotifier : BackgroundService
             {
                 var newTimer = NotificationsQueue.Peek().Time - new TimeSpan(DateTime.Now.Ticks);
                 SendNotificationTimer = new PeriodicTimer(newTimer);
-                Logger.LogInformation("{} has a new Timer: {}h{}m{}s, next notification is scheduled @ {}", nameof(MedicationsNotifier), newTimer.Hours, newTimer.Minutes, newTimer.Seconds, (DateTime.Now + newTimer).TimeOfDay.ToString(@"hh\:mm\:ss"));
+                Logger.LogInformation($"{nameof(MedicationsNotifier)} has a new Timer: {newTimer.Hours}h{newTimer.Minutes}m{newTimer.Seconds}s, next notification is scheduled @ {(DateTime.Now + newTimer).TimeOfDay.ToString(@"hh\:mm\:ss")}");
             }
             catch (Exception e)
             {
-                Logger.LogError("{} is an invalid period.",(NotificationsQueue.Peek().Time - new TimeSpan(DateTime.Now.Ticks)).TotalSeconds);
+                Logger.LogError($"{(NotificationsQueue.Peek().Time - new TimeSpan(DateTime.Now.Ticks)).TotalSeconds} is an invalid period.");
             }
         }
         else
@@ -84,9 +84,9 @@ public class MedicationsNotifier : BackgroundService
     private void RefreshNotificationQueue()
     {
         FirstServiceRequest = false;
-        Logger.LogInformation("{} is retrieving medications from service.", nameof(MedicationsNotifier));
+        Logger.LogInformation($"{nameof(MedicationsNotifier)} is retrieving medications from service.");
         NotificationsQueue = NotificationService.GetMedicationsNotificationsNextHour();
-        Logger.LogInformation("{} retrieved {} medications from service.", nameof(MedicationsNotifier), NotificationsQueue.Count);
+        Logger.LogInformation($"{nameof(MedicationsNotifier)} retrieved {NotificationsQueue.Count} medications from service.");
         SendNotificationTimer = new PeriodicTimer(DefaultSendNotificationPeriod);
     }
 
@@ -109,12 +109,12 @@ public class MedicationsNotifier : BackgroundService
                     notificationToSend,
                     url = "medications",
                 });
-                Logger.LogInformation("{} is sending a notification to {} with subscription {}", nameof(MedicationsNotifier), notificationToSend.UserId, notificationToSend.NotificationSubscription.Id);
+                Logger.LogInformation($"{nameof(MedicationsNotifier)} is sending a notification to {notificationToSend.UserId} with subscription {notificationToSend.NotificationSubscription.Id}");
                 await webPushClient.SendNotificationAsync(pushSubscription, payload, VapidKeys);
             }
             catch (Exception e)
             {
-                Logger.LogWarning("Error while trying to send notification to {}: {}", notificationToSend.UserId, e);
+                Logger.LogWarning($"Error while trying to send notification to {notificationToSend.UserId}: {e}");
             }
  
             sentNotifications.Add(
@@ -124,6 +124,6 @@ public class MedicationsNotifier : BackgroundService
                     
             await Task.WhenAll(sentNotifications);
         }
-        Logger.LogInformation("{} has sent {} notifications @ {}", nameof(MedicationsNotifier), sentNotifications.Count, DateTime.Now.TimeOfDay.ToString(@"hh\:mm\:ss"));
+        Logger.LogInformation($"{nameof(MedicationsNotifier)} has sent {sentNotifications.Count} notifications @ {DateTime.Now.TimeOfDay.ToString(@"hh\:mm\:ss")}");
     }
 }
