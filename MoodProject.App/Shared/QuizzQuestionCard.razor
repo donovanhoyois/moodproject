@@ -65,7 +65,8 @@
     {
         if (Question.CustomQuestion.Type.Equals(QuestionType.LikertScale))
         {
-            SliderValue = (int) Math.Round((decimal)(Question.CustomQuestion.AnswerPossibilities.Count() / 2));
+            SliderValue = (int) Math.Round((decimal)(Question.CustomQuestion.AnswerPossibilities.Count() / 2)) + 1;
+            Console.WriteLine(SliderValue);
         }
     }
 

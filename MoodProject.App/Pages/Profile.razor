@@ -12,7 +12,7 @@
 @using ChartJs.Blazor.Util
 @inject ISymptomsTypesService TypesService
 @inject ISymptomsService SymptomsService
-@inject IQuizzService QuizzService
+@inject IHealthService HealthService
 
 @attribute [Authorize]
 
@@ -136,7 +136,7 @@
 
     private void CalculateHealthAverages()
     {
-        healthAveragePercentageOperation = QuizzService.GetHealthAverageAsPercentage(symptoms);
+        healthAveragePercentageOperation = HealthService.GetHealthAverageAsPercentage(symptoms);
         if (healthAveragePercentageOperation.Status.Equals(OperationResultType.Ok))
         {
             healthAveragePercentageOperation.Content = (float) Math.Round(healthAveragePercentageOperation.Content, MidpointRounding.ToEven);
@@ -202,7 +202,7 @@
     
     private IEnumerable<double> CalculateGraphValues()
     {
-        return QuizzService.GetHealthAverageHistory(symptoms, 10)
+        return HealthService.GetHealthAverageHistory(symptoms, 10)
                 .Reverse()
                 .Select(v => Math.Round(v, MidpointRounding.ToEven));
     }

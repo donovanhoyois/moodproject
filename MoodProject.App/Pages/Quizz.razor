@@ -6,6 +6,7 @@
 @attribute [Authorize]
 
 @inject IQuizzService QuizzService
+@inject IQuizzGenerator QuizzGenerator
 
 @inherits MoodProject.App.Shared.Helpers.IdentityHelper
 
@@ -49,7 +50,7 @@
     
     protected override async Task OnInitializedAsync()
     {
-        quizzQuestionsOperation = await QuizzService.Generate(await GetUserId());
+        quizzQuestionsOperation = await QuizzGenerator.Generate(await GetUserId());
         Console.WriteLine("Generation ended.");
         if (quizzQuestionsOperation.Status == OperationResultType.Ok)
         {

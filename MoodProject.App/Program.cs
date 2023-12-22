@@ -42,6 +42,8 @@ builder.Services.AddSingleton<IApiAuthService, ApiAuthService>();
 builder.Services.AddSingleton<ISymptomsTypesService, SymptomsTypesService>();
 builder.Services.AddSingleton<ISymptomsService, SymptomsService>();
 builder.Services.AddSingleton<IQuizzService, QuizzService>();
+builder.Services.AddSingleton<IQuizzGenerator, QuizzGenerator>();
+builder.Services.AddSingleton<IHealthService, HealthService>();
 builder.Services.AddSingleton<IChatRoomsService, ChatRoomsService>();
 builder.Services.AddSingleton<IUsersService, UsersService>();
 builder.Services.AddSingleton<IMedicationService, MedicationService>();
