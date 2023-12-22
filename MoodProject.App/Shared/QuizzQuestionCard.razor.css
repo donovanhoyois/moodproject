@@ -26,6 +26,9 @@
 .emoji.selected{
     filter: grayscale(0%);
 }
+.likert-scale-value{
+    text-align: center;
+}
 .btn-success{
     padding: 15px 0;
 }

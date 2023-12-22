@@ -34,7 +34,16 @@
     }
     @if (Question.CustomQuestion.Type.Equals(QuestionType.LikertScale))
     {
-        <p>NOT SUPPORTED FOR NOW</p>
+        <input type="range"
+               min="1"
+               max="@Question.CustomQuestion.AnswerPossibilities.Count()"
+               step="1"
+               class="likert-scale m-3"
+               @bind-value="SliderValue"
+               @bind-value:event="oninput"/>
+        <div class="likert-scale-value">
+            <p>@SliderValue</p>
+        </div>
     }
 </div>
 <button type="button" class="btn btn-success w-100 mt-3" onclick="@OnClickValidate">@ValidateButtonText</button>
@@ -46,12 +55,28 @@
     public string ValidateButtonText { get; set; }
     [Parameter]
     public Action OnClickValidateAction { get; set; }
+
+    private int SliderValue;
     
     private const string SelectedAnswerCssClass = "selected";
     private const string EmojisIconsLocation = "img/quizz";
 
+    protected override void OnInitialized()
+    {
+        if (Question.CustomQuestion.Type.Equals(QuestionType.LikertScale))
+        {
+            SliderValue = (int) Math.Round((decimal)(Question.CustomQuestion.AnswerPossibilities.Count() / 2));
+        }
+    }
+
     private void OnClickValidate()
     {
+        if (Question.CustomQuestion.Type.Equals(QuestionType.LikertScale))
+        {
+            var answerPossibilities = Question.CustomQuestion.AnswerPossibilities.ToList();
+            answerPossibilities.Reverse();
+            Question.Result = answerPossibilities.ElementAt(SliderValue - 1).Weight;
+        }
         OnClickValidateAction.Invoke();
     }
 

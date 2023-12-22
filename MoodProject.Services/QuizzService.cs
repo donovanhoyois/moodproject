@@ -45,12 +45,11 @@ public class QuizzService : IQuizzService
 
         foreach (var symptom in symptoms)
         {
-            Console.WriteLine("Config: "+QuizzConfiguration.IgnoreMinDaysToGenerateQuizz);
             if (QuizzConfiguration.IgnoreMinDaysToGenerateQuizz)
             {
                 // FOR DEBUG
-                questions.Add(GenerateQuestion(symptom, FactorType.Presence, customQuestions, QuestionType.Emojis));
-                questions.Add(GenerateQuestion(symptom, FactorType.Harmfulness, customQuestions, QuestionType.Emojis));
+                questions.Add(GenerateQuestion(symptom, FactorType.Presence, customQuestions));
+                questions.Add(GenerateQuestion(symptom, FactorType.Harmfulness, customQuestions));
             }
             else
             {
