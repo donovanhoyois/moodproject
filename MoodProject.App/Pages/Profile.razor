@@ -10,16 +10,15 @@
 @using ChartJs.Blazor.Common.Axes
 @using ChartJs.Blazor.Common.Enums
 @using ChartJs.Blazor.Util
-@inject IJSRuntime JsRuntime
 @inject ISymptomsTypesService TypesService
 @inject ISymptomsService SymptomsService
-@inject IQuizzService QuizzService
+@inject IHealthService HealthService
 
 @attribute [Authorize]
 
 @inherits MoodProject.App.Shared.Helpers.IdentityHelper
 
-<h1 class="display-1">Votre profil</h1>
+<h1>Votre profil</h1>
 <div class="symptoms my-3">
     <div class="card">
       <div class="card-header">
@@ -137,7 +136,7 @@
 
     private void CalculateHealthAverages()
     {
-        healthAveragePercentageOperation = QuizzService.GetHealthAverageAsPercentage(symptoms);
+        healthAveragePercentageOperation = HealthService.GetHealthAverageAsPercentage(symptoms);
         if (healthAveragePercentageOperation.Status.Equals(OperationResultType.Ok))
         {
             healthAveragePercentageOperation.Content = (float) Math.Round(healthAveragePercentageOperation.Content, MidpointRounding.ToEven);
@@ -203,7 +202,7 @@
     
     private IEnumerable<double> CalculateGraphValues()
     {
-        return QuizzService.GetHealthAverageHistory(symptoms, 100)
+        return HealthService.GetHealthAverageHistory(symptoms, 10)
                 .Reverse()
                 .Select(v => Math.Round(v, MidpointRounding.ToEven));
     }

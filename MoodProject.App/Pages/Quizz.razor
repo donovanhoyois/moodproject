@@ -6,11 +6,12 @@
 @attribute [Authorize]
 
 @inject IQuizzService QuizzService
+@inject IQuizzGenerator QuizzGenerator
 
 @inherits MoodProject.App.Shared.Helpers.IdentityHelper
 
 <PageTitle>Questionnaire</PageTitle>
-<h3>Questionnaire</h3>
+<h1>Questionnaire</h1>
 <div>
     @if (quizzQuestionsOperation.Status == OperationResultType.Pending)
     {
@@ -18,22 +19,23 @@
     }
     else if(quizzQuestionsOperation.Status == OperationResultType.Ok)
     {
-        if (currentQuestion < quizz.Questions.Count())
+        if (currentQuestion < quizz.Questions.Count)
         {
-            <QuizzQuestionCard Question=quizz.Questions[currentQuestion] OnClickValidateAction="() => Confirm()"/>
+            <p>@(currentQuestion+1)/@quizz.Questions.Count</p>
+            <QuizzQuestionCard
+                Question=quizz.Questions[currentQuestion]
+                OnClickValidateAction="() => Confirm()"
+                ValidateButtonText="@ValidateButtonText"/>
         }
         else
         {
-            <div class="alert alert-success" role="alert">
-                Merci d'avoir répondu !
-            </div>
+            <SuccessMessage Text="Merci d'avoir répondu !"/>
+            <a class="btn btn-primary" href="/profile">Voir mon profil</a>
         }
     }
     else
     {
-        <div class="alert alert-danger" role="alert">
-            @quizzQuestionsOperation.Message
-        </div>
+        <ErrorMessage Text="@quizzQuestionsOperation.Message" />
     }
 </div>
 
@@ -41,22 +43,26 @@
 
     private QuizzForm quizz = new QuizzForm(new List<AnswerableQuizzQuestion>());
     private int currentQuestion = 0;
+    private string ValidateButtonText = string.Empty;
 
     private OperationResult<IEnumerable<QuizzQuestion>> quizzQuestionsOperation { get; set; } = new(OperationResultType.Pending);
     
+    
     protected override async Task OnInitializedAsync()
     {
-        quizzQuestionsOperation = await QuizzService.Generate(await GetUserId());
+        quizzQuestionsOperation = await QuizzGenerator.Generate(await GetUserId());
         Console.WriteLine("Generation ended.");
         if (quizzQuestionsOperation.Status == OperationResultType.Ok)
         {
             quizz = new QuizzForm(quizzQuestionsOperation.Content);
+            ValidateButtonText = GetValidateButtonText();
         }
     }
 
     private async Task Confirm()
     {
         currentQuestion++;
+        ValidateButtonText = GetValidateButtonText();
         if (currentQuestion >= quizz.Questions.Count)
         {
             var valuesToSubmit = new List<FactorValue>();
@@ -70,10 +76,15 @@
                     Value = question.Result
                 });
             }
-            
-            var symptoms = quizz.Questions.Select(q => q.Symptom).ToList();
+
+            var symptoms = quizz.Questions.Select(q => q.Symptom).ToHashSet();
             await QuizzService.Submit(symptoms, valuesToSubmit);
         }
         StateHasChanged();
+    }
+
+    private string GetValidateButtonText()
+    {
+        return currentQuestion + 1 >= quizz.Questions.Count ? "Terminer le questionnaire" : "Continuer";
     }
 }

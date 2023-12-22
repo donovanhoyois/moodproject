@@ -23,6 +23,7 @@ public class CustomQuizzQuestionsController
     {
         return DbContext.QuizzQuestions
             .Include(q => q.SymptomType)
+            .Include(q => q.AnswerPossibilities.OrderBy(answer => answer.Weight))
             .ToList();
     }
 }

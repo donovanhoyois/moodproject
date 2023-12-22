@@ -1,36 +1,100 @@
 ﻿@using MoodProject.App.Models
+@using MoodProject.Core.Enums
+@using MoodProject.Core.Models
 
 <div class="card">
-  <div class="card-header">
-    <p>@Question.CustomQuestion.Text</p>
-    @if (Question.CustomQuestion.Id == 0)
+    <div class="card-header">
+        <p>@Question.CustomQuestion.Text</p>
+    </div>
+    @if (Question.CustomQuestion.Type.Equals(QuestionType.QCM))
     {
-      <p>@Question.Symptom.Type.Name</p>
+        <ul class="list-group list-group-flush">
+            <InputRadioGroup @bind-Value="Question.Result">
+                @foreach (var answer in Question.CustomQuestion.AnswerPossibilities)
+                {
+                    <li class="list-group-item @GetSelectedCssClass(answer)" @onclick="() => SelectAnswer(answer)">
+                        <InputRadio Value="answer.Weight" hidden/>
+                        <span></span>
+                        <p>@answer.Text</p>
+                    </li>
+                }
+            </InputRadioGroup> 
+        </ul>
     }
-  </div>
-  <ul class="list-group list-group-flush">
-    <InputRadioGroup @bind-Value="Question.Result">
-      @foreach (var answer in Question.CustomQuestion.AnswerPossibilities)
-      {
-        <li class="list-group-item">
-          <InputRadio Value="answer.Weight"/>
-          <text>@answer.Text</text>
-        </li>
-      }
-    </InputRadioGroup>
-    <button type="button" class="btn btn-success" onclick="@OnClickValidate">Valider</button>
-  </ul>
+    @if (Question.CustomQuestion.Type.Equals(QuestionType.Emojis))
+    {
+        var index = 0;
+        <ul class="emojis-list mt-3">
+            @foreach (var answer in Question.CustomQuestion.AnswerPossibilities.Reverse())
+            {
+                <li><img class="emoji @GetSelectedCssClass(answer)" @onclick="() => SelectAnswer(answer)" src=@GetEmojiSrc(index) alt="@answer.Text"/></li>
+                index++;
+            }
+        </ul>
+    }
+    @if (Question.CustomQuestion.Type.Equals(QuestionType.LikertScale))
+    {
+        <input type="range"
+               min="1"
+               max="@Question.CustomQuestion.AnswerPossibilities.Count()"
+               step="1"
+               class="likert-scale m-3"
+               @bind-value="SliderValue"
+               @bind-value:event="oninput"/>
+        <div class="likert-scale-value">
+            <p>@SliderValue</p>
+        </div>
+    }
 </div>
+<button type="button" class="btn btn-success w-100 mt-3" onclick="@OnClickValidate">@ValidateButtonText</button>
 
 @code {
-    [Parameter]
+    [Parameter, EditorRequired]
     public AnswerableQuizzQuestion Question { get; set; }
+    [Parameter, EditorRequired]
+    public string ValidateButtonText { get; set; }
     [Parameter]
     public Action OnClickValidateAction { get; set; }
 
+    private int SliderValue;
+    
+    private const string SelectedAnswerCssClass = "selected";
+    private const string EmojisIconsLocation = "img/quizz";
+
+    protected override void OnInitialized()
+    {
+        if (Question.CustomQuestion.Type.Equals(QuestionType.LikertScale))
+        {
+            SliderValue = (int) Math.Round((decimal)(Question.CustomQuestion.AnswerPossibilities.Count() / 2)) + 1;
+            Console.WriteLine(SliderValue);
+        }
+    }
+
     private void OnClickValidate()
     {
-      OnClickValidateAction.Invoke();
+        if (Question.CustomQuestion.Type.Equals(QuestionType.LikertScale))
+        {
+            var answerPossibilities = Question.CustomQuestion.AnswerPossibilities.ToList();
+            answerPossibilities.Reverse();
+            Question.Result = answerPossibilities.ElementAt(SliderValue - 1).Weight;
+        }
+        OnClickValidateAction.Invoke();
+    }
+
+    private void SelectAnswer(QuizzAnswer quizzAnswer)
+    {
+        Question.Result = quizzAnswer.Weight;
+        StateHasChanged();
+    }
+
+    private string GetSelectedCssClass(QuizzAnswer quizzAnswer)
+    {
+        return Question.Result.Equals(quizzAnswer.Weight) ? SelectedAnswerCssClass : string.Empty;
+    }
+
+    private string GetEmojiSrc(int index)
+    {
+        return $"{EmojisIconsLocation}/emoji_{index}.png";
     }
     
 }
