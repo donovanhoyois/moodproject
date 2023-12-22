@@ -61,12 +61,11 @@
     private const string SelectedAnswerCssClass = "selected";
     private const string EmojisIconsLocation = "img/quizz";
 
-    protected override void OnInitialized()
+    protected override void OnParametersSet()
     {
         if (Question.CustomQuestion.Type.Equals(QuestionType.LikertScale))
         {
             SliderValue = (int) Math.Round((decimal)(Question.CustomQuestion.AnswerPossibilities.Count() / 2)) + 1;
-            Console.WriteLine(SliderValue);
         }
     }
 
