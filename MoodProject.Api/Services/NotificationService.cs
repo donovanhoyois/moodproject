@@ -5,12 +5,10 @@ namespace MoodProject.Api.Services;
 
 public class NotificationService
 {
-    private readonly ILogger<NotificationService> Logger;
     private readonly MoodProjectContext DbContext;
     
-    public NotificationService(ILogger<NotificationService> logger)
+    public NotificationService()
     {
-        Logger = logger;
         DbContext = new MoodProjectContext();
     }
     

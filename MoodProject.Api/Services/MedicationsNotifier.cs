@@ -109,6 +109,7 @@ public class MedicationsNotifier : BackgroundService
                     notificationToSend,
                     url = "medications",
                 });
+                Logger.LogInformation("{} is sending a notification to {} with subscription {}", nameof(MedicationsNotifier), notificationToSend.UserId, notificationToSend.NotificationSubscription.Id);
                 await webPushClient.SendNotificationAsync(pushSubscription, payload, VapidKeys);
             }
             catch (Exception e)

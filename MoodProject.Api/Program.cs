@@ -1,6 +1,7 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Logging.AzureAppServices;
 using Microsoft.IdentityModel.Tokens;
 using MoodProject.Api;
 using MoodProject.Api.Configuration;
@@ -29,6 +30,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidAudiences = builder.Configuration.GetSection("Authentication:Schemes:Bearer:ValidAudiences").Get<string[]>(),
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["Authentication:Schemes:Bearer:Secret"]))
     };
+});
+
+// Logging
+builder.Services.AddLogging(logging =>
+{
+    logging.ClearProviders();
+    logging.AddConsole();
+    logging.AddDebug();
+    logging.AddAzureWebAppDiagnostics();
+}).Configure<AzureFileLoggerOptions>(options =>
+{
+    options.FileName = "api-log";
+    options.FileSizeLimit = 50 * 1024;
+    options.RetainedFileCountLimit = 30;
 });
 
 // SignalR
