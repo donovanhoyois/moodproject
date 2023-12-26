@@ -52,7 +52,7 @@ builder.Services.AddSignalR();
 builder.Services.AddHostedService<MedicationsNotifier>();
 
 // Notification Service
-builder.Services.AddSingleton<NotificationService>();
+builder.Services.AddScoped<NotificationService>();
 
 // CORS Policy
 builder.Services.AddCors(c => c.AddPolicy("dev", builder =>

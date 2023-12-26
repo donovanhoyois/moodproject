@@ -214,6 +214,9 @@ namespace MoodProject.Api.Migrations
                     b.Property<TimeOnly>("TimeOfTheDay")
                         .HasColumnType("time without time zone");
 
+                    b.Property<int>("UtcOffset")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("MedicationId");

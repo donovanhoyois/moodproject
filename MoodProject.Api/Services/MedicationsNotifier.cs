@@ -14,13 +14,13 @@ namespace MoodProject.Api.Services;
 /// <summary>
 /// This BackgroundService retrieve notifications from a service and then send the notifications to the correct clients at the right time. 
 /// </summary>
-public class MedicationsNotifier : BackgroundService
+public sealed class MedicationsNotifier : BackgroundService
 {
     private static readonly TimeSpan DefaultServiceRequestPeriod = TimeSpan.FromHours(1);
     private static readonly TimeSpan DefaultSendNotificationPeriod = TimeSpan.FromSeconds(1);
     private readonly ILogger<MedicationsNotifier> Logger;
     private readonly IHubContext<NotificationsHub, INotificationClient> Context;
-    private readonly NotificationService NotificationService;
+    private readonly IServiceProvider ServiceProvider;
 
     private Queue<MedicationNotification> NotificationsQueue = new();
     private PeriodicTimer ServiceRequestTimer = new(DefaultServiceRequestPeriod);
@@ -30,11 +30,16 @@ public class MedicationsNotifier : BackgroundService
 
     private bool FirstServiceRequest = true;
 
-    public MedicationsNotifier(ILogger<MedicationsNotifier> logger, IHubContext<NotificationsHub, INotificationClient> context, NotificationService notificationService, NotificationConfiguration notificationConfiguration)
+    
+    public MedicationsNotifier(
+        ILogger<MedicationsNotifier> logger,
+        IHubContext<NotificationsHub, INotificationClient> context,
+        IServiceProvider serviceProvider,
+        NotificationConfiguration notificationConfiguration)
     {
         Logger = logger;
         Context = context;
-        NotificationService = notificationService;
+        ServiceProvider = serviceProvider;
         VapidKeys = new VapidDetails(notificationConfiguration.Subject, notificationConfiguration.PublicKey, notificationConfiguration.PrivateKey);
     }
     
@@ -81,11 +86,16 @@ public class MedicationsNotifier : BackgroundService
     /// <summary>
     /// This method called every hour and call the service to retrieve notifications to sent.
     /// </summary>
+    /// <remarks>As NotificationService is a scoped service and MedicationNotifier is a singleton, the scoped service need to be retrieved when used</remarks>
     private void RefreshNotificationQueue()
     {
         FirstServiceRequest = false;
         Logger.LogInformation($"{nameof(MedicationsNotifier)} is retrieving medications from service.");
-        NotificationsQueue = NotificationService.GetMedicationsNotificationsNextHour();
+        using (var scope = ServiceProvider.CreateScope())
+        {
+            var notificationService = scope.ServiceProvider.GetRequiredService<NotificationService>();
+            NotificationsQueue = notificationService.GetMedicationsNotificationsNextHour();
+        }
         Logger.LogInformation($"{nameof(MedicationsNotifier)} retrieved {NotificationsQueue.Count} medications from service.");
         SendNotificationTimer = new PeriodicTimer(DefaultSendNotificationPeriod);
     }

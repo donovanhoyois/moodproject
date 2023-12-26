@@ -1,4 +1,5 @@
 ﻿using MoodProject.Core;
+using MoodProject.Core.Enums;
 using MoodProject.Core.Models;
 using MoodProject.Core.Ports.In;
 using MoodProject.Core.Ports.Out;
@@ -18,9 +19,18 @@ public class SymptomsService : ISymptomsService
         return await AppApi.GetSymptomsByUserId(userId);
     }
 
-    public async Task<bool> SaveSymptoms(IEnumerable<Symptom> symptoms)
+    public async Task<OperationResult<bool>> SaveSymptoms(IEnumerable<Symptom> symptoms)
     {
-        return await AppApi.SaveSymptoms(symptoms);
+        var apiResponse = await AppApi.SaveSymptoms(symptoms);
+        return apiResponse
+            ? new OperationResult<bool>(OperationResultType.Ok)
+            {
+                Message = "Vos symptômes ont bien été mis à jour."
+            }
+            : new OperationResult<bool>(OperationResultType.Error)
+            {
+                Message = "Une erreur est survenue lors de la mise à jour de vos symptômes."
+            };
     }
 
     public async Task<IEnumerable<Symptom>> GetSymptomsWithHistory(string userId)

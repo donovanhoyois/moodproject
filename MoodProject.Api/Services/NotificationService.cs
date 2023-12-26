@@ -7,9 +7,9 @@ public class NotificationService
 {
     private readonly MoodProjectContext DbContext;
     
-    public NotificationService()
+    public NotificationService(MoodProjectContext dbContext)
     {
-        DbContext = new MoodProjectContext();
+        DbContext = dbContext;
     }
     
     /// <summary>
@@ -20,27 +20,44 @@ public class NotificationService
     /// <returns>A <see cref="Queue{T}"/> of <see cref="MedicationNotification"/> containing the notifications to sent in the next hour.</returns>
     public Queue<MedicationNotification> GetMedicationsNotificationsNextHour()
     {
+        var serverUtcOffset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow).Hours;
+
         var minTimeSpan = new TimeSpan(DateTime.Now.Ticks);
         var maxTimeSpan = new TimeSpan(DateTime.Now.Ticks) + TimeSpan.FromHours(1);
 
-        var dayUsages = new List<MedicationDayUsage>();
+        // Retrieving day usages from database for the next hour
+        var dayUsages = RetrieveDayUsagesBetween(minTimeSpan, maxTimeSpan, serverUtcOffset);
 
-        foreach (var d in DbContext.MedicationDayUsages)
+        // Apply timestamp to retrieved day usages to send it back to notifier service
+        var medicationNotifications = CreateNotificationWithTimestamp(dayUsages, minTimeSpan, serverUtcOffset);
+
+        return new Queue<MedicationNotification>(medicationNotifications.FindAll(notification => notification.NotificationSubscription != null).OrderBy(medNotification => medNotification.Time));
+    }
+
+    private List<MedicationDayUsage> RetrieveDayUsagesBetween(TimeSpan minTimeSpan, TimeSpan maxTimeSpan, int serverUtcOffset)
+    {
+        var dayUsages = new List<MedicationDayUsage>();
+        foreach (var d in DbContext.Medications.Where(m => m.AreNotificationsEnabled).SelectMany(m => m.DayUsages).ToList())
         {
-            var dayTimespan = new TimeSpan(minTimeSpan.Days, d.TimeOfTheDay.Hour, d.TimeOfTheDay.Minute, d.TimeOfTheDay.Minute);
-            var nextDayTimespan = new TimeSpan(minTimeSpan.Days + 1, d.TimeOfTheDay.Hour, d.TimeOfTheDay.Minute, d.TimeOfTheDay.Minute);
+            var dayTimespan = new TimeSpan(minTimeSpan.Days, d.TimeOfTheDay.Hour + (d.UtcOffset - serverUtcOffset), d.TimeOfTheDay.Minute, d.TimeOfTheDay.Minute);
+            var nextDayTimespan = new TimeSpan(minTimeSpan.Days + 1, d.TimeOfTheDay.Hour + (d.UtcOffset - serverUtcOffset), d.TimeOfTheDay.Minute, d.TimeOfTheDay.Minute);
             if (dayTimespan >= minTimeSpan && dayTimespan <= maxTimeSpan || nextDayTimespan >= minTimeSpan && nextDayTimespan <= maxTimeSpan)
             {
                 dayUsages.Add(d);
             }
         }
 
+        return dayUsages;
+    }
+    
+    private List<MedicationNotification> CreateNotificationWithTimestamp(List<MedicationDayUsage> dayUsages, TimeSpan minTimeSpan, int serverUtcOffset)
+    {
         var medicationNotifications = new List<MedicationNotification>();
         foreach (var dayUsage in dayUsages)
         {
-            var todayTimespan = new TimeSpan(minTimeSpan.Days, dayUsage.TimeOfTheDay.Hour, dayUsage.TimeOfTheDay.Minute, dayUsage.TimeOfTheDay.Second);
+            var todayTimespan = new TimeSpan(minTimeSpan.Days, dayUsage.TimeOfTheDay.Hour + (dayUsage.UtcOffset - serverUtcOffset), dayUsage.TimeOfTheDay.Minute, dayUsage.TimeOfTheDay.Second);
             var nextNotificationTimespan = todayTimespan < new TimeSpan(DateTime.Now.Ticks)
-                ? new TimeSpan(minTimeSpan.Days + 1, dayUsage.TimeOfTheDay.Hour, dayUsage.TimeOfTheDay.Minute,
+                ? new TimeSpan(minTimeSpan.Days + 1, dayUsage.TimeOfTheDay.Hour + (dayUsage.UtcOffset - serverUtcOffset), dayUsage.TimeOfTheDay.Minute,
                     dayUsage.TimeOfTheDay.Second)
                 : todayTimespan;
             var correspondingMedication = DbContext.Medications.First(med => med.Id.Equals(dayUsage.MedicationId));
@@ -57,6 +74,6 @@ public class NotificationService
             );
         }
 
-        return new Queue<MedicationNotification>(medicationNotifications.FindAll(notification => notification.NotificationSubscription != null).OrderBy(medNotification => medNotification.Time));
+        return medicationNotifications;
     }
 }

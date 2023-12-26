@@ -34,6 +34,7 @@ public class MedicationsController
     {
         medications.ForEach(med =>
         {
+
             var retrievedMed =
                 DbContext.Medications
                     .Where(dbMed => dbMed.Id.Equals(med.Id))

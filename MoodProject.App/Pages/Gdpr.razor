@@ -9,7 +9,7 @@
 
 @attribute [Authorize]
 
-<h1>Réglement général de protection des données</h1><br />
+<h1>Réglement général de protection des données</h1>
 <div class="gdpr">
     <div class="gdpr-chapter">
         <h2>1. Informations générales</h2>
@@ -32,7 +32,7 @@
     </div>
     <div class="gdpr-chapter">
         <h2>4. Consentement</h2>
-        <p>En utilisant notre application, vous consentez expressément à la collecte et au traitement de données médicales à des fins fonctionnelles, conformément à cette politique de confidentialité. Vous avez le droit de retirer ce consentement à tout moment en modifiant les paramètres de confidentialité dans l'application.</p>
+        <p>En utilisant notre application, vous consentez expressément à la collecte et au traitement de données médicales à des fins fonctionnelles, conformément à cette politique de confidentialité. Vous avez le droit de retirer ce consentement à tout moment en envoyant un mail à <a href="mailto:contact@vigilance-mentale.be">contact@vigilance-mentale.be</a>.</p>
     </div>
     <div class="gdpr-chapter">
         <h2>5. Sécurité des Données</h2>
@@ -40,19 +40,28 @@
     </div>
     <div class="gdpr-chapter">
         <h2>6. Droits des Utilisateurs</h2>
-        <p>Vous avez le droit d'accéder, de rectifier, de supprimer ou de limiter le traitement de vos données médicales. Pour exercer ces droits ou poser des questions sur notre politique de confidentialité, veuillez nous contacter à [adresse e-mail/contact].</p>
+        <p>Vous avez le droit d'accéder, de rectifier, de supprimer ou de limiter le traitement de vos données médicales. Pour exercer ces droits ou poser des questions sur notre politique de confidentialité, veuillez nous contacter à <a href="mailto:contact@vigilance-mentale.be">contact@vigilance-mentale.be</a>.</p>
     </div>
-    <EditForm Model="@IsBoxChecked" OnSubmit="AcceptGdpr">
-        <div class="form-check">
-            <InputCheckbox @bind-Value="@IsBoxChecked" class="form-check-input"/>
-            <label class="form-check-label" for="gdprCheck">J'ai lu et j'accepte le réglement de protection des données</label>
-        </div>
-        <button type="submit" id="gdprCheck" class="btn btn-primary" disabled="@(!IsBoxChecked)">Accepter</button>
-    </EditForm>
+    @if (!HasAcceptedGdpr)
+    {
+        <EditForm Model="@IsBoxChecked" OnSubmit="AcceptGdpr">
+            <div class="form-check">
+                <InputCheckbox @bind-Value="@IsBoxChecked" class="form-check-input"/>
+                <label class="form-check-label" for="gdprCheck">J'ai lu et j'accepte le réglement de protection des données</label>
+            </div>
+            <button type="submit" id="gdprCheck" class="btn btn-primary" disabled="@(!IsBoxChecked)">Accepter</button>
+        </EditForm>
+    }
 </div>
 
 @code {
     private bool IsBoxChecked = false;
+    private bool HasAcceptedGdpr = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        HasAcceptedGdpr = await CacheService.GetHasAcceptedGdpr(await GetUserId());
+    }
 
     private async Task AcceptGdpr(EditContext editContext)
     {

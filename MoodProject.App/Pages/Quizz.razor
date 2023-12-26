@@ -51,7 +51,6 @@
     protected override async Task OnInitializedAsync()
     {
         quizzQuestionsOperation = await QuizzGenerator.Generate(await GetUserId());
-        Console.WriteLine("Generation ended.");
         if (quizzQuestionsOperation.Status == OperationResultType.Ok)
         {
             quizz = new QuizzForm(quizzQuestionsOperation.Content);

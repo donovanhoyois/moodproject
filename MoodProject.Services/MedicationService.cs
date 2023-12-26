@@ -55,6 +55,12 @@ public class MedicationService : IMedicationService
             };
         }
         
+        // Applying user current utc offset
+        medication.DayUsages.ForEach(dayUsage =>
+        {
+            dayUsage.UtcOffset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow).Hours;
+        });
+        
         var apiResponse = await AppApi.UpdateMedications(new List<Medication>(){ medication });
         return apiResponse
             ? new OperationResult<Medication>(OperationResultType.Ok)

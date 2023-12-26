@@ -101,7 +101,7 @@
                             <td>@comment.Content</td>
                             <td>@GetPublishedDateFormatted(comment.PublishedDate)</td>
                             <td>
-                                
+                                <a class="btn btn-primary" href="/rooms/post/@comment.ChatRoomPostId">Voir</a>
                             </td>
                             <td>
                                 @switch (comment.ModerationStatus)
@@ -146,6 +146,6 @@
     
     private string GetPublishedDateFormatted(DateTime dateTime)
     {
-        return $"Publié le {dateTime.Day}/{dateTime.Month}/{dateTime.Year} à {dateTime.Hour}:{dateTime.Minute}.";
+        return $"Publié le {dateTime.ToString("dd/MM/yyyy")} à {dateTime.ToString("HH:mm")}.";
     }
 }

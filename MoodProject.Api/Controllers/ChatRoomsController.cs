@@ -11,7 +11,7 @@ namespace MoodProject.Api.Controllers;
 [EnableCors]
 public class ChatRoomsController
 {
-	private MoodProjectContext DbContext;
+	private readonly MoodProjectContext DbContext;
     
 	public ChatRoomsController(MoodProjectContext dbContext)
 	{
@@ -55,7 +55,7 @@ public class ChatRoomsController
 			.FirstOrDefault();
 	}
 
-	[HttpGet, ActionName("GetPostByUserId")]
+	[HttpGet, ActionName("GetPostsByUserId")]
 	public IEnumerable<ChatRoomPost> GetPostsByUserId(string userId)
 	{
 		return DbContext.ChatRoomPosts.Where(p => p.AuthorId.Equals(userId));

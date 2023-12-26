@@ -8,6 +8,7 @@ public class MedicationDayUsage
     public int Id { get; set; }
     public int MedicationId { get; set; }
     public TimeOnly TimeOfTheDay { get; set; }
+    public int UtcOffset { get; set; }
 
     public MedicationDayUsage()
     {

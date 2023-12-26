@@ -31,12 +31,20 @@
               {
                   <div class="form-check">
                       <InputCheckbox @bind-Value="@type.IsChecked" DisplayName="@type.Name" class="form-check-input"/>
-                      <label class="form-check-label" for="flexCheckDefault">
+                      <label class="form-check-label">
                           @type.Name
                       </label>
                   </div>
               }
               <br />
+              @if (SymptomsFormOperation.Status == OperationResultType.Ok)
+              {
+                  <SuccessMessage Text="@SymptomsFormOperation.Message"/>
+              }
+              @if (SymptomsFormOperation.Status == OperationResultType.Error)
+              {
+                  <ErrorMessage Text="@SymptomsFormOperation.Message"/>
+              }
               <button type="button" class="btn btn-success p-2" onclick="@SymptomsSubmit">Valider</button>
           </EditForm>
       </div>
@@ -85,7 +93,9 @@
     private SymptomsTypesForm _symptomTypesForm = new SymptomsTypesForm(new List<SymptomType>());
 
     private LineConfig graphConfig;
+    private bool ShowGraph = false;
 
+    private OperationResult<bool> SymptomsFormOperation = new OperationResult<bool>(OperationResultType.WaitingForUser);
     private OperationResult<float> healthAveragePercentageOperation = new OperationResult<float>(OperationResultType.Pending);
     
     protected override async Task OnInitializedAsync()
@@ -99,7 +109,10 @@
         if (healthAveragePercentageOperation.Status == OperationResultType.Ok)
         {
             var graphValues = CalculateGraphValues();
-            ConfigureHealthHistoryGraph(graphValues);
+            if (graphValues.Count() > 1)
+            {
+                ConfigureHealthHistoryGraph(graphValues);
+            }
         }
     }
 
@@ -131,7 +144,8 @@
                 ValuesHistory = new List<FactorValue>()
             });
         }
-        var response = await SymptomsService.SaveSymptoms(updatedSymptomsList);
+        SymptomsFormOperation = await SymptomsService.SaveSymptoms(updatedSymptomsList);
+        Console.WriteLine(SymptomsFormOperation.Status);
     }
 
     private void CalculateHealthAverages()

@@ -68,10 +68,10 @@ public class QuizzGenerator : IQuizzGenerator
     {
         if (questionType == null)
         {
-            var r = new Random().Next(Enum.GetNames(typeof(QuestionType)).Length+1);
+            var r = new Random().Next(Enum.GetNames(typeof(QuestionType)).Length);
             questionType = (QuestionType)r;
         }
-        
+
         var newQuestion = new QuizzQuestion
         {
             CustomQuestion = 
