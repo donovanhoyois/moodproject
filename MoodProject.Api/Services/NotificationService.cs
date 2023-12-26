@@ -23,7 +23,7 @@ public class NotificationService
         var serverUtcOffset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow).Hours;
 
         var minTimeSpan = new TimeSpan(DateTime.Now.Ticks);
-        var maxTimeSpan = new TimeSpan(DateTime.Now.Ticks) + TimeSpan.FromHours(1);
+        var maxTimeSpan = new TimeSpan(DateTime.Now.Ticks) + TimeSpan.FromHours(12);
 
         // Retrieving day usages from database for the next hour
         var dayUsages = RetrieveDayUsagesBetween(minTimeSpan, maxTimeSpan, serverUtcOffset);
@@ -55,9 +55,9 @@ public class NotificationService
         var medicationNotifications = new List<MedicationNotification>();
         foreach (var dayUsage in dayUsages)
         {
-            var todayTimespan = new TimeSpan(minTimeSpan.Days, dayUsage.TimeOfTheDay.Hour + (dayUsage.UtcOffset - serverUtcOffset), dayUsage.TimeOfTheDay.Minute, dayUsage.TimeOfTheDay.Second);
+            var todayTimespan = new TimeSpan(minTimeSpan.Days, dayUsage.TimeOfTheDay.Hour + (serverUtcOffset - dayUsage.UtcOffset), dayUsage.TimeOfTheDay.Minute, dayUsage.TimeOfTheDay.Second);
             var nextNotificationTimespan = todayTimespan < new TimeSpan(DateTime.Now.Ticks)
-                ? new TimeSpan(minTimeSpan.Days + 1, dayUsage.TimeOfTheDay.Hour + (dayUsage.UtcOffset - serverUtcOffset), dayUsage.TimeOfTheDay.Minute,
+                ? new TimeSpan(minTimeSpan.Days + 1, dayUsage.TimeOfTheDay.Hour + (serverUtcOffset - dayUsage.UtcOffset), dayUsage.TimeOfTheDay.Minute,
                     dayUsage.TimeOfTheDay.Second)
                 : todayTimespan;
             var correspondingMedication = DbContext.Medications.First(med => med.Id.Equals(dayUsage.MedicationId));
