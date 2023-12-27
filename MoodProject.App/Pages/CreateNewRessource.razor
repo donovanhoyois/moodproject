@@ -1,0 +1,45 @@
+﻿@page "/Ressources/create"
+@using InputFile = Microsoft.AspNetCore.Components.Forms.InputFile
+@using MoodProject.Core.Models
+@using MoodProject.Core.Ports.In
+@inject IFileService FileService
+
+@attribute [Authorize]
+
+<h1>Création d'une nouvelle ressource</h1>
+
+<EditForm Model="_ressourceForm" OnSubmit="RessourceFormSubmit">
+    <div class="form-group my-2">
+        <label>Titre</label>
+        <InputText @bind-Value="@_ressourceForm.Title" class="form-control"/>
+    </div>
+    <div class="form-group my-2">
+        <label>Contenu</label>
+        <InputTextArea @bind-Value="@_ressourceForm.Content" class="form-control"/>
+    </div>
+    <div class="form-group my-2">
+        <label>Fichiers</label>
+        <InputFile multiple OnChange="@LoadFiles" class="form-control"/>
+    </div>
+    <button type="button" class="btn btn-primary mt-2" onclick="@RessourceFormSubmit">Valider</button>
+</EditForm>
+
+
+@code {
+    private Ressource _ressourceForm = new();
+    
+    private async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        Console.WriteLine("load files");
+        foreach (var file in e.GetMultipleFiles())
+        {
+            Console.WriteLine("uploading");
+            _ressourceForm.Files.Add(new RessourceFile(file.Name));
+            await FileService.Upload(file.OpenReadStream(2097152));
+        }
+    }
+
+    private void RessourceFormSubmit()
+    {
+    }
+}

@@ -30,4 +30,5 @@ public interface IAppApi
     public Task<bool> UpdateMedications(IEnumerable<Medication> medications);
     public Task<bool> DeleteMedications(IEnumerable<Medication> medications);
     public Task<bool> RegisterNewNotificationSubscription(NotificationSubscription notificationSubscription);
+    public Task<bool> UploadFile(Stream stream);
 }

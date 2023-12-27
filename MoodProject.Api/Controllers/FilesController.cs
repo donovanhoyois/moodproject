@@ -26,4 +26,11 @@ public class FilesController
         await BlobServiceClient.CreateBlobContainerAsync("test");
         return true;
     }
+
+    [HttpPut, ActionName("Upload"), Consumes("application/octet-stream")]
+    public async Task Upload(Stream stream)
+    {
+        stream.Close();
+        //TODO: implementer et tester
+    }
 }

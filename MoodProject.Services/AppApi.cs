@@ -149,4 +149,12 @@ public class AppApi : IAppApi
         var response = await ApiClient.PutAsJsonAsync("NotificationSubscriptions/RegisterNewNotificationSubscription", notificationSubscription);
         return response.IsSuccessStatusCode;
     }
+
+    public async Task<bool> UploadFile(Stream stream)
+    {
+        var content = new StreamContent(stream);
+        content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+        var response = await ApiClient.PutAsync("Files/Upload", content);
+        return response.IsSuccessStatusCode;
+    }
 }
