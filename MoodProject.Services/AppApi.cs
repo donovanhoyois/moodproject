@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using MoodProject.Core;
 using MoodProject.Core.Configuration;
 using MoodProject.Core.Enums;
 using MoodProject.Core.Models;
@@ -150,11 +151,25 @@ public class AppApi : IAppApi
         return response.IsSuccessStatusCode;
     }
 
-    public async Task<bool> UploadFile(Stream stream)
+    public async Task<IEnumerable<Ressource>> GetRessources()
     {
-        var content = new StreamContent(stream);
-        content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
-        var response = await ApiClient.PutAsync("Files/Upload", content);
-        return response.IsSuccessStatusCode;
+        return await ApiClient.GetFromJsonAsync<IEnumerable<Ressource>>("Ressources/GetAll");
+    }
+
+    public async Task<Ressource?> GetRessource(int id)
+    {
+        return await ApiClient.GetFromJsonAsync<Ressource?>($"Ressources/GetById?id={id}");
+    }
+
+    public async Task<Ressource> CreateRessource(Ressource ressource)
+    {
+        var response = await ApiClient.PutAsJsonAsync("Ressources/Create", ressource);
+        return await response.Content.ReadFromJsonAsync<Ressource>();
+    }
+
+    public async Task<string> UploadFile(FileWithContent fileWithContent)
+    {
+        var response = await ApiClient.PutAsJsonAsync("Files/Upload", fileWithContent);
+        return await response.Content.ReadAsStringAsync();
     }
 }

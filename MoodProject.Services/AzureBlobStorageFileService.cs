@@ -1,4 +1,6 @@
-﻿using MoodProject.Core.Ports.In;
+﻿using MoodProject.Core;
+using MoodProject.Core.Models;
+using MoodProject.Core.Ports.In;
 using MoodProject.Core.Ports.Out;
 
 namespace MoodProject.Services;
@@ -11,8 +13,10 @@ public class AzureBlobStorageFileService : IFileService
     {
         AppApi = appApi;
     }
-    public async Task Upload(Stream stream)
+
+    public async Task<string> Upload(FileWithContent file)
     {
-        await AppApi.UploadFile(stream);
+        file.Name = file.Name.Replace(" ", "_");
+        return await AppApi.UploadFile(file);
     }
 }

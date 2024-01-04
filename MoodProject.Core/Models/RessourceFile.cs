@@ -10,8 +10,15 @@ public class RessourceFile
     public string Name { get; set; }
     public Uri Uri { get; set; }
 
-    public RessourceFile(string name)
+    public RessourceFile()
     {
         
+    }
+
+    public RessourceFile(int ressourceId, string name, Uri uri)
+    {
+        RessourceId = ressourceId;
+        Name = name;
+        Uri = uri;
     }
 }

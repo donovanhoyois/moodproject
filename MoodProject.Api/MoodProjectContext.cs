@@ -18,6 +18,8 @@ public class MoodProjectContext : DbContext
     public DbSet<Medication> Medications { get; set; }
     public DbSet<MedicationDayUsage> MedicationDayUsages { get; set; }
     public DbSet<NotificationSubscription> NotificationSubscriptions { get; set; }
+    public DbSet<Ressource> Ressources { get; set; }
+    public DbSet<RessourceFile> RessourceFiles { get; set; }
 
     public MoodProjectContext()
     {

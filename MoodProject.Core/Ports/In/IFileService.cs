@@ -1,6 +1,8 @@
-﻿namespace MoodProject.Core.Ports.In;
+﻿using MoodProject.Core.Models;
+
+namespace MoodProject.Core.Ports.In;
 
 public interface IFileService
 {
-    public Task Upload(Stream stream);
+    public Task<string> Upload(FileWithContent file);
 }
