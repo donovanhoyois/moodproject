@@ -20,13 +20,13 @@ public class ResourcesController
     [HttpGet, ActionName("GetAll")]
     public List<Resource> GetAll()
     {
-        return DbContext.Ressources.ToList();
+        return DbContext.Resources.ToList();
     }
 
     [HttpGet, ActionName("GetById")]
     public Resource? GetById(int id)
     {
-        return DbContext.Ressources
+        return DbContext.Resources
             .Include(r => r.Files)
             .FirstOrDefault(r => r.Id.Equals(id));
     }
@@ -36,7 +36,7 @@ public class ResourcesController
     {
         DbContext.Add(resource);
         DbContext.SaveChanges();
-        return DbContext.Ressources.First(r => r.Id.Equals(resource.Id));
+        return DbContext.Resources.First(r => r.Id.Equals(resource.Id));
     }
     
 }
