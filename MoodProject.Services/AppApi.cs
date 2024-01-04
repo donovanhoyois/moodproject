@@ -151,20 +151,20 @@ public class AppApi : IAppApi
         return response.IsSuccessStatusCode;
     }
 
-    public async Task<IEnumerable<Ressource>> GetRessources()
+    public async Task<IEnumerable<Resource>> GetRessources()
     {
-        return await ApiClient.GetFromJsonAsync<IEnumerable<Ressource>>("Ressources/GetAll");
+        return await ApiClient.GetFromJsonAsync<IEnumerable<Resource>>("Resources/GetAll");
     }
 
-    public async Task<Ressource?> GetRessource(int id)
+    public async Task<Resource?> GetRessource(int id)
     {
-        return await ApiClient.GetFromJsonAsync<Ressource?>($"Ressources/GetById?id={id}");
+        return await ApiClient.GetFromJsonAsync<Resource?>($"Resources/GetById?id={id}");
     }
 
-    public async Task<Ressource> CreateRessource(Ressource ressource)
+    public async Task<Resource> CreateRessource(Resource resource)
     {
-        var response = await ApiClient.PutAsJsonAsync("Ressources/Create", ressource);
-        return await response.Content.ReadFromJsonAsync<Ressource>();
+        var response = await ApiClient.PutAsJsonAsync("Resources/Create", resource);
+        return await response.Content.ReadFromJsonAsync<Resource>();
     }
 
     public async Task<string> UploadFile(FileWithContent fileWithContent)

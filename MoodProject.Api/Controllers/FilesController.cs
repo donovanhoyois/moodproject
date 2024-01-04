@@ -38,7 +38,7 @@ public class FilesController
             await blobClient.UploadAsync(BinaryData.FromStream(stream), true);
         }
 
-        DbContext.Add(new RessourceFile(int.Parse(file.ParentName), file.Name, blobClient.Uri));
+        DbContext.Add(new ResourceFile(int.Parse(file.ParentName), file.Name, blobClient.Uri));
         DbContext.SaveChanges();
         return blobClient.Uri.ToString();
     }

@@ -1,0 +1,43 @@
+﻿@page "/Resources"
+@using MoodProject.Core.Models
+@using MoodProject.Core.Enums
+@using MoodProject.Core.Ports.In
+@inject IResourcesService ResourcesService
+
+@if (ResourcesOperation.Status == OperationResultType.Pending)
+{
+    <LoadingText />
+}
+else if (ResourcesOperation.Status == OperationResultType.Error)
+{
+    <ErrorMessage Text="@ResourcesOperation.Message" />
+}
+else if (ResourcesOperation.Status == OperationResultType.Ok)
+{
+    foreach (var resource in ResourcesOperation.Content)
+    {
+        <div class="card my-3">
+            <div class="card-header">
+                @resource.Title
+            </div>
+            <div class="card-body">
+                <p class="card-text">
+                    @resource.Content<br />
+                </p>
+                <p class="card-text">
+                    <a class="btn btn-primary" href="/resource/@resource.Id">Voir</a>
+                </p>
+            </div>
+        </div>
+    }
+}
+
+@code {
+    OperationResult<IEnumerable<Resource>> ResourcesOperation = new(OperationResultType.Pending);
+
+    protected override async Task OnInitializedAsync()
+    {
+        ResourcesOperation = await ResourcesService.GetAll();
+    }
+
+}

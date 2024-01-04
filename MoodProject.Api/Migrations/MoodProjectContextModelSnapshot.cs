@@ -274,7 +274,7 @@ namespace MoodProject.Api.Migrations
                     b.ToTable("QuizzAnswers");
                 });
 
-            modelBuilder.Entity("MoodProject.Core.Models.Ressource", b =>
+            modelBuilder.Entity("MoodProject.Core.Models.Resource", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -295,7 +295,7 @@ namespace MoodProject.Api.Migrations
                     b.ToTable("Ressources");
                 });
 
-            modelBuilder.Entity("MoodProject.Core.Models.RessourceFile", b =>
+            modelBuilder.Entity("MoodProject.Core.Models.ResourceFile", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -307,6 +307,9 @@ namespace MoodProject.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int?>("ResourceId")
+                        .HasColumnType("integer");
+
                     b.Property<int>("RessourceId")
                         .HasColumnType("integer");
 
@@ -316,7 +319,7 @@ namespace MoodProject.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RessourceId");
+                    b.HasIndex("ResourceId");
 
                     b.ToTable("RessourceFiles");
                 });
@@ -448,13 +451,11 @@ namespace MoodProject.Api.Migrations
                         .HasForeignKey("CustomQuizzQuestionId");
                 });
 
-            modelBuilder.Entity("MoodProject.Core.Models.RessourceFile", b =>
+            modelBuilder.Entity("MoodProject.Core.Models.ResourceFile", b =>
                 {
-                    b.HasOne("MoodProject.Core.Models.Ressource", null)
+                    b.HasOne("MoodProject.Core.Models.Resource", null)
                         .WithMany("Files")
-                        .HasForeignKey("RessourceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ResourceId");
                 });
 
             modelBuilder.Entity("MoodProject.Core.Models.Symptom", b =>
@@ -488,7 +489,7 @@ namespace MoodProject.Api.Migrations
                     b.Navigation("DayUsages");
                 });
 
-            modelBuilder.Entity("MoodProject.Core.Models.Ressource", b =>
+            modelBuilder.Entity("MoodProject.Core.Models.Resource", b =>
                 {
                     b.Navigation("Files");
                 });

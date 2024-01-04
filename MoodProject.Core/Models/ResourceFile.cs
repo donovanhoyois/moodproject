@@ -2,7 +2,7 @@
 
 namespace MoodProject.Core.Models;
 
-public class RessourceFile
+public class ResourceFile
 {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
@@ -10,12 +10,12 @@ public class RessourceFile
     public string Name { get; set; }
     public Uri Uri { get; set; }
 
-    public RessourceFile()
+    public ResourceFile()
     {
         
     }
 
-    public RessourceFile(int ressourceId, string name, Uri uri)
+    public ResourceFile(int ressourceId, string name, Uri uri)
     {
         RessourceId = ressourceId;
         Name = name;

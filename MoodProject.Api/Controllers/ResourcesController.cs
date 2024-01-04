@@ -8,23 +8,23 @@ namespace MoodProject.Api.Controllers;
 [ApiController]
 [Route("api/[controller]/[action]/")]
 [EnableCors]
-public class RessourcesController
+public class ResourcesController
 {
     private readonly MoodProjectContext DbContext;
     
-    public RessourcesController(MoodProjectContext dbContext)
+    public ResourcesController(MoodProjectContext dbContext)
     {
         DbContext = dbContext;
     }
 
     [HttpGet, ActionName("GetAll")]
-    public List<Ressource> GetAll()
+    public List<Resource> GetAll()
     {
         return DbContext.Ressources.ToList();
     }
 
     [HttpGet, ActionName("GetById")]
-    public Ressource? GetById(int id)
+    public Resource? GetById(int id)
     {
         return DbContext.Ressources
             .Include(r => r.Files)
@@ -32,11 +32,11 @@ public class RessourcesController
     }
 
     [HttpPut, ActionName("Create")]
-    public Ressource Create(Ressource ressource)
+    public Resource Create(Resource resource)
     {
-        DbContext.Add(ressource);
+        DbContext.Add(resource);
         DbContext.SaveChanges();
-        return DbContext.Ressources.First(r => r.Id.Equals(ressource.Id));
+        return DbContext.Ressources.First(r => r.Id.Equals(resource.Id));
     }
     
 }

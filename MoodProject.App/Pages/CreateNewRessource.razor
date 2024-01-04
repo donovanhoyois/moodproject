@@ -3,42 +3,41 @@
 @using MoodProject.Core.Models
 @using MoodProject.Core.Ports.In
 @using MoodProject.App.Models
-@using MoodProject.Core
 @using MoodProject.Core.Enums
-@inject IExternalRessourceService ExternalRessourceService
+@inject IResourcesService ResourcesService
 
 @attribute [Authorize]
 
 <h1>Création d'une nouvelle ressource</h1>
-@if (RessourceCreationOperation.Status == OperationResultType.Ok)
+@if (ResourceCreationOperation.Status == OperationResultType.Ok)
 {
-    <SuccessMessage Text="@RessourceCreationOperation.Message"/>
-    <a class="btn btn-primary" href="/ressource/@RessourceCreationOperation.Content.Id">Voir la ressource</a>
+    <SuccessMessage Text="@ResourceCreationOperation.Message"/>
+    <a class="btn btn-primary" href="/resource/@ResourceCreationOperation.Content.Id">Voir la ressource</a>
 }
-else if (RessourceCreationOperation.Status == OperationResultType.Error)
+else if (ResourceCreationOperation.Status == OperationResultType.Error)
 {
-    <ErrorMessage Text="@RessourceCreationOperation.Message" />
+    <ErrorMessage Text="@ResourceCreationOperation.Message" />
 }
-else if (RessourceCreationOperation.Status is OperationResultType.WaitingForUser or OperationResultType.Pending)
+else if (ResourceCreationOperation.Status is OperationResultType.WaitingForUser or OperationResultType.Pending)
 {
-    <EditForm Model="RessourceForm" OnSubmit="RessourceFormSubmit">
+    <EditForm Model="ResourceForm" OnSubmit="RessourceFormSubmit">
         <div class="form-group my-2">
             <label>Titre</label>
-            <InputText @bind-Value="@RessourceForm.Title" class="form-control"/>
+            <InputText @bind-Value="@ResourceForm.Title" class="form-control"/>
         </div>
         <div class="form-group my-2">
             <label>Contenu</label>
-            <InputTextArea @bind-Value="@RessourceForm.Content" class="form-control"/>
+            <InputTextArea @bind-Value="@ResourceForm.Content" class="form-control"/>
         </div>
         <div class="form-group my-2">
             <label>Fichiers</label>
             <InputFile multiple OnChange="@LoadFiles" class="form-control"/>
         </div>
-        @if (RessourceCreationOperation.Status == OperationResultType.Pending)
+        @if (ResourceCreationOperation.Status == OperationResultType.Pending)
         {
             <LoadingText />
         }
-        @if (RessourceCreationOperation.Status == OperationResultType.WaitingForUser)
+        @if (ResourceCreationOperation.Status == OperationResultType.WaitingForUser)
         {
             <button type="button" class="btn btn-primary mt-2" onclick="@RessourceFormSubmit">Valider</button>
         }
@@ -46,9 +45,9 @@ else if (RessourceCreationOperation.Status is OperationResultType.WaitingForUser
 }
 
 @code {
-    private Ressource RessourceForm = new();
+    private Resource ResourceForm = new();
     private HashSet<RessourceFileToUpload> FilesToUpload = new();
-    private OperationResult<Ressource> RessourceCreationOperation = new OperationResult<Ressource>(OperationResultType.WaitingForUser);
+    private OperationResult<Resource> ResourceCreationOperation = new OperationResult<Resource>(OperationResultType.WaitingForUser);
 
     private void LoadFiles(InputFileChangeEventArgs e)
     {
@@ -60,7 +59,7 @@ else if (RessourceCreationOperation.Status is OperationResultType.WaitingForUser
 
     private async Task RessourceFormSubmit()
     {
-        RessourceCreationOperation = new OperationResult<Ressource>(OperationResultType.Pending);
+        ResourceCreationOperation = new OperationResult<Resource>(OperationResultType.Pending);
         var filesWithContent = new List<FileWithContent>();
         foreach (var file in FilesToUpload)
         {
@@ -72,6 +71,6 @@ else if (RessourceCreationOperation.Status is OperationResultType.WaitingForUser
                 filesWithContent.Add(new FileWithContent(file.BrowserFile.Name, Convert.ToBase64String(buffer)));
             }
         }
-        RessourceCreationOperation = await ExternalRessourceService.Create(RessourceForm, filesWithContent);
+        ResourceCreationOperation = await ResourcesService.Create(ResourceForm, filesWithContent);
     }
 }
