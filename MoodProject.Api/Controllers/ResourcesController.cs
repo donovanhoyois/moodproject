@@ -38,5 +38,17 @@ public class ResourcesController
         DbContext.SaveChanges();
         return DbContext.Resources.First(r => r.Id.Equals(resource.Id));
     }
+
+    [HttpDelete, ActionName("Delete")]
+    public bool Delete(int id)
+    {
+        var resource = DbContext.Resources.FirstOrDefault(r => r.Id.Equals(id));
+        if (resource != null)
+        {
+            DbContext.Resources.Remove(resource);
+        }
+
+        return DbContext.SaveChanges() > 0;
+    }
     
 }

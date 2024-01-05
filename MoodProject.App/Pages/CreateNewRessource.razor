@@ -1,4 +1,4 @@
-﻿@page "/Ressources/create"
+﻿@page "/Resources/create"
 @using InputFile = Microsoft.AspNetCore.Components.Forms.InputFile
 @using MoodProject.Core.Models
 @using MoodProject.Core.Ports.In
@@ -26,6 +26,15 @@ else if (ResourceCreationOperation.Status is OperationResultType.WaitingForUser 
             <InputText @bind-Value="@ResourceForm.Title" class="form-control"/>
         </div>
         <div class="form-group my-2">
+            <label>Catégorie</label>
+            <InputSelect @bind-Value="@ResourceForm.Type" placeholder="Type" class="form-control">
+                @foreach (var usage in ResourceForm.TypeDictionary)
+                {
+                    <option value="@usage.Key">@usage.Value</option>
+                }
+            </InputSelect>
+        </div>
+        <div class="form-group my-2">
             <label>Contenu</label>
             <InputTextArea @bind-Value="@ResourceForm.Content" class="form-control"/>
         </div>
@@ -45,9 +54,9 @@ else if (ResourceCreationOperation.Status is OperationResultType.WaitingForUser 
 }
 
 @code {
-    private Resource ResourceForm = new();
+    private ResourceForm ResourceForm = new();
     private HashSet<RessourceFileToUpload> FilesToUpload = new();
-    private OperationResult<Resource> ResourceCreationOperation = new OperationResult<Resource>(OperationResultType.WaitingForUser);
+    private OperationResult<Resource> ResourceCreationOperation = new(OperationResultType.WaitingForUser);
 
     private void LoadFiles(InputFileChangeEventArgs e)
     {
@@ -63,7 +72,6 @@ else if (ResourceCreationOperation.Status is OperationResultType.WaitingForUser 
         var filesWithContent = new List<FileWithContent>();
         foreach (var file in FilesToUpload)
         {
-            Console.WriteLine(file.BrowserFile.Name);
             using (var stream = file.BrowserFile.OpenReadStream(file.BrowserFile.Size))
             {
                 var buffer = new byte[stream.Length];

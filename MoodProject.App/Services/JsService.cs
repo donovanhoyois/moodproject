@@ -11,7 +11,7 @@ public class JsService
         JsRuntime = jsRuntime;
     }
 
-    public async Task Execute(string functionName, string paramArgs)
+    public async Task Execute(string functionName, params object?[] paramArgs)
     {
         await JsRuntime.InvokeVoidAsync(functionName, paramArgs);
     }

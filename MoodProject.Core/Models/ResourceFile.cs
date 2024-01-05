@@ -6,7 +6,7 @@ public class ResourceFile
 {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
-    public int RessourceId { get; set; }
+    public int ResourceId { get; set; }
     public string Name { get; set; }
     public Uri Uri { get; set; }
 
@@ -15,9 +15,9 @@ public class ResourceFile
         
     }
 
-    public ResourceFile(int ressourceId, string name, Uri uri)
+    public ResourceFile(int resourceId, string name, Uri uri)
     {
-        RessourceId = ressourceId;
+        ResourceId = resourceId;
         Name = name;
         Uri = uri;
     }

@@ -5,11 +5,11 @@ using MoodProject.Core.Ports.Out;
 
 namespace MoodProject.Services;
 
-public class AzureBlobStorageFileService : IFileService
+public class FileService : IFileService
 {
     private readonly IAppApi AppApi;
     
-    public AzureBlobStorageFileService(IAppApi appApi)
+    public FileService(IAppApi appApi)
     {
         AppApi = appApi;
     }
@@ -18,5 +18,10 @@ public class AzureBlobStorageFileService : IFileService
     {
         file.Name = file.Name.Replace(" ", "_");
         return await AppApi.UploadFile(file);
+    }
+
+    public async Task<FileWithContent?> Download(int fileId)
+    {
+        return await AppApi.DownloadFile(fileId);
     }
 }

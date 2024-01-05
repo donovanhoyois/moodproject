@@ -167,9 +167,24 @@ public class AppApi : IAppApi
         return await response.Content.ReadFromJsonAsync<Resource>();
     }
 
+    public async Task<bool> DeleteResource(int id)
+    {
+        return await ApiClient.DeleteFromJsonAsync<bool>($"Resources/Delete?id={id}");
+    }
+
     public async Task<string> UploadFile(FileWithContent fileWithContent)
     {
         var response = await ApiClient.PutAsJsonAsync("Files/Upload", fileWithContent);
         return await response.Content.ReadAsStringAsync();
+    }
+
+    public async Task<FileWithContent?> DownloadFile(int id)
+    {
+        return await ApiClient.GetFromJsonAsync<FileWithContent?>($"Files/Download?id={id}");
+    }
+
+    public async Task<bool> DeleteFile(int id)
+    {
+        return await ApiClient.DeleteFromJsonAsync<bool>($"Files/Delete?id={id}");
     }
 }

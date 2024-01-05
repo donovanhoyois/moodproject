@@ -1,0 +1,65 @@
+﻿@page "/Resource/{ResourceId:int}"
+@using MoodProject.Core.Models
+@using MoodProject.Core.Enums
+@using MoodProject.Core.Ports.In
+@using MoodProject.App.Services
+@inject IResourcesService ResourceService
+@inject IFileService FileService
+@inject JsService JsService
+
+@if (ResourceOperation.Status == OperationResultType.Pending)
+{
+    <LoadingText />
+}
+else if (ResourceOperation.Status == OperationResultType.Error)
+{
+    <ErrorMessage Text="@ResourceOperation.Message" />
+}
+else if (ResourceOperation.Status == OperationResultType.Ok)
+{
+    <div class="card">
+        <div class="card-header">
+            @ResourceOperation.Content.Title
+        </div>
+        <div class="card-body">
+            <p class="card-text">@ResourceOperation.Content.Content</p>
+        </div>
+        @if (ResourceOperation.Content.Files.Any())
+        {
+            <div class="card-footer">
+                @foreach (var file in ResourceOperation.Content.Files)
+                {
+                    <div>
+                        <a class="btn btn-primary mx-3 @(FilesDownloading.Contains(file.Id) ? "disabled" : "")" @onclick="() => DownloadFile(file.Id)">Télécharger</a>@file.Name
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int ResourceId { get; set; }
+
+    private OperationResult<Resource> ResourceOperation = new(OperationResultType.Pending);
+
+    private HashSet<int> FilesDownloading = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ResourceOperation = await ResourceService.GetById(ResourceId);
+    }
+
+    private async Task DownloadFile(int fileId)
+    {
+        FilesDownloading.Add(fileId);
+        var file = await FileService.Download(fileId);
+        if (file != null)
+        {
+            await JsService.Execute("FileManager.download", file.Base64Content, file.Name);
+        }
+        FilesDownloading.Remove(fileId);
+    }
+
+}

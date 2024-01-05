@@ -6,6 +6,18 @@ public class FileWithContent
     public string Name { get; set; }
     public string Base64Content { get; set; }
 
+    public FileWithContent()
+    {
+        
+    }
+
+    public FileWithContent(string parentName, string name, string base64Content)
+    {
+        ParentName = parentName;
+        Name = name;
+        Base64Content = base64Content;
+    }
+
     public FileWithContent(string name, string base64Content)
     {
         Name = name;

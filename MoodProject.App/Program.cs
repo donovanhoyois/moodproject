@@ -48,7 +48,7 @@ builder.Services.AddSingleton<IChatRoomsService, ChatRoomsService>();
 builder.Services.AddSingleton<IUsersService, UsersService>();
 builder.Services.AddSingleton<IMedicationService, MedicationService>();
 builder.Services.AddSingleton<INotificationService, NotificationService>();
-builder.Services.AddSingleton<IFileService, AzureBlobStorageFileService>();
+builder.Services.AddSingleton<IFileService, FileService>();
 builder.Services.AddSingleton<IResourcesService, ResourcesService>();
 
 // Blazor-specific services
