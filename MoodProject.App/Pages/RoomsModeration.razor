@@ -158,7 +158,6 @@
             post.Comments ??= new List<ChatRoomComment>();
             
             var updateOperation = await RoomsService.UpdatePost(post);
-            Console.WriteLine(updateOperation.Message);
             if (updateOperation.Status.Equals(OperationResultType.Ok))
             {
                 StateHasChanged();

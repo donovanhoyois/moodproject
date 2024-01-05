@@ -1,5 +1,4 @@
 ﻿(function () {
-    // Note: Replace with your own key pair before deploying
     const applicationServerPublicKey = 'BBX-NVGCKMcssQIN-G5bz7j4XYzZZBkVwtTLpm__iSSitFMehBSqft6vGkMpezgiF186dfLEAoUJk3yTmr8PTBw';
 
     window.blazorPushNotifications = {

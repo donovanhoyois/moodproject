@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MoodProject.Api;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MoodProject.Api.Migrations
 {
     [DbContext(typeof(MoodProjectContext))]
-    partial class MoodProjectContextModelSnapshot : ModelSnapshot
+    [Migration("20240104165701_RessourcesFiles_typo_2")]
+    partial class RessourcesFiles_typo_2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -290,9 +293,6 @@ namespace MoodProject.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.ToTable("Resources");
@@ -310,7 +310,10 @@ namespace MoodProject.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("ResourceId")
+                    b.Property<int?>("ResourceId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RessourceId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Uri")
@@ -455,9 +458,7 @@ namespace MoodProject.Api.Migrations
                 {
                     b.HasOne("MoodProject.Core.Models.Resource", null)
                         .WithMany("Files")
-                        .HasForeignKey("ResourceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ResourceId");
                 });
 
             modelBuilder.Entity("MoodProject.Core.Models.Symptom", b =>

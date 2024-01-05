@@ -1,0 +1,84 @@
+﻿@page "/Resources/create"
+@using InputFile = Microsoft.AspNetCore.Components.Forms.InputFile
+@using MoodProject.Core.Models
+@using MoodProject.Core.Ports.In
+@using MoodProject.App.Models
+@using MoodProject.Core.Enums
+@inject IResourcesService ResourcesService
+
+@attribute [Authorize]
+
+<h1>Création d'une nouvelle ressource</h1>
+@if (ResourceCreationOperation.Status == OperationResultType.Ok)
+{
+    <SuccessMessage Text="@ResourceCreationOperation.Message"/>
+    <a class="btn btn-primary" href="/resource/@ResourceCreationOperation.Content.Id">Voir la ressource</a>
+}
+else if (ResourceCreationOperation.Status == OperationResultType.Error)
+{
+    <ErrorMessage Text="@ResourceCreationOperation.Message" />
+}
+else if (ResourceCreationOperation.Status is OperationResultType.WaitingForUser or OperationResultType.Pending)
+{
+    <EditForm Model="ResourceForm" OnSubmit="RessourceFormSubmit">
+        <div class="form-group my-2">
+            <label>Titre</label>
+            <InputText @bind-Value="@ResourceForm.Title" class="form-control"/>
+        </div>
+        <div class="form-group my-2">
+            <label>Catégorie</label>
+            <InputSelect @bind-Value="@ResourceForm.Type" placeholder="Type" class="form-control">
+                @foreach (var usage in ResourceForm.TypeDictionary)
+                {
+                    <option value="@usage.Key">@usage.Value</option>
+                }
+            </InputSelect>
+        </div>
+        <div class="form-group my-2">
+            <label>Contenu</label>
+            <InputTextArea @bind-Value="@ResourceForm.Content" class="form-control"/>
+        </div>
+        <div class="form-group my-2">
+            <label>Fichiers</label>
+            <InputFile multiple OnChange="@LoadFiles" class="form-control"/>
+        </div>
+        @if (ResourceCreationOperation.Status == OperationResultType.Pending)
+        {
+            <LoadingText />
+        }
+        @if (ResourceCreationOperation.Status == OperationResultType.WaitingForUser)
+        {
+            <button type="button" class="btn btn-primary mt-2" onclick="@RessourceFormSubmit">Valider</button>
+        }
+    </EditForm>
+}
+
+@code {
+    private ResourceForm ResourceForm = new();
+    private HashSet<RessourceFileToUpload> FilesToUpload = new();
+    private OperationResult<Resource> ResourceCreationOperation = new(OperationResultType.WaitingForUser);
+
+    private void LoadFiles(InputFileChangeEventArgs e)
+    {
+        foreach (var file in e.GetMultipleFiles())
+        {
+            FilesToUpload.Add(new RessourceFileToUpload(file));
+        }
+    }
+
+    private async Task RessourceFormSubmit()
+    {
+        ResourceCreationOperation = new OperationResult<Resource>(OperationResultType.Pending);
+        var filesWithContent = new List<FileWithContent>();
+        foreach (var file in FilesToUpload)
+        {
+            using (var stream = file.BrowserFile.OpenReadStream(file.BrowserFile.Size))
+            {
+                var buffer = new byte[stream.Length];
+                await stream.ReadAsync(buffer, 0, (int)stream.Length);
+                filesWithContent.Add(new FileWithContent(file.BrowserFile.Name, Convert.ToBase64String(buffer)));
+            }
+        }
+        ResourceCreationOperation = await ResourcesService.Create(ResourceForm, filesWithContent);
+    }
+}

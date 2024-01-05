@@ -19,6 +19,7 @@ builder.Services.AddSwaggerGen();
 // Configuration
 builder.Services.AddSingleton(provider => provider.GetService<IConfiguration>().GetSection("Authentication:Schemes:Bearer").Get<AuthConfiguration>());
 builder.Services.AddSingleton(provider => provider.GetService<IConfiguration>().GetSection("Notification").Get<NotificationConfiguration>());
+builder.Services.AddSingleton(provider => provider.GetService<IConfiguration>().GetSection("FileStorage").Get<FileStorageConfiguration>());
 
 // Security
 builder.Services.AddAuthorization();

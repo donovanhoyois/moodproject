@@ -30,4 +30,12 @@ public interface IAppApi
     public Task<bool> UpdateMedications(IEnumerable<Medication> medications);
     public Task<bool> DeleteMedications(IEnumerable<Medication> medications);
     public Task<bool> RegisterNewNotificationSubscription(NotificationSubscription notificationSubscription);
+    public Task<IEnumerable<Resource>> GetRessources();
+    public Task<Resource?> GetRessource(int id);
+    public Task<Resource> CreateRessource(Resource resource);
+    public Task<bool> DeleteResource(int id);
+    public Task<string> UploadFile(FileWithContent fileWithContent);
+    public Task<FileWithContent?> DownloadFile(int id);
+    public Task<bool> DeleteFile(int id);
+
 }

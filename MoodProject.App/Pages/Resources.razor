@@ -1,0 +1,74 @@
+﻿@page "/Resources"
+@using MoodProject.Core.Models
+@using MoodProject.Core.Enums
+@using MoodProject.Core.Ports.In
+@using MoodProject.App.Models
+@inject IResourcesService ResourcesService
+
+@if (ResourcesOperation.Status == OperationResultType.Pending)
+{
+    <LoadingText />
+}
+else if (ResourcesOperation.Status == OperationResultType.Error)
+{
+    <InfoMessage Text="@ResourcesOperation.Message" />
+}
+else if (ResourcesOperation.Status == OperationResultType.Ok)
+{
+    foreach (var type in Enum.GetValues(typeof(ResourceType)))
+    {
+        @if (ResourcesOperation.Content.Any(r => r.Type.Equals((ResourceType)type)))
+        {
+            <h2>@ResourceForm.TypeDictionary.First(pair => pair.Key.Equals((ResourceType) type)).Value</h2>
+            foreach (var resource in ResourcesOperation.Content.Where(r => r.Type.Equals((ResourceType) type)))
+            {
+                <div class="card my-3">
+                    <div class="card-header">
+                        @resource.Title
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">
+                            @if (resource.Content.Length > 64)
+                            {
+                                @(new string(resource.Content.Take(64).ToArray()))<span>...</span>
+                            }
+                            else
+                            {
+                                @resource.Content
+                            }
+                        </p>
+                        <p class="card-text">
+                            <a class="btn btn-primary" href="/resource/@resource.Id">Voir</a>
+                            <AuthorizeView Roles="Moderator">
+                                <Authorized>
+                                    <a class="btn btn-danger ms-3" @onclick="() => DeleteResource(resource.Id)">Supprimer</a>
+                                </Authorized>
+                            </AuthorizeView>
+                        </p>
+                    </div>
+                </div>
+            }
+        }
+    }
+}
+<AuthorizeView Roles="Moderator">
+    <Authorized>
+        <a class="btn btn-primary" href="/resources/create">Créer une ressource</a>
+    </Authorized>
+</AuthorizeView>
+
+@code {
+    OperationResult<IEnumerable<Resource>> ResourcesOperation = new(OperationResultType.Pending);
+
+    protected override async Task OnInitializedAsync()
+    {
+        ResourcesOperation = await ResourcesService.GetAll();
+    }
+
+    private async Task DeleteResource(int resourceId)
+    {
+        await ResourcesService.Delete(resourceId);
+        ResourcesOperation = await ResourcesService.GetAll();
+    }
+
+}
