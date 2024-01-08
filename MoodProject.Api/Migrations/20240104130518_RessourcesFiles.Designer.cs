@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MoodProject.Api;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MoodProject.Api.Migrations
 {
     [DbContext(typeof(MoodProjectContext))]
-    partial class MoodProjectContextModelSnapshot : ModelSnapshot
+    [Migration("20240104130518_RessourcesFiles")]
+    partial class RessourcesFiles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -274,7 +277,7 @@ namespace MoodProject.Api.Migrations
                     b.ToTable("QuizzAnswers");
                 });
 
-            modelBuilder.Entity("MoodProject.Core.Models.Resource", b =>
+            modelBuilder.Entity("MoodProject.Core.Models.Ressource", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -290,15 +293,12 @@ namespace MoodProject.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
-                    b.ToTable("Resources");
+                    b.ToTable("Ressources");
                 });
 
-            modelBuilder.Entity("MoodProject.Core.Models.ResourceFile", b =>
+            modelBuilder.Entity("MoodProject.Core.Models.RessourceFile", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -310,7 +310,7 @@ namespace MoodProject.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("ResourceId")
+                    b.Property<int>("RessourceId")
                         .HasColumnType("integer");
 
                     b.Property<string>("Uri")
@@ -319,9 +319,9 @@ namespace MoodProject.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ResourceId");
+                    b.HasIndex("RessourceId");
 
-                    b.ToTable("ResourceFiles");
+                    b.ToTable("RessourceFiles");
                 });
 
             modelBuilder.Entity("MoodProject.Core.Models.Symptom", b =>
@@ -451,11 +451,11 @@ namespace MoodProject.Api.Migrations
                         .HasForeignKey("CustomQuizzQuestionId");
                 });
 
-            modelBuilder.Entity("MoodProject.Core.Models.ResourceFile", b =>
+            modelBuilder.Entity("MoodProject.Core.Models.RessourceFile", b =>
                 {
-                    b.HasOne("MoodProject.Core.Models.Resource", null)
+                    b.HasOne("MoodProject.Core.Models.Ressource", null)
                         .WithMany("Files")
-                        .HasForeignKey("ResourceId")
+                        .HasForeignKey("RessourceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -491,7 +491,7 @@ namespace MoodProject.Api.Migrations
                     b.Navigation("DayUsages");
                 });
 
-            modelBuilder.Entity("MoodProject.Core.Models.Resource", b =>
+            modelBuilder.Entity("MoodProject.Core.Models.Ressource", b =>
                 {
                     b.Navigation("Files");
                 });

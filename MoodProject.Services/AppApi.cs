@@ -1,5 +1,6 @@
 ﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using MoodProject.Core;
 using MoodProject.Core.Configuration;
 using MoodProject.Core.Enums;
 using MoodProject.Core.Models;
@@ -148,5 +149,42 @@ public class AppApi : IAppApi
     {
         var response = await ApiClient.PutAsJsonAsync("NotificationSubscriptions/RegisterNewNotificationSubscription", notificationSubscription);
         return response.IsSuccessStatusCode;
+    }
+
+    public async Task<IEnumerable<Resource>> GetRessources()
+    {
+        return await ApiClient.GetFromJsonAsync<IEnumerable<Resource>>("Resources/GetAll");
+    }
+
+    public async Task<Resource?> GetRessource(int id)
+    {
+        return await ApiClient.GetFromJsonAsync<Resource?>($"Resources/GetById?id={id}");
+    }
+
+    public async Task<Resource> CreateRessource(Resource resource)
+    {
+        var response = await ApiClient.PutAsJsonAsync("Resources/Create", resource);
+        return await response.Content.ReadFromJsonAsync<Resource>();
+    }
+
+    public async Task<bool> DeleteResource(int id)
+    {
+        return await ApiClient.DeleteFromJsonAsync<bool>($"Resources/Delete?id={id}");
+    }
+
+    public async Task<string> UploadFile(FileWithContent fileWithContent)
+    {
+        var response = await ApiClient.PutAsJsonAsync("Files/Upload", fileWithContent);
+        return await response.Content.ReadAsStringAsync();
+    }
+
+    public async Task<FileWithContent?> DownloadFile(int id)
+    {
+        return await ApiClient.GetFromJsonAsync<FileWithContent?>($"Files/Download?id={id}");
+    }
+
+    public async Task<bool> DeleteFile(int id)
+    {
+        return await ApiClient.DeleteFromJsonAsync<bool>($"Files/Delete?id={id}");
     }
 }
