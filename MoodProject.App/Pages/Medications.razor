@@ -1,11 +1,8 @@
 ﻿@page "/Medications"
 
-@attribute [Authorize]
-
 @using MoodProject.Core.Models
 @using MoodProject.Core.Enums
 @using MoodProject.Core.Ports.In
-@using Microsoft.AspNetCore.Components
 @using MoodProject.App.Converters
 @using MoodProject.App.Models
 @using MoodProject.App.Services
@@ -13,7 +10,9 @@
 @inject JsService JsService
 @inject NotificationClient NotificationClient
 
-@inherits MoodProject.App.Shared.Helpers.IdentityHelper
+@inherits BasePage
+
+@attribute [Authorize]
 
 <h1>Vos médicaments</h1>
 <div class="my-3">
@@ -124,7 +123,7 @@
 
     private async Task SubmitMedicationForm()
     {
-        var medication = MedicationFormConverter.ConvertFormToModel(MedicationForm, await GetUserId());
+        var medication = MedicationFormConverter.ConvertFormToModel(MedicationForm, await IdentityService.GetUserId());
         SubmitMedicationFormOperation = await MedicationService.UpdateMedication(medication);
         if (SubmitMedicationFormOperation.Status == OperationResultType.Ok)
         {
@@ -136,10 +135,10 @@
     private async Task ReloadMedications()
     {
         MedicationOperation = new OperationResult<IEnumerable<Medication>>(OperationResultType.Pending);
-        MedicationOperation = await MedicationService.GetMedicationsOfUser(await GetUserId());
+        MedicationOperation = await MedicationService.GetMedicationsOfUser(await IdentityService.GetUserId());
         if (MedicationOperation.Status == OperationResultType.Ok && MedicationOperation.Content.Any(med => med.AreNotificationsEnabled))
         {
-            await NotificationClient.RequestAccess(await GetUserId());
+            await NotificationClient.RequestAccess(await IdentityService.GetUserId());
         }
         StateHasChanged();
     }
@@ -156,7 +155,7 @@
 
     private async Task DeleteMedication()
     {
-        var medication = MedicationFormConverter.ConvertFormToModel(MedicationForm, await GetUserId());
+        var medication = MedicationFormConverter.ConvertFormToModel(MedicationForm, await IdentityService.GetUserId());
         DeleteMedicationOperation = await MedicationService.DeleteMedication(medication);
         if (DeleteMedicationOperation.Status == OperationResultType.Ok)
         {

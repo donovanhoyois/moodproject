@@ -3,13 +3,14 @@
 @using MoodProject.Core.Ports.In
 @using MoodProject.Core.Enums
 @inject IChatRoomsService RoomsService
+@inject IUsersService UsersService
 @inject NavigationManager NavigationManager
 
 @attribute [Authorize]
 
-@inherits MoodProject.App.Shared.Helpers.IdentityHelper
+@inherits BasePage
 
-@switch (roomOperation.Status)
+@switch (RoomOperation.Status)
 {
     case OperationResultType.Pending:
         <div class="spinner-border text-success" role="status">
@@ -18,21 +19,28 @@
         break;
 
     case OperationResultType.Ok:
-        if (roomOperation.Content.Posts.Any(p => p.ModerationStatus == ModerationStatus.Published))
+        if (RoomOperation.Content.Posts.Any(p => p.ModerationStatus == ModerationStatus.Published))
         {
             <table class="table table-hover">
                 <thead class="thead-dark">
                 <tr>
                     <th scope="col">Titre</th>
-                    <th scope="col">Auteur</th>
+                    @if (AuthorMappingOperation.Status == OperationResultType.Ok)
+                    {
+                        <th scope="col">Auteur</th>
+                    }
                 </tr>
                 </thead>
                 <tbody>
-                @foreach (var post in roomOperation.Content.Posts.Where(p => p.ModerationStatus == ModerationStatus.Published))
+                @foreach (var post in RoomOperation.Content.Posts.Where(p => p.ModerationStatus == ModerationStatus.Published))
                 {
                     <tr @onclick="@(()=> NavigationManager.NavigateTo($"/rooms/post/{post.Id}"))">
                         <td>@post.Title</td>
-                        <td>@post.AuthorId</td>
+                        @if (AuthorMappingOperation.Status == OperationResultType.Ok)
+                        {
+                            var nickname = AuthorMappingOperation.Content.First(map => map.Key.Equals(post.AuthorId)).Value;
+                            <td>@(nickname.Equals("x") ? "Utilisateur anonyme" : nickname)</td>
+                        }
                     </tr>
                 }
                 </tbody>
@@ -46,7 +54,7 @@
 
     default:
         <div class="alert alert-danger" role="alert">
-            @roomOperation.Message
+            @RoomOperation.Message
         </div>
         break;
         
@@ -57,20 +65,27 @@
     [Parameter]
     public int Id { get; set; }
 
-    private string userId { get; set; }
+    private OperationResult<ChatRoom> RoomOperation = new(OperationResultType.Pending);
+    private OperationResult<Dictionary<string, string>> AuthorMappingOperation = new(OperationResultType.Pending);
 
-    private OperationResult<ChatRoom> roomOperation = new(OperationResultType.Pending);
-    
 
     protected override async Task OnInitializedAsync()
     {
-        roomOperation = await RoomsService.GetRoomById(Id);
-        userId = await GetUserId();
+        await base.OnInitializedAsync();
+        RoomOperation = await RoomsService.GetRoomById(Id);
+        var authors = new HashSet<string>();
+        if (RoomOperation.Status == OperationResultType.Ok && RoomOperation.Content.Posts.Any())
+        {
+            AuthorMappingOperation = await UsersService.GetUsernamesMapping(
+                RoomOperation.Content.Posts
+                    .GroupBy(p => p.AuthorId)
+                    .Select(grp => grp.First().AuthorId));
+        }
     }
 
     private async Task UpdatePostStatus(int id, ModerationStatus newStatus)
     {
-        var post = roomOperation.Content.Posts.FirstOrDefault(p => p.Id.Equals(id));
+        var post = RoomOperation.Content.Posts.FirstOrDefault(p => p.Id.Equals(id));
         if (post != null)
         {
             post.ModerationStatus = newStatus;

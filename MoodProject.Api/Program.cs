@@ -1,5 +1,4 @@
 using System.Text;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Logging.AzureAppServices;
 using Microsoft.IdentityModel.Tokens;
@@ -9,17 +8,17 @@ using MoodProject.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
+// API
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Configuration
 builder.Services.AddSingleton(provider => provider.GetService<IConfiguration>().GetSection("Authentication:Schemes:Bearer").Get<AuthConfiguration>());
+builder.Services.AddSingleton(provider => provider.GetService<IConfiguration>().GetSection("Authority").Get<AuthorityConfiguration>());
 builder.Services.AddSingleton(provider => provider.GetService<IConfiguration>().GetSection("Notification").Get<NotificationConfiguration>());
 builder.Services.AddSingleton(provider => provider.GetService<IConfiguration>().GetSection("FileStorage").Get<FileStorageConfiguration>());
+
 
 // Security
 builder.Services.AddAuthorization();
@@ -52,14 +51,15 @@ builder.Services.AddLogging(logging =>
 builder.Services.AddSignalR();
 builder.Services.AddHostedService<MedicationsNotifier>();
 
-// Notification Service
+// Services
 builder.Services.AddScoped<NotificationService>();
+builder.Services.AddSingleton<AuthorizationService>();
 
 // CORS Policy
-builder.Services.AddCors(c => c.AddPolicy("dev", builder =>
+builder.Services.AddCors(c => c.AddDefaultPolicy(corsBuilder =>
 {
-    builder
-        .AllowAnyOrigin()
+    corsBuilder
+        .WithOrigins(builder.Configuration.GetSection("Authentication:Schemes:Bearer:ValidAudiences").Get<string[]>() ?? Array.Empty<string>())
         .AllowAnyHeader()
         .AllowAnyMethod();
 }));
@@ -81,11 +81,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors("dev");
+app.UseCors();
 
 app.UseHttpsRedirection();
 
-// SignalR
 app.UseAuthorization();
 
 app.MapHub<NotificationsHub>("notifications");

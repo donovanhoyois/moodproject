@@ -1,9 +1,6 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Text.Json;
-using Microsoft.AspNetCore.Authorization;
+﻿using System.Text.Json;
 using Microsoft.AspNetCore.SignalR;
 using MoodProject.Api.Configuration;
-using MoodProject.Api.Controllers;
 using MoodProject.Api.Interfaces;
 using MoodProject.Core.Models.Notifications;
 using WebPush;
@@ -113,7 +110,6 @@ public sealed class MedicationsNotifier : BackgroundService
             var webPushClient = new WebPushClient();
             try
             {
-                var message = $"Il est l'heure de prendre votre médicament: {notificationToSend.MedicationName}";
                 var payload = JsonSerializer.Serialize(new
                 {
                     notificationToSend,

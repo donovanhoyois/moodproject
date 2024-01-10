@@ -6,7 +6,6 @@ namespace MoodProject.Api;
 
 public class MoodProjectContext : DbContext
 {
-    public DbSet<User> Users { get; set; }
     public DbSet<SymptomType> SymptomTypes { get; set; }
     public DbSet<Symptom> Symptoms { get; set; }
     public DbSet<FactorValue> FactorValues { get; set; }

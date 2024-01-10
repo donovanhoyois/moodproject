@@ -6,7 +6,7 @@
 
 @attribute [Authorize]
 
-@inherits MoodProject.App.Shared.Helpers.IdentityHelper
+@inherits BasePage
 
 @switch(postsHistoryOperation.Status)
 {
@@ -140,8 +140,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        postsHistoryOperation = await RoomsService.GetPostsOfUser(await GetUserId());
-        commentsHistoryOperation = await RoomsService.GetCommentsOfUser(await GetUserId());
+        await base.OnInitializedAsync();
+        postsHistoryOperation = await RoomsService.GetPostsOfUser(await IdentityService.GetUserId());
+        commentsHistoryOperation = await RoomsService.GetCommentsOfUser(await IdentityService.GetUserId());
     }
     
     private string GetPublishedDateFormatted(DateTime dateTime)

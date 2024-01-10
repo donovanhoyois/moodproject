@@ -5,6 +5,8 @@
 @using MoodProject.App.Models
 @inject IResourcesService ResourcesService
 
+@inherits BasePage
+
 @if (ResourcesOperation.Status == OperationResultType.Pending)
 {
     <LoadingText />
@@ -62,6 +64,7 @@ else if (ResourcesOperation.Status == OperationResultType.Ok)
 
     protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
         ResourcesOperation = await ResourcesService.GetAll();
     }
 

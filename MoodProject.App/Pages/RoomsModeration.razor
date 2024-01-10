@@ -6,7 +6,7 @@
 
 @attribute [Authorize(Roles = "Moderator")]
 
-@inherits MoodProject.App.Shared.Helpers.IdentityHelper
+@inherits BasePage
 
 @switch(postsOperation.Status)
 {
@@ -145,6 +145,7 @@
     
     protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
         postsOperation = await RoomsService.GetPosts(ModerationStatus.Pending);
         commentsOperation = await RoomsService.GetComments(ModerationStatus.Pending);
     }

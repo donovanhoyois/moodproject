@@ -1,0 +1,18 @@
+﻿@page "/BasePage"
+@using MoodProject.App.Services
+
+@inject NotificationClient NotificationClient
+
+@code {
+
+    [Inject]
+    protected IdentityService IdentityService { get; init; } = default!;
+    protected override async Task OnInitializedAsync()
+    {
+        if (await IdentityService.IsAuthenticated())
+        {
+            await NotificationClient.Connect(await IdentityService.GetUserId());
+        }
+    }
+
+}

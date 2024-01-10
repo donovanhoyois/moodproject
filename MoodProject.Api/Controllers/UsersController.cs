@@ -1,83 +1,61 @@
-﻿using System.Text;
-using System.Text.Json;
-using System.Text.Json.Nodes;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using MoodProject.Core;
-using MoodProject.Core.Models;
+using MoodProject.Api.Services;
 
 namespace MoodProject.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]/[action]/")]
 [EnableCors]
+[Authorize]
 public class UsersController
 {
     private readonly MoodProjectContext DbContext;
+    private readonly AuthorizationService AuthorizationService;
     
-    public UsersController(MoodProjectContext dbContext)
+    public UsersController(MoodProjectContext dbContext, AuthorizationService authorizationService)
     {
         DbContext = dbContext;
+        AuthorizationService = authorizationService;
     }
     
     [HttpGet, ActionName("GetGDPRConsent")]
-    public bool GetGdprConsent(string authProviderId)
+    public async Task<bool> GetGdprConsent(string authProviderId)
     {
-        return DbContext.Users
-            .FirstOrDefault(u => u.AuthProviderUserId.Equals(authProviderId))?
-            .HasAcceptedGdpr
-               ?? false;
+        return await AuthorizationService.GetGdprStatus(authProviderId);
     }
 
     [HttpPost, ActionName("AcceptGDPR")]
-    public void AcceptGdpr(string authProviderId)
+    public async Task AcceptGdpr(string authProviderId)
     {
-        var user = DbContext.Users
-            .FirstOrDefault(u => u.AuthProviderUserId.Equals(authProviderId));
-        if (user != null)
-        {
-            user.HasAcceptedGdpr = true;
-        }
-        else
-        {
-            var newUser = new User()
-            {
-                AuthProviderUserId = authProviderId,
-                HasAcceptedGdpr = true
-            };
-            DbContext.Users.Add(newUser);
-        }
-        DbContext.SaveChanges();
+        await AuthorizationService.UpdateGdprStatus(authProviderId, true);
     }
-}
-/* 
- 
-                                    <!>
-        KEEP CODE IN CASE THIS IS USEFUL LATER TO USE THE AUTH0 API
-                                    <!>
- 
- */
-public static class Helper{
     
-    private static async Task<string> GetToken(HttpClient httpClient)
+    [HttpGet, ActionName("GetHasChosenNickname")]
+    public async Task<bool> GetHasChosenNickname(string authProviderId)
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, "https://dev-s3pebaupby0iyub8.us.auth0.com/oauth/token");
-        request.Content = new StringContent("{\"client_id\":\"HhYYUECtqYEWgaGIb7OYUn8uFPbigS5d\",\"client_secret\":\"2pJejsYtf-eXORa5lRKg8AirOJalFgHIPFEkpBKNy1vJ5BEDeE3LWQWjzi87yZdB\",\"audience\":\"https://dev-s3pebaupby0iyub8.us.auth0.com/api/v2/\",\"grant_type\":\"client_credentials\"}", Encoding.UTF8, "application/json");
-        var response = await httpClient.SendAsync(request);
-        var responseString = await response.Content.ReadAsStringAsync();
-        var token = JsonSerializer.Deserialize<JsonNode>(responseString)["access_token"].ToString();
-        return token;
+        return await AuthorizationService.GetHasChosenNickname(authProviderId);
     }
-    public static async Task<string> GetUserId(string mail, HttpClient httpClient)
+    
+    [HttpGet, ActionName("GetNickname")]
+    public async Task<string> GetNickname(string authProviderId)
     {
-        var token = await GetToken(httpClient);
-        
-        var request = new HttpRequestMessage(HttpMethod.Get, $"https://dev-s3pebaupby0iyub8.us.auth0.com/api/v2/users-by-email?email={mail}");
-        request.Headers.Add("authorization", $"Bearer {token}");
-        var response = await httpClient.SendAsync(request);
-        var responseString = await response.Content.ReadAsStringAsync();
-        var userId = JsonSerializer.Deserialize<JsonNode>(responseString)[0]["identities"][0]["user_id"].ToString();
-        return userId;
+        return await AuthorizationService.GetNickname(authProviderId);
+    }
+
+    [HttpPost, ActionName("UpdateNickname")]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(403)]
+    public async Task<IActionResult> UpdateNickname(string authProviderId, string nickname)
+    {
+        var updateResponse = await AuthorizationService.UpdateNickname(authProviderId, nickname);
+        return new StatusCodeResult((int) updateResponse);
+    }
+
+    [HttpPost, ActionName("GetUsernamesMapping")]
+    public async Task<Dictionary<string, string>> GetUsernamesMapping(List<string> userIds)
+    {
+        return await AuthorizationService.GetUsernames(userIds);
     }
 }

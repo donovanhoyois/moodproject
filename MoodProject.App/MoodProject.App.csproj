@@ -32,14 +32,11 @@
 
   <ItemGroup>
     <_ContentIncludedByDefault Remove="wwwroot\sample-data\weather.json" />
+    <_ContentIncludedByDefault Remove="Shared\Helpers\IdentityHelper.razor" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="wwwroot\js\CircleProgress.js" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Models\Notifications\" />
   </ItemGroup>
 
 </Project>

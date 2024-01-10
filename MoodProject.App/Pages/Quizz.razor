@@ -8,7 +8,7 @@
 @inject IQuizzService QuizzService
 @inject IQuizzGenerator QuizzGenerator
 
-@inherits MoodProject.App.Shared.Helpers.IdentityHelper
+@inherits BasePage
 
 <PageTitle>Questionnaire</PageTitle>
 <h1>Questionnaire</h1>
@@ -50,7 +50,8 @@
     
     protected override async Task OnInitializedAsync()
     {
-        quizzQuestionsOperation = await QuizzGenerator.Generate(await GetUserId());
+        await base.OnInitializedAsync();
+        quizzQuestionsOperation = await QuizzGenerator.Generate(await IdentityService.GetUserId());
         if (quizzQuestionsOperation.Status == OperationResultType.Ok)
         {
             quizz = new QuizzForm(quizzQuestionsOperation.Content);

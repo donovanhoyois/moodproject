@@ -1,11 +1,58 @@
 ﻿@page "/"
+@inject NavigationManager Navigation
 
-@inherits IdentityHelper
+@inherits BasePage
 
-<PageTitle>Index</PageTitle>
+<h1>Bienvenue !</h1>
+<p>vigilance-mentale.be est une application venant en aide aux personnes schizophrènes</p>
+<div class="accordion" id="accordionExample">
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+        Vous êtes schizophrène ?
+      </button>
+    </h2>
+    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <p>
+          Les rechutes, aussi appelées décompensations, sont parfois difficiles à repérer, c'est pourquoi nous vous proposons un questionnaire régulier adapté à vos symptomes et à votre état de santé général.
+        </p>
+        <p>
+          Si vous souhaitez utiliser l'application, inscrivez-vous et commencez par renseigner vos symptômes.
+        </p>
+        <p>
+          Après cela, il ne vous restera plus qu'à répondre à votre tout premier questionnaire !
+        </p>
+        <button class="btn btn-primary" @onclick='(() => Navigation.NavigateTo("/authentication/login"))'>S'inscrire</button>
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+        Vous connaissez une personne schizophréne ?
+      </button>
+    </h2>
+    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+      <div class="accordion-body">
+        <p>
+          Des ressources publiques sont accessibles pour vous si vous souhaitez mieux comprendre cette maladie.
+        </p>
+        <button class="btn btn-primary" @onclick='(() => Navigation.NavigateTo("/resources"))'>Voir les ressources</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-<h1>Bienvenue</h1>
+@code{
 
-Welcome to your new app.
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        if (await IdentityService.IsAuthenticated())
+        {
+            Navigation.NavigateTo("/profile");
+        }
+    }
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+}

@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Http.HttpResults;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using MoodProject.Core;
 using MoodProject.Core.Models;
 
 namespace MoodProject.Api.Controllers;
@@ -9,6 +8,7 @@ namespace MoodProject.Api.Controllers;
 [ApiController]
 [Route("api/[controller]/[action]/")]
 [EnableCors()]
+[Authorize]
 public class SymptomsTypesController
 {
     private MoodProjectContext DbContext;

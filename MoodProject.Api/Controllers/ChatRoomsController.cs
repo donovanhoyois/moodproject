@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MoodProject.Core.Enums;
@@ -9,6 +10,7 @@ namespace MoodProject.Api.Controllers;
 [ApiController]
 [Route("api/[controller]/[action]/")]
 [EnableCors]
+[Authorize]
 public class ChatRoomsController
 {
 	private readonly MoodProjectContext DbContext;

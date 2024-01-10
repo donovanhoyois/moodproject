@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Cors;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using MoodProject.Core.Models.Notifications;
 
@@ -7,6 +8,7 @@ namespace MoodProject.Api.Controllers;
 [ApiController]
 [Route("api/[controller]/[action]/")]
 [EnableCors]
+[Authorize]
 public class NotificationSubscriptionsController
 {
     private readonly ILogger<MedicationsController> Logger;

@@ -4,9 +4,10 @@
 @using MoodProject.Core.Enums
 @inject IChatRoomsService RoomsService
 
+@inherits BasePage
+
 @attribute [Authorize]
 
-@inherits MoodProject.App.Shared.Helpers.IdentityHelper
 
 @switch(roomListOperation.Status)
 {
@@ -56,7 +57,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        roomListOperation = (await RoomsService.GetRooms(await GetUserId()));
+        await base.OnInitializedAsync();
+        roomListOperation = (await RoomsService.GetRooms(await IdentityService.GetUserId()));
     }
 
     private string GetPublishedDateFormatted(DateTime dateTime)
