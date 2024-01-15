@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Net.Http.Json;
-using MoodProject.Core;
-using MoodProject.Core.Models;
+﻿using MoodProject.Core.Models;
 using MoodProject.Core.Ports.In;
 using MoodProject.Core.Ports.Out;
 

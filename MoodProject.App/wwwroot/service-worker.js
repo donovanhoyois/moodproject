@@ -8,7 +8,7 @@ self.addEventListener('push', event => {
     event.waitUntil(
         self.registration.showNotification(payload.notificationToSend.Title, {
             body: payload.notificationToSend.Content,
-            icon: 'img/icon-512.png',
+            icon: 'img/logo.png',
             vibrate: [100, 50, 100],
             data: { url: payload.url }
         })

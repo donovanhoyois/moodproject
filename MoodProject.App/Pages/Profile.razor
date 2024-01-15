@@ -1,7 +1,6 @@
 ﻿@page "/Profile"
 @using MoodProject.Core.Ports.In
 @using MoodProject.App.Models
-@using Microsoft.AspNetCore.Components
 @using MoodProject.Core.Enums
 @using MoodProject.Core.Models
 @using ChartJs.Blazor;
@@ -10,13 +9,17 @@
 @using ChartJs.Blazor.Common.Axes
 @using ChartJs.Blazor.Common.Enums
 @using ChartJs.Blazor.Util
+@using MoodProject.App.Services
+@using System.Net
 @inject ISymptomsTypesService TypesService
 @inject ISymptomsService SymptomsService
 @inject IHealthService HealthService
+@inject IUsersService UsersService
+@inject JsService JsService
 
 @attribute [Authorize]
 
-@inherits MoodProject.App.Shared.Helpers.IdentityHelper
+@inherits BasePage
 
 <h1>Votre profil</h1>
 <div class="symptoms my-3">
@@ -24,30 +27,51 @@
       <div class="card-header">
         Vos symptomes
       </div>
-      <div class="card-body">
-          <p class="card-text">Vous pouvez modifier les symptomes qui seront suivis à tout moment.</p>
-          <EditForm Model="_symptomTypesForm" OnSubmit="SymptomsSubmit" Context="formContext">
-              @foreach (var type in _symptomTypesForm.symptomsTypesCheckboxes)
-              {
-                  <div class="form-check">
-                      <InputCheckbox @bind-Value="@type.IsChecked" DisplayName="@type.Name" class="form-check-input"/>
-                      <label class="form-check-label">
-                          @type.Name
-                      </label>
-                  </div>
-              }
-              <br />
-              @if (SymptomsFormOperation.Status == OperationResultType.Ok)
-              {
-                  <SuccessMessage Text="@SymptomsFormOperation.Message"/>
-              }
-              @if (SymptomsFormOperation.Status == OperationResultType.Error)
-              {
-                  <ErrorMessage Text="@SymptomsFormOperation.Message"/>
-              }
-              <button type="button" class="btn btn-success p-2" onclick="@SymptomsSubmit">Valider</button>
-          </EditForm>
-      </div>
+        <div class="card-body">
+            <p class="card-text">Vous pouvez modifier les symptomes qui seront suivis à tout moment.</p>
+            <EditForm Model="_symptomTypesForm" OnSubmit="SymptomsSubmit" Context="formContext">
+                @foreach (var type in _symptomTypesForm.symptomsTypesCheckboxes)
+                {
+                    <div class="form-check">
+                        <InputCheckbox @bind-Value="@type.IsChecked" DisplayName="@type.Name" class="form-check-input"/>
+                        <label class="form-check-label">
+                            @type.Name
+                        </label>
+                    </div>
+                }
+                <br />
+                @if (SymptomsFormOperation.Status == OperationResultType.Ok)
+                {
+                    <SuccessMessage Text="@SymptomsFormOperation.Message"/>
+                }
+                @if (SymptomsFormOperation.Status == OperationResultType.Error)
+                {
+                    <ErrorMessage Text="@SymptomsFormOperation.Message"/>
+                }
+                <button type="button" class="btn btn-success p-2" onclick="@SymptomsSubmit">Valider</button>
+            </EditForm>
+        </div>
+        <div class="card-header">
+            Votre surnom
+        </div>
+        <div class="card-body">
+            <p>Choisissez le surnom qui sera associé à vos publications et vos commentaires dans les différents espaces de discussion.</p>
+            <p>Vous pouvez également être anonyme en cliquant sur le bouton "Rester anonyme".</p>
+            <EditForm Model="@NewNicknameForm" OnSubmit="() => NicknameSubmit(false)">
+                <label>Surnom: </label>
+                <InputText @bind-Value="@NewNicknameForm.Nickname" class="form-control mb-3"></InputText>
+                @if (UpdateNicknameOperation.Status == OperationResultType.Error)
+                {
+                    <ErrorMessage Text="@UpdateNicknameOperation.Message" />
+                }
+                @if (UpdateNicknameOperation.Status == OperationResultType.Ok)
+                {
+                    <SuccessMessage Text="@UpdateNicknameOperation.Message" />
+                }
+                <button type="submit" class="btn btn-success">Confirmer</button>
+                <button type="button" class="btn btn-secondary mx-3" data-bs-dismiss="modal" @onclick="() => NicknameSubmit(true)">Rester anonyme</button>
+            </EditForm>
+        </div>
     </div>
 </div>
 <div class="health-average my-3">
@@ -88,23 +112,35 @@
 
 @code {
 
-    private List<SymptomType> symptomsTypes = new List<SymptomType>();
-    private List<Symptom> symptoms = new List<Symptom>();
-    private SymptomsTypesForm _symptomTypesForm = new SymptomsTypesForm(new List<SymptomType>());
+    private List<SymptomType> symptomsTypes = new();
+    private List<Symptom> symptoms = new();
+    private SymptomsTypesForm _symptomTypesForm = new(new List<SymptomType>());
+    private NewNicknameForm NewNicknameForm = new();
 
     private LineConfig graphConfig;
     private bool ShowGraph = false;
 
-    private OperationResult<bool> SymptomsFormOperation = new OperationResult<bool>(OperationResultType.WaitingForUser);
-    private OperationResult<float> healthAveragePercentageOperation = new OperationResult<float>(OperationResultType.Pending);
+    private OperationResult<bool> SymptomsFormOperation = new(OperationResultType.WaitingForUser);
+    private OperationResult<HttpStatusCode> UpdateNicknameOperation { get; set; } = new(OperationResultType.WaitingForUser);
     
+    private OperationResult<float> healthAveragePercentageOperation = new(OperationResultType.Pending);
+    private OperationResult<string> CurrentNicknameOperation = new(OperationResultType.Pending);
+
     protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
         _symptomTypesForm = new SymptomsTypesForm((await TypesService.GetAll()).ToList());
-        symptoms = (await SymptomsService.GetSymptomsWithHistory(await GetUserId())).ToList();
+        symptoms = (await SymptomsService.GetSymptomsWithHistory(await IdentityService.GetUserId())).ToList();
         
         CheckRetrievedSymptoms();
         CalculateHealthAverages();
+        CurrentNicknameOperation = await UsersService.GetNickname(await IdentityService.GetUserId());
+        if (CurrentNicknameOperation.Status == OperationResultType.Ok)
+        {
+            NewNicknameForm.Nickname = CurrentNicknameOperation.Content == "x"
+                ? string.Empty
+                : CurrentNicknameOperation.Content;
+        }
 
         if (healthAveragePercentageOperation.Status == OperationResultType.Ok)
         {
@@ -131,7 +167,7 @@
     /// <summary>
     /// Submit the checkboxes form
     /// </summary>
-        private async Task SymptomsSubmit()
+    private async Task SymptomsSubmit()
     {
         var updatedSymptomsList = new List<Symptom>();
         foreach (var symptomType in _symptomTypesForm.symptomsTypesCheckboxes.Where(symptomType => symptomType.IsChecked))
@@ -140,11 +176,28 @@
             {
                 Type = symptomType,
                 TypeId = symptomType.Id,
-                UserId = await GetUserId(),
+                UserId = await IdentityService.GetUserId(),
                 ValuesHistory = new List<FactorValue>()
             });
         }
         SymptomsFormOperation = await SymptomsService.SaveSymptoms(updatedSymptomsList);
+    }
+
+    /// <summary>
+    /// Submit the nickname form
+    /// </summary>
+    private async Task NicknameSubmit(bool anonymous)
+    {
+        if (anonymous)
+        {
+            NewNicknameForm.Nickname = string.Empty;
+        }
+        UpdateNicknameOperation = await UsersService.UpdateNickname(await IdentityService.GetUserId(), anonymous ? "x" : NewNicknameForm.Nickname);
+        StateHasChanged();
+        if (UpdateNicknameOperation.Status == OperationResultType.Ok)
+        {
+            await JsService.Execute("BootstrapManager.closeModal", "#newNicknameModal");
+        }
     }
 
     private void CalculateHealthAverages()

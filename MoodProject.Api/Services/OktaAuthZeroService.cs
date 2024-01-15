@@ -1,11 +1,7 @@
-﻿using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using MoodProject.Api.Interfaces;
-using MoodProject.Core;
-using MoodProject.Core.Ports.In;
 using StringContent = System.Net.Http.StringContent;
 
 namespace MoodProject.Services;

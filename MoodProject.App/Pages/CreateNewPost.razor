@@ -1,14 +1,37 @@
 ﻿@page "/rooms/{RoomId:int}/create"
 @using MoodProject.Core.Models
 @using MoodProject.App.Models
+@using MoodProject.App.Services
 @using MoodProject.Core.Enums
 @using MoodProject.Core.Ports.In
+@using System.Net
 @inject IChatRoomsService RoomsService
+@inject IUsersService UsersService
+@inject JsService JsService
+
+@inherits BasePage
 
 @attribute [Authorize]
 
-@inherits MoodProject.App.Shared.Helpers.IdentityHelper
-
+<Modal
+    Id="newNicknameModal"
+    PrimaryButtonText="Confirmer"
+    SecondaryButtonText="Rester anonyme"
+    Title="Choisissez votre surnom"
+    OnPrimaryButtonClick="@(async () => await SubmitNewNickname(false))"
+    OnSecondaryButtonClick="@(async () => await SubmitNewNickname(true))">
+    @if (UpdateNicknameOperation.Status == OperationResultType.Error)
+    {
+        <p>erreur</p>
+        <ErrorMessage Text="@UpdateNicknameOperation.Message" />
+    }
+    <p>Le surnom sera associé aux publications et commentaires que vous publierez sur l'application.</p>
+    <p>Si vous ne souhaitez pas de surnom, vous pouvez choisir de rester anonyme en cliquant sur le bouton "Rester anonyme"</p>
+    <EditForm Model="@NewNicknameForm">
+        <label>Surnom: </label>
+        <InputText @bind-Value="@NewNicknameForm.Nickname" class="form-control"></InputText>
+    </EditForm>
+</Modal>
 @if (CreateNewPostOperation.Status is OperationResultType.WaitingForUser or OperationResultType.Error)
 {
     <EditForm Model="postForm" OnSubmit="Submit" Context="formContext">
@@ -44,25 +67,56 @@
     public int RoomId { get; set; }
 
     private NewChatRoomPostForm postForm { get; set; } = new();
+    private NewNicknameForm NewNicknameForm { get; set; } = new();
 
     private OperationResult<ChatRoomPost> CreateNewPostOperation { get; set; } = new(OperationResultType.WaitingForUser);
+    private OperationResult<HttpStatusCode> UpdateNicknameOperation { get; set; } = new(OperationResultType.WaitingForUser);
+    
+    private OperationResult<bool> HasChosenNicknameOperation = new(OperationResultType.Pending);
+
+    protected override async Task OnInitializedAsync()
+    {
+        HasChosenNicknameOperation = await UsersService.GetHasChosenNickname(await IdentityService.GetUserId());
+    }
 
     private async Task Submit()
     {
-        if (!postForm.MandatoryBoxIsChecked)
+        if (HasChosenNicknameOperation.Status == OperationResultType.Ok && !HasChosenNicknameOperation.Content)
         {
-            CreateNewPostOperation = new OperationResult<ChatRoomPost>(OperationResultType.Error)
-            {
-                Message = "Vous devez accepter le réglement avant de publier dans cet espace de discussion."
-            };
-            return;
+            await JsService.Execute("BootstrapManager.openModal", "#newNicknameModal");
         }
-        postForm.ChatRoomId = RoomId;
-        postForm.AuthorId = await GetUserId();
-        postForm.ModerationStatus = ModerationStatus.Pending;
-        postForm.PublishedDate = DateTime.Now;
-        postForm.Comments = new List<ChatRoomComment>();
+        else
+        {
+            if (!postForm.MandatoryBoxIsChecked)
+            {
+                CreateNewPostOperation = new OperationResult<ChatRoomPost>(OperationResultType.Error)
+                {
+                    Message = "Vous devez accepter le réglement avant de publier dans cet espace de discussion."
+                };
+                return;
+            }
+            postForm.ChatRoomId = RoomId;
+            postForm.AuthorId = await IdentityService.GetUserId();
+            postForm.ModerationStatus = ModerationStatus.Pending;
+            postForm.PublishedDate = DateTime.Now;
+            postForm.Comments = new List<ChatRoomComment>();
 
-        CreateNewPostOperation = await RoomsService.CreatePost(postForm);
+            CreateNewPostOperation = await RoomsService.CreatePost(postForm);
+        }
+    }
+    
+    private async Task SubmitNewNickname(bool anonymous)
+    {
+        if (anonymous)
+        {
+            NewNicknameForm.Nickname = "x";
+        }
+        UpdateNicknameOperation = await UsersService.UpdateNickname(await IdentityService.GetUserId(), NewNicknameForm.Nickname);
+        StateHasChanged();
+        if (UpdateNicknameOperation.Status == OperationResultType.Ok)
+        {
+            HasChosenNicknameOperation = await UsersService.GetHasChosenNickname(await IdentityService.GetUserId());
+            await JsService.Execute("BootstrapManager.closeModal", "#newNicknameModal");
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using MoodProject.Core.Enums;
+﻿using System.Net;
+using MoodProject.Core.Enums;
 using MoodProject.Core.Models;
 using MoodProject.Core.Models.Notifications;
 
@@ -26,6 +27,10 @@ public interface IAppApi
     public Task<bool> UpdateComment(ChatRoomComment comment);
     public Task<bool> GetGdprConsent(string authProviderId);
     public Task<bool> AcceptGdpr(string authProviderId);
+    public Task<bool> GetHasChosenNickanme(string authProviderId);
+    public Task<string> GetUsername(string authProviderId);
+    public Task<HttpStatusCode> UpdateNickname(string authProviderId, string newNickname);
+    public Task<Dictionary<string, string>> GetUsernamesMapping(IEnumerable<string> userIds);
     public Task<IEnumerable<Medication>> GetMedicationsByUserId(string userId);
     public Task<bool> UpdateMedications(IEnumerable<Medication> medications);
     public Task<bool> DeleteMedications(IEnumerable<Medication> medications);

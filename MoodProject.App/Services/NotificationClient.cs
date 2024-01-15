@@ -1,9 +1,7 @@
-﻿using System.Text.Json;
-using Microsoft.AspNetCore.SignalR.Client;
+﻿using Microsoft.AspNetCore.SignalR.Client;
 using MoodProject.App.Configuration;
 using MoodProject.Core.Models.Notifications;
 using MoodProject.Core.Ports.In;
-using WebPush;
 
 namespace MoodProject.App.Services;
 
@@ -36,7 +34,7 @@ public class NotificationClient : IAsyncDisposable
     
     public async Task Connect(string userId)
     {
-        var token = await CacheService.GetApiToken(userId, refreshToken: true);
+        var token = await CacheService.GetApiToken(userId, true);
         
         HubConnection = new HubConnectionBuilder()
             .WithUrl(

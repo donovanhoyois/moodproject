@@ -3,7 +3,6 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using MoodProject.Api.Configuration;
 using MoodProject.Core.Models;
 
@@ -17,7 +16,7 @@ public class FilesController
     private readonly ILogger<FilesController> Logger;
     private readonly MoodProjectContext DbContext;
     private BlobServiceClient BlobServiceClient { get; set; }
-    private string RessourcesFolderName { get; init; }
+    private string ResourcesFolderName { get; init; }
     
     public FilesController(ILogger<FilesController> logger, MoodProjectContext dbContext, FileStorageConfiguration fileStorageConfiguration)
     {
@@ -26,13 +25,13 @@ public class FilesController
         BlobServiceClient = new BlobServiceClient(
             new Uri(fileStorageConfiguration.Url),
             new StorageSharedKeyCredential(fileStorageConfiguration.AccountName, fileStorageConfiguration.AccountKey));
-        RessourcesFolderName = fileStorageConfiguration.ExternalRessourcesFolderName;
+        ResourcesFolderName = fileStorageConfiguration.ExternalRessourcesFolderName;
     }
 
     [HttpPut, ActionName("Upload")]
     public async Task<string> Upload(FileWithContent file)
     {
-        var blobContainerClient = BlobServiceClient.GetBlobContainerClient(RessourcesFolderName);
+        var blobContainerClient = BlobServiceClient.GetBlobContainerClient(ResourcesFolderName);
         await blobContainerClient.CreateIfNotExistsAsync();
         var blobClient = blobContainerClient.GetBlobClient($"{file.ParentName}/{file.Name}");
         using (var stream = new MemoryStream(Convert.FromBase64String(file.Base64Content)))
@@ -57,7 +56,7 @@ public class FilesController
 
         try
         {
-            var blobContainerClient = BlobServiceClient.GetBlobContainerClient(RessourcesFolderName);
+            var blobContainerClient = BlobServiceClient.GetBlobContainerClient(ResourcesFolderName);
             var blobClient = blobContainerClient.GetBlobClient($"{file.ResourceId}/{file.Name}");
             var download = await blobClient.DownloadContentAsync();
             
@@ -78,7 +77,7 @@ public class FilesController
         if (file != null)
         {
             // Remove file from Azure Blob Storage
-            var blobContainerClient = BlobServiceClient.GetBlobContainerClient(RessourcesFolderName);
+            var blobContainerClient = BlobServiceClient.GetBlobContainerClient(ResourcesFolderName);
             var blobClient = blobContainerClient.GetBlobClient($"{file.ResourceId}/{file.Name}");
             await blobClient.DeleteAsync(snapshotsOption: DeleteSnapshotsOption.IncludeSnapshots);
             

@@ -1,26 +1,21 @@
-﻿@* Client/Pages/Authentication.razor *@
-
-@page "/authentication/{action}"
+﻿@page "/authentication/{action}"
 @using MoodProject.Core.Ports.In
 @using MoodProject.App.Services
+@using MoodProject.Core.Configuration
 
 @inject IUsersService UsersService
-@inject IConfiguration Configuration
-@inject IApiAuthService ApiAuthService
 @inject NavigationManager Navigation
-@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject CacheService CacheService
+@inject IdentityService IdentityService
+@inject AuthConfiguration AuthConfiguration
 
-@inherits IdentityHelper
+@inherits BasePage
 
 <IdentityHelper />
 <RemoteAuthenticatorView Action="@Action">
     <LogOut>
         @{
-            var authority = (string)Configuration["Auth0:Authority"];
-            var clientId = (string)Configuration["Auth0:ClientId"];
-
-            Navigation.NavigateTo($"{authority}/v2/logout?client_id={clientId}");
+            Navigation.NavigateTo($"{AuthConfiguration.Authority}/v2/logout?client_id={AuthConfiguration.ClientId}");
         }
     </LogOut>
     <CompletingLoggingIn>
@@ -43,11 +38,17 @@
     protected override async Task OnParametersSetAsync()
     {
         await AuthenticationStateTask;
-        if (Action.Equals("login-callback") && await IsAuthenticated())
+        if (Action.Equals("login-callback") && await IdentityService.IsAuthenticated())
         {
-            var hasAcceptedGdpr = await UsersService.GetGdprConsent(await GetUserId());
-            await CacheService.GetApiToken(await GetUserId(), true);
-            Navigation.NavigateTo(!hasAcceptedGdpr ? "/gdpr" : "/profile");
+            var hasAcceptedGdpr = await UsersService.GetGdprConsent(await IdentityService.GetUserId());
+            Console.WriteLine("refreshing");
+            await CacheService.GetApiToken(await IdentityService.GetUserId(), true);
+            Navigation.NavigateTo(!hasAcceptedGdpr.Content ? "/gdpr" : "/profile");
+        }
+
+        if (Action.Equals("logged-out"))
+        {
+            Navigation.NavigateTo("/");
         }
     }
 }

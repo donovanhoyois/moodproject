@@ -2,6 +2,10 @@
     window.BootstrapManager = {
         closeModal: (modalId) => {
             $(modalId).modal('hide');
+        },
+        openModal: (modalId) => {
+            console.log(modalId)
+            $(modalId).modal('show');
         }
     }
     window.FileManager = {

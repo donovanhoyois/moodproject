@@ -15,14 +15,14 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddTransient<HttpClient>(sp => new HttpClient());
+// HttpClient
+builder.Services.AddScoped<HttpClient>(sp => new HttpClient());
 
 // Auth0
 builder.Services.AddOidcAuthentication(options =>
 {
     builder.Configuration.Bind("Auth0", options.ProviderOptions);
     options.ProviderOptions.ResponseType = "code";
-    //options.ProviderOptions.AdditionalProviderParameters.Add("audience", builder.Configuration["Auth0:Audience"]);
 });
 builder.Services.AddScoped(typeof(AccountClaimsPrincipalFactory<RemoteUserAccount>), typeof(CustomAccountFactory));
 
@@ -31,30 +31,30 @@ builder.Services.AddSingleton(provider => provider.GetService<IConfiguration>().
 builder.Services.AddSingleton(provider => provider.GetService<IConfiguration>().GetSection("Cache").Get<CacheConfiguration>());
 builder.Services.AddSingleton(provider => provider.GetService<IConfiguration>().GetSection("Notifications").Get<NotificationsConfiguration>());
 builder.Services.AddSingleton(provider => provider.GetService<IConfiguration>().GetSection("Quizz").Get<QuizzConfiguration>());
-
-
-// External Services
-builder.Services.AddBlazoredLocalStorageAsSingleton();
+builder.Services.AddSingleton(provider => provider.GetService<IConfiguration>().GetSection("Auth0").Get<AuthConfiguration>());
 
 // Services
-builder.Services.AddSingleton<IAppApi, AppApi>();
-builder.Services.AddSingleton<IApiAuthService, ApiAuthService>();
-builder.Services.AddSingleton<ISymptomsTypesService, SymptomsTypesService>();
-builder.Services.AddSingleton<ISymptomsService, SymptomsService>();
-builder.Services.AddSingleton<IQuizzService, QuizzService>();
-builder.Services.AddSingleton<IQuizzGenerator, QuizzGenerator>();
-builder.Services.AddSingleton<IHealthService, HealthService>();
-builder.Services.AddSingleton<IChatRoomsService, ChatRoomsService>();
-builder.Services.AddSingleton<IUsersService, UsersService>();
-builder.Services.AddSingleton<IMedicationService, MedicationService>();
-builder.Services.AddSingleton<INotificationService, NotificationService>();
-builder.Services.AddSingleton<IFileService, FileService>();
-builder.Services.AddSingleton<IResourcesService, ResourcesService>();
+builder.Services.AddScoped<IAppApi, AppApi>();
+builder.Services.AddScoped<IApiAuthService, ApiAuthService>();
+builder.Services.AddScoped<ISymptomsTypesService, SymptomsTypesService>();
+builder.Services.AddScoped<ISymptomsService, SymptomsService>();
+builder.Services.AddScoped<IQuizzService, QuizzService>();
+builder.Services.AddScoped<IQuizzGenerator, QuizzGenerator>();
+builder.Services.AddScoped<IHealthService, HealthService>();
+builder.Services.AddScoped<IChatRoomsService, ChatRoomsService>();
+builder.Services.AddScoped<IUsersService, UsersService>();
+builder.Services.AddScoped<IMedicationService, MedicationService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<IResourcesService, ResourcesService>();
 
 // Blazor-specific services
 builder.Services.AddScoped<IdentityService>();
 builder.Services.AddScoped<CacheService>();
 builder.Services.AddScoped<JsService>();
 builder.Services.AddScoped<NotificationClient>();
+
+// External Services
+builder.Services.AddBlazoredLocalStorageAsSingleton();
 
 await builder.Build().RunAsync();

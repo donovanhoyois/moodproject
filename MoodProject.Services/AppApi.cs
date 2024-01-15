@@ -1,6 +1,6 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using MoodProject.Core;
 using MoodProject.Core.Configuration;
 using MoodProject.Core.Enums;
 using MoodProject.Core.Models;
@@ -118,14 +118,35 @@ public class AppApi : IAppApi
 
     public async Task<bool> GetGdprConsent(string authProviderId)
     {
-        var response = await ApiClient.GetFromJsonAsync<bool>($"Users/GetGdprConsent?authProviderId={authProviderId}");
-        return response;
+        return await ApiClient.GetFromJsonAsync<bool>($"Users/GetGdprConsent?authProviderId={authProviderId}");
     }
 
     public async Task<bool> AcceptGdpr(string authProviderId)
     {
         var response = await ApiClient.PostAsJsonAsync($"Users/AcceptGdpr?authProviderId={authProviderId}", "");
         return response.IsSuccessStatusCode;
+    }
+
+    public async Task<bool> GetHasChosenNickanme(string authProviderId)
+    {
+        return await ApiClient.GetFromJsonAsync<bool>($"Users/GetHasChosenNickname?authProviderId={authProviderId}");
+    }
+
+    public async Task<string> GetUsername(string authProviderId)
+    {
+        return await ApiClient.GetStringAsync($"Users/GetNickname?authProviderId={authProviderId}");
+    }
+
+    public async Task<HttpStatusCode> UpdateNickname(string authProviderId, string newNickname)
+    {
+        var response = await ApiClient.PostAsJsonAsync($"Users/UpdateNickname?authProviderId={authProviderId}&nickname={newNickname}", "");
+        return response.StatusCode;
+    }
+
+    public async Task<Dictionary<string, string>> GetUsernamesMapping(IEnumerable<string> userIds)
+    {
+        var response = await ApiClient.PostAsJsonAsync($"Users/GetUsernamesMapping", userIds);
+        return await response.Content.ReadFromJsonAsync<Dictionary<string, string>>() ?? new Dictionary<string, string>();
     }
 
     public async Task<IEnumerable<Medication>> GetMedicationsByUserId(string userId)

@@ -5,9 +5,7 @@
 @inject NavigationManager Navigation
 @inject CacheService CacheService
 
-@inherits MoodProject.App.Shared.Helpers.IdentityHelper
-
-@attribute [Authorize]
+@inherits BasePage
 
 <h1>Réglement général de protection des données</h1>
 <div class="gdpr">
@@ -60,14 +58,15 @@
 
     protected override async Task OnInitializedAsync()
     {
-        HasAcceptedGdpr = await CacheService.GetHasAcceptedGdpr(await GetUserId());
+        await base.OnInitializedAsync();
+        HasAcceptedGdpr = await CacheService.GetHasAcceptedGdpr(await IdentityService.GetUserId());
     }
 
     private async Task AcceptGdpr(EditContext editContext)
     {
-        var gdprAcceptOperation = await UsersService.AcceptGdpr(await GetUserId());
-        await CacheService.UpdateHasAcceptedGdpr(gdprAcceptOperation);
-        if (gdprAcceptOperation)
+        var gdprAcceptOperation = await UsersService.AcceptGdpr(await IdentityService.GetUserId());
+        await CacheService.UpdateHasAcceptedGdpr(gdprAcceptOperation.Content);
+        if (gdprAcceptOperation.Content)
         {
             Navigation.NavigateTo("/profile", true);
         }
