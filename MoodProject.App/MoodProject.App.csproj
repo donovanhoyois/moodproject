@@ -39,4 +39,10 @@
     <None Include="wwwroot\js\CircleProgress.js" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="wwwroot\img\logo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

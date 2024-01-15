@@ -45,5 +45,10 @@
             await CacheService.GetApiToken(await IdentityService.GetUserId(), true);
             Navigation.NavigateTo(!hasAcceptedGdpr.Content ? "/gdpr" : "/profile");
         }
+
+        if (Action.Equals("logged-out"))
+        {
+            Navigation.NavigateTo("/");
+        }
     }
 }

@@ -1,11 +1,12 @@
 .navbar-toggler {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: #004070;
 }
 
 .nav-scrollable {
     display: flex;
     flex-flow: column;
     justify-content: space-between;
+    background-color: #003357FF;
 }
 .collapse {
     display: none;
@@ -13,11 +14,21 @@
 
 .top-row {
     height: 3.5rem;
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgba(247,247,247,0.96);
 }
 
 .navbar-brand {
     font-size: 1.1rem;
+    color: #000;
+    font-family: "Trebuchet MS", serif;
+}
+.navbar-brand:hover{
+    color: #003357FF;
+    transition-duration: 3s;
+}
+.logo:hover{
+    filter: hue-rotate(360deg);
+    transition-duration: 4s;
 }
 
 .oi {
@@ -41,7 +52,7 @@
     }
 
     .nav-item ::deep a {
-        color: #d7d7d7;
+        color: #fff;
         border-radius: 4px;
         height: 3rem;
         display: flex;
@@ -60,8 +71,10 @@
 }
 
 .version{
+    position: relative;
     width: 100%;
-    background-color: #e0e0e0;
+    background-color: #406681;
+    color: white;
     bottom: 0;
 }
 .version p{
@@ -69,7 +82,7 @@
     margin: 0;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 640px) {
     .navbar-toggler {
         display: none;
     }
@@ -83,11 +96,5 @@
         /* Allow sidebar to scroll for tall menus */
         height: calc(100vh - 3.5rem);
         overflow-y: auto;
-    }
-}
-
-@media (min-width: 640px){
-    .nav-scrollable{
-        
     }
 }
