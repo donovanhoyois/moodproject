@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MoodProject.Api.Configuration;
 using MoodProject.Core.Models;
 using MoodProject.Core.Models.Notifications;
 
@@ -6,6 +7,7 @@ namespace MoodProject.Api;
 
 public class MoodProjectContext : DbContext
 {
+    private DatabaseConfiguration Config { get; init; }
     public DbSet<SymptomType> SymptomTypes { get; set; }
     public DbSet<Symptom> Symptoms { get; set; }
     public DbSet<FactorValue> FactorValues { get; set; }
@@ -20,20 +22,14 @@ public class MoodProjectContext : DbContext
     public DbSet<Resource> Resources { get; set; }
     public DbSet<ResourceFile> ResourceFiles { get; set; }
 
-    public MoodProjectContext()
+    public MoodProjectContext(DatabaseConfiguration configuration)
     {
-        
+        Config = configuration;
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        /* old mysql
-        var connectionString = "Server=localhost; User ID=root; Password=; Database=moodproject";
-        optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
-        */
-        const string connectionString ="Host=flora.db.elephantsql.com;Database=einxmlgw;Username=einxmlgw;Password=l-zqSmHY366YOxf_iZTy3SipGL9rmjkp;Include Error Detail=true";
-        optionsBuilder.UseNpgsql(connectionString);
-
+        optionsBuilder.UseNpgsql(Config.ConnectionString);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

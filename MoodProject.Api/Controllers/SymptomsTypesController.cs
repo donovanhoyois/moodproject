@@ -11,7 +11,7 @@ namespace MoodProject.Api.Controllers;
 [Authorize]
 public class SymptomsTypesController
 {
-    private MoodProjectContext DbContext;
+    private readonly MoodProjectContext DbContext;
 
     public SymptomsTypesController(MoodProjectContext dbContext)
     {
@@ -21,22 +21,15 @@ public class SymptomsTypesController
     [HttpGet, ActionName("GetAll")]
     public IEnumerable<SymptomType> GetSymptomsTypes()
     {
-        using (var context = new MoodProjectContext())
-        {
-            var types = context.SymptomTypes.ToList();
-            return types;
-        }
+        return DbContext.SymptomTypes.ToList();
     }
 
     [HttpGet, ActionName("Add")]
     public IResult AddSymptomType(string name)
     {
-        using (var context = new MoodProjectContext())
-        {
-            var symptomType = new SymptomType(0, name);
-            context.SymptomTypes.Add(symptomType);
-            context.SaveChanges();
-        }
+        var symptomType = new SymptomType(0, name);
+        DbContext.SymptomTypes.Add(symptomType);
+        DbContext.SaveChanges();
         return Results.Ok();
     }
 }
