@@ -44,10 +44,8 @@ public class NotificationClient : IAsyncDisposable
                     options.AccessTokenProvider = () => Task.FromResult<string?>(token);
                 })
             .Build();
-
-        // TODO: Use SignalR hub to receive notifications
         
-        await HubConnection.StartAsync();
+        //await HubConnection.StartAsync();
     }
     
     public async ValueTask DisposeAsync()

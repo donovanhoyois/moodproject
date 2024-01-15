@@ -41,7 +41,6 @@
         if (Action.Equals("login-callback") && await IdentityService.IsAuthenticated())
         {
             var hasAcceptedGdpr = await UsersService.GetGdprConsent(await IdentityService.GetUserId());
-            Console.WriteLine("refreshing");
             await CacheService.GetApiToken(await IdentityService.GetUserId(), true);
             Navigation.NavigateTo(!hasAcceptedGdpr.Content ? "/gdpr" : "/profile");
         }
