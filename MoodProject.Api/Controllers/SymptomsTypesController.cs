@@ -8,7 +8,7 @@ namespace MoodProject.Api.Controllers;
 [ApiController]
 [Route("api/[controller]/[action]/")]
 [EnableCors()]
-//[Authorize]
+[Authorize]
 public class SymptomsTypesController
 {
     private readonly MoodProjectContext DbContext;
