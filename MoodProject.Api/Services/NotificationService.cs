@@ -1,15 +1,16 @@
-﻿using MoodProject.Core.Models;
+﻿using MoodProject.Api.Configuration;
+using MoodProject.Core.Models;
 using MoodProject.Core.Models.Notifications;
 
 namespace MoodProject.Api.Services;
 
 public class NotificationService
 {
-    private readonly MoodProjectContext DbContext;
+    private readonly DatabaseConfiguration DatabaseConfiguration;
     
-    public NotificationService(MoodProjectContext dbContext)
+    public NotificationService(DatabaseConfiguration databaseConfiguration)
     {
-        DbContext = dbContext;
+        DatabaseConfiguration = databaseConfiguration;
     }
     
     /// <summary>
@@ -20,24 +21,26 @@ public class NotificationService
     /// <returns>A <see cref="Queue{T}"/> of <see cref="MedicationNotification"/> containing the notifications to sent in the next hour.</returns>
     public Queue<MedicationNotification> GetMedicationsNotificationsNextHour()
     {
-        var serverUtcOffset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow).Hours;
+        using var dbContext = new MoodProjectContext(DatabaseConfiguration);
+        
+        var serverUtcOffset = TimeZoneInfo.Local.GetUtcOffset(DateTime.Now).Hours;
 
         var minTimeSpan = new TimeSpan(DateTime.Now.Ticks);
-        var maxTimeSpan = new TimeSpan(DateTime.Now.Ticks) + TimeSpan.FromHours(12);
+        var maxTimeSpan = new TimeSpan(DateTime.Now.Ticks) + TimeSpan.FromHours(1);
 
         // Retrieving day usages from database for the next hour
-        var dayUsages = RetrieveDayUsagesBetween(minTimeSpan, maxTimeSpan, serverUtcOffset);
+        var dayUsages = RetrieveDayUsagesBetween(dbContext, minTimeSpan, maxTimeSpan, serverUtcOffset);
 
         // Apply timestamp to retrieved day usages to send it back to notifier service
-        var medicationNotifications = CreateNotificationWithTimestamp(dayUsages, minTimeSpan, serverUtcOffset);
+        var medicationNotifications = CreateNotificationWithTimestamp(dbContext, dayUsages, minTimeSpan, serverUtcOffset);
 
         return new Queue<MedicationNotification>(medicationNotifications.FindAll(notification => notification.NotificationSubscription != null).OrderBy(medNotification => medNotification.Time));
     }
 
-    private List<MedicationDayUsage> RetrieveDayUsagesBetween(TimeSpan minTimeSpan, TimeSpan maxTimeSpan, int serverUtcOffset)
+    private List<MedicationDayUsage> RetrieveDayUsagesBetween(MoodProjectContext dbContext, TimeSpan minTimeSpan, TimeSpan maxTimeSpan, int serverUtcOffset)
     {
         var dayUsages = new List<MedicationDayUsage>();
-        foreach (var d in DbContext.Medications.Where(m => m.AreNotificationsEnabled).SelectMany(m => m.DayUsages).ToList())
+        foreach (var d in dbContext.Medications.Where(m => m.AreNotificationsEnabled).SelectMany(m => m.DayUsages).ToList())
         {
             var dayTimespan = new TimeSpan(minTimeSpan.Days, d.TimeOfTheDay.Hour + (d.UtcOffset - serverUtcOffset), d.TimeOfTheDay.Minute, d.TimeOfTheDay.Minute);
             var nextDayTimespan = new TimeSpan(minTimeSpan.Days + 1, d.TimeOfTheDay.Hour + (d.UtcOffset - serverUtcOffset), d.TimeOfTheDay.Minute, d.TimeOfTheDay.Minute);
@@ -50,7 +53,7 @@ public class NotificationService
         return dayUsages;
     }
     
-    private List<MedicationNotification> CreateNotificationWithTimestamp(List<MedicationDayUsage> dayUsages, TimeSpan minTimeSpan, int serverUtcOffset)
+    private List<MedicationNotification> CreateNotificationWithTimestamp(MoodProjectContext dbContext, List<MedicationDayUsage> dayUsages, TimeSpan minTimeSpan, int serverUtcOffset)
     {
         var medicationNotifications = new List<MedicationNotification>();
         foreach (var dayUsage in dayUsages)
@@ -60,8 +63,8 @@ public class NotificationService
                 ? new TimeSpan(minTimeSpan.Days + 1, dayUsage.TimeOfTheDay.Hour + (serverUtcOffset - dayUsage.UtcOffset), dayUsage.TimeOfTheDay.Minute,
                     dayUsage.TimeOfTheDay.Second)
                 : todayTimespan;
-            var correspondingMedication = DbContext.Medications.First(med => med.Id.Equals(dayUsage.MedicationId));
-            var userNotificationSubscription = DbContext.NotificationSubscriptions.FirstOrDefault(subscription => subscription.UserId.Equals(correspondingMedication.UserId));
+            var correspondingMedication = dbContext.Medications.First(med => med.Id.Equals(dayUsage.MedicationId));
+            var userNotificationSubscription = dbContext.NotificationSubscriptions.FirstOrDefault(subscription => subscription.UserId.Equals(correspondingMedication.UserId));
             medicationNotifications.Add(
                 new MedicationNotification(
                     "Rappel de médicament",

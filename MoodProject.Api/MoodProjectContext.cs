@@ -34,34 +34,6 @@ public class MoodProjectContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        /*
-
-        // Symptom <-> SymptomType
-        modelBuilder.Entity<Symptom>()
-            .HasOne(symptom => symptom.Type)
-            .WithMany()
-            .HasForeignKey(symptom => symptom.TypeId)
-            .IsRequired();
-
-        // Symptom <-> FactorValue
-        modelBuilder.Entity<Symptom>()
-            .HasMany(symptom => symptom.ValuesHistory)
-            .WithOne()
-            .HasForeignKey(value => value.SymptomId)
-            .IsRequired();
-        */
-        /*
-        modelBuilder.Entity<FactorValue>()
-            .HasOne(value => value.Symptom)
-            .WithMany(symptom => symptom.HarmfulnessFactorValuesHistory)
-            .OnDelete(DeleteBehavior.NoAction);
         
-        modelBuilder.Entity<FactorValue>()
-            .HasOne(value => value.Symptom)
-            .WithMany(symptom => symptom.PresenceFactorValuesHistory)
-            .OnDelete(DeleteBehavior.NoAction);
-        */
-        
-        //base.OnModelCreating(modelBuilder);
     }
 }
