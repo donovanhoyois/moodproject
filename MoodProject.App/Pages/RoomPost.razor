@@ -94,7 +94,7 @@ else if (PostOperation.Status is OperationResultType.Ok)
             </div>
             <div class="form-check">
                 <InputCheckbox @bind-Value="@FormComment.MandatoryBoxIsChecked" class="form-check-input" />
-                <label class="form-check-label">J'ai lu le réglement des espaces de discussions</label>
+                <label class="form-check-label" for="exampleCheck1">J'ai lu le <a href="/rooms/rules">réglement des espaces de discussions</a></label>
             </div>
             @if (NewCommentOperation.Status is OperationResultType.Ok)
             {

@@ -45,7 +45,7 @@
         <EditForm Model="@IsBoxChecked" OnSubmit="AcceptGdpr">
             <div class="form-check">
                 <InputCheckbox @bind-Value="@IsBoxChecked" class="form-check-input"/>
-                <label class="form-check-label" for="gdprCheck">J'ai lu le <a href="/rooms/rules">réglement des espaces de discussions</a></label>
+                <label class="form-check-label" for="gdprCheck">J'ai lu et j'accepte le réglement de protection des données</label>
             </div>
             <button type="submit" id="gdprCheck" class="btn btn-primary" disabled="@(!IsBoxChecked)">Accepter</button>
         </EditForm>
